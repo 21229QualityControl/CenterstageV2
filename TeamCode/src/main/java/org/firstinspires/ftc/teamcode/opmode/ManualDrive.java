@@ -8,7 +8,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.Hang;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Memory;
+import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.util.ActionScheduler;
 import org.firstinspires.ftc.teamcode.util.GamePadController;
 import org.firstinspires.ftc.teamcode.util.SmartGameTimer;
@@ -24,6 +28,10 @@ public class ManualDrive extends LinearOpMode {
    private GamePadController g1, g2;
    private MecanumDrive drive;
    private ActionScheduler sched;
+   private Intake intake;
+   private Outtake outtake;
+   private Hang hang;
+   private Plane plane;
 
    @Override
    public void runOpMode() throws InterruptedException {
@@ -37,6 +45,10 @@ public class ManualDrive extends LinearOpMode {
       g2.update();
       sched = new ActionScheduler();
       drive = new MecanumDrive(hardwareMap, Memory.LAST_POSE);
+      intake = new Intake(hardwareMap);
+      outtake = new Outtake(hardwareMap);
+      hang = new Hang(hardwareMap);
+      plane = new Plane(hardwareMap);
 
       if (Memory.RAN_AUTO) {
          smartGameTimer = new SmartGameTimer(true);
@@ -72,6 +84,7 @@ public class ManualDrive extends LinearOpMode {
 
          drive.updatePoseEstimate();
          sched.update();
+         outtake.update();
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
          telemetry.update();

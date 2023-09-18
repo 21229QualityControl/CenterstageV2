@@ -6,10 +6,14 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Memory;
+import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 
 public abstract class AutoBase extends LinearOpMode {
     protected MecanumDrive drive;
+    protected Outtake outtake;
+    protected Intake intake;
 
     final public void runOpMode() throws InterruptedException {
         telemetry.addLine("Initializing... Please wait");
@@ -20,6 +24,8 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Init subsystems
         this.drive = new MecanumDrive(hardwareMap, Memory.LAST_POSE);
+        this.intake = new Intake(hardwareMap);
+        this.outtake = new Outtake(hardwareMap);
 
         onInit();
 

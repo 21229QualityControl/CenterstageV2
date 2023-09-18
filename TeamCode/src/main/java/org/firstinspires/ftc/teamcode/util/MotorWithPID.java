@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.util;
 
 
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -78,6 +81,47 @@ public class MotorWithPID {
     public void setTargetPosition(int position) {
         this.targetPosition = position;
         this.pidfController.setTargetPosition(position - internalOffset); // TODO: Verify sign
+    }
+
+    private class TargetPositionAction implements Action {
+        int position;
+        boolean blocking;
+
+        public TargetPositionAction(int position, boolean blocking) {
+            this.position = position;
+            this.blocking = blocking;
+        }
+        @Override
+        public void preview(Canvas c) {
+            setTargetPosition(position);
+        }
+
+        @Override
+        public boolean run(TelemetryPacket packet) {
+            if (blocking) {
+                return isBusy();
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Creates an action that will call setTargetPosition with the provided position
+     *
+     * @param position the desired encoder target position
+     */
+    public Action setTargetPositionAction(int position) {
+        return new TargetPositionAction(position, false);
+    }
+
+    /**
+     * Creates an action that will call setTargetPosition with the provided position and
+     * wait for the position to be reached
+     *
+     * @param position the desired encoder target position
+     */
+    public Action setTargetPositionActionBlocking(int position) {
+        return new TargetPositionAction(position, true);
     }
 
     /**
