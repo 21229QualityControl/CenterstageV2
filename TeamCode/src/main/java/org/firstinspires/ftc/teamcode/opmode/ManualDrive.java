@@ -54,6 +54,7 @@ public class ManualDrive extends LinearOpMode {
          smartGameTimer = new SmartGameTimer(true);
       } else { // No auto memory, pull in slides
          smartGameTimer = new SmartGameTimer(false);
+         outtake.prepTeleop();
       }
 
       // Ready!
@@ -69,10 +70,11 @@ public class ManualDrive extends LinearOpMode {
 
          // Finish pulling in slides
          if (!smartGameTimer.isNominal()) {
-
+            outtake.finishPrepTeleop();
          }
 
          // Init opmodes
+         outtake.initializeTeleop();
       }
 
       // Main loop
@@ -103,5 +105,30 @@ public class ManualDrive extends LinearOpMode {
       if (g1.rightBumper()) input_turn -= SLOW_TURN_SPEED;
 
       drive.setDrivePowers(new PoseVelocity2d(new Vector2d(input_x, input_y), input_turn));
+   }
+
+   private void subsystemControls() {
+      // Intake controls
+      if (g1.a() && !intake.isIntakeOn()) {
+         sched.queueAction(intake.intakeOn());
+      }
+      if (!g1.a() && intake.isIntakeOn()) {
+         sched.queueAction(intake.intakeOff());
+      }
+
+      // Outtake controls
+      if (g1.yOnce()) {
+         sched.queueAction(outtake.latchClosed());
+         sched.queueAction(outtake.wristScoring());
+         sched.queueAction(outtake.extendOuttakeBlocking());
+      }
+      if (g1.xOnce()) {
+         sched.queueAction(outtake.latchScoring());
+      }
+      if (g1.bOnce()) {
+         sched.queueAction(outtake.latchOpen());
+         sched.queueAction(outtake.wristStored());
+         sched.queueAction(outtake.retractOuttake());
+      }
    }
 }
