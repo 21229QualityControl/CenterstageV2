@@ -15,6 +15,9 @@ public class ActionScheduler {
    final Canvas canvas = new Canvas();
 
    public void queueAction(Action action) {
+      if (actions.peek() == null) {
+         action.preview(canvas);
+      }
       actions.add(action);
    }
 
@@ -31,7 +34,9 @@ public class ActionScheduler {
 
       if (!running) {
          actions.remove();
-         actions.peek().preview(canvas);
+         if (actions.peek() != null) {
+            actions.peek().preview(canvas);
+         }
       }
    }
 }

@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 
 @Config
 public class Intake {
-   public static double INTAKE_POWER = 0.5;
+   public static double INTAKE_POWER = 1.0;
 
    final DcMotorEx intakeMotor;
 

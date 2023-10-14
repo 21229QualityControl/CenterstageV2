@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 
 @Config
 public final class TwoDeadWheelLocalizer implements Localizer {
@@ -34,8 +35,8 @@ public final class TwoDeadWheelLocalizer implements Localizer {
     private final double inPerTick;
 
     public TwoDeadWheelLocalizer(HardwareMap hardwareMap, IMU imu, double inPerTick) {
-        par = new RawEncoder(hardwareMap.get(DcMotorEx.class, "par"));
-        perp = new RawEncoder(hardwareMap.get(DcMotorEx.class, "perp"));
+        par = new RawEncoder(HardwareCreator.createMotor(hardwareMap,"par"));
+        perp = new RawEncoder(HardwareCreator.createMotor(hardwareMap, "perp"));
         this.imu = imu;
 
         lastParPos = par.getPositionAndVelocity().position;

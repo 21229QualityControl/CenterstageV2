@@ -13,19 +13,20 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Outtake {
-   public static PIDCoefficients outtakePID;
+   public static PIDCoefficients outtakePID = new PIDCoefficients(0.03, 0, 0.0004);
    public static int OUTTAKE_EXTENDED = 1521;
    public static double LATCH_SCORING = 0.976;
    public static double LATCH_OPEN = 0.823;
    public static double LATCH_CLOSED = 1;
    public static double WRIST_STORED = 0.27;
-   public static double WRIST_SCORING = 0.5;
+   public static double WRIST_SCORING = 0.558;
    final MotorWithPID slide;
    final Servo latch;
    final Servo wrist;
 
    public Outtake(HardwareMap hardwareMap) {
       this.slide = new MotorWithPID(HardwareCreator.createMotor(hardwareMap, "outtakeSlide"), outtakePID);
+      this.slide.setMaxPower(1.0);
       this.slide.getMotor().setDirection(DcMotorSimple.Direction.REVERSE);
       this.latch = HardwareCreator.createServo(hardwareMap, "outtakeLatch");
       this.wrist = HardwareCreator.createServo(hardwareMap, "outtakeWrist");
@@ -42,7 +43,7 @@ public class Outtake {
    public void initializeTeleop() {
       this.slide.setTargetPosition(0);
       this.wrist.setPosition(WRIST_STORED);
-      this.latch.setPosition(LATCH_SCORING);
+      this.latch.setPosition(LATCH_OPEN);
    }
 
    public void update() {

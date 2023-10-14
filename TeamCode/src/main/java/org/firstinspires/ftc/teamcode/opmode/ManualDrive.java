@@ -2,7 +2,10 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -83,6 +86,7 @@ public class ManualDrive extends LinearOpMode {
          g2.update();
 
          move();
+         subsystemControls();
 
          drive.updatePoseEstimate();
          sched.update();
@@ -118,7 +122,7 @@ public class ManualDrive extends LinearOpMode {
 
       // Outtake controls
       if (g1.yOnce()) {
-         sched.queueAction(outtake.latchClosed());
+         sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.3)));
          sched.queueAction(outtake.wristScoring());
          sched.queueAction(outtake.extendOuttakeBlocking());
       }
