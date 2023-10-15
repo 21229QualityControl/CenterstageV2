@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
@@ -122,9 +123,11 @@ public class ManualDrive extends LinearOpMode {
 
       // Outtake controls
       if (g1.yOnce()) {
-         sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.3)));
-         sched.queueAction(outtake.wristScoring());
-         sched.queueAction(outtake.extendOuttakeBlocking());
+         sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.1)));
+         sched.queueAction(new ParallelAction(
+                 new SequentialAction(new SleepAction(0.2), outtake.wristScoring()),
+                 outtake.extendOuttakeBlocking()
+         ));
       }
       if (g1.xOnce()) {
          sched.queueAction(outtake.latchScoring());

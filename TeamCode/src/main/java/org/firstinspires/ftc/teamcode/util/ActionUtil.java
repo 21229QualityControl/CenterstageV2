@@ -15,13 +15,10 @@ public class ActionUtil {
          this.power = power;
          this.motor = motor;
       }
-      @Override
-      public void preview(Canvas c) {
-         motor.setPower(power);
-      }
 
       @Override
       public boolean run(TelemetryPacket packet) {
+         motor.setPower(power);
          return false;
       }
    }
@@ -34,13 +31,10 @@ public class ActionUtil {
          this.servo = servo;
          this.position = position;
       }
-      @Override
-      public void preview(Canvas c) {
-         servo.setPosition(position);
-      }
 
       @Override
       public boolean run(TelemetryPacket packet) {
+         servo.setPosition(position);
          return false;
       }
    }

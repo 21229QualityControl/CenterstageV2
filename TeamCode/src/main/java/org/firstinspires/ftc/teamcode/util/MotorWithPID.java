@@ -91,13 +91,10 @@ public class MotorWithPID {
             this.position = position;
             this.blocking = blocking;
         }
-        @Override
-        public void preview(Canvas c) {
-            setTargetPosition(position);
-        }
 
         @Override
         public boolean run(TelemetryPacket packet) {
+            setTargetPosition(position);
             if (blocking) {
                 return isBusy();
             }
