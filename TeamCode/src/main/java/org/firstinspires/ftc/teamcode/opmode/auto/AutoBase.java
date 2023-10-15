@@ -16,6 +16,7 @@ public abstract class AutoBase extends LinearOpMode {
     protected Intake intake;
 
     final public void update() {
+        telemetry.addData("Time left", 30 - getRuntime());
         outtake.update();
     }
 
@@ -30,6 +31,9 @@ public abstract class AutoBase extends LinearOpMode {
         this.drive = new MecanumDrive(hardwareMap, Memory.LAST_POSE);
         this.intake = new Intake(hardwareMap);
         this.outtake = new Outtake(hardwareMap);
+
+        outtake.initialize();
+        intake.initialize();
 
         onInit();
 

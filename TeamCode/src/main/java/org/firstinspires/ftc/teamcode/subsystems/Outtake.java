@@ -40,7 +40,7 @@ public class Outtake {
       this.slide.getMotor().setPower(0);
    }
 
-   public void initializeTeleop() {
+   public void initialize() {
       this.slide.setTargetPosition(0);
       this.wrist.setPosition(WRIST_STORED);
       this.latch.setPosition(LATCH_OPEN);
