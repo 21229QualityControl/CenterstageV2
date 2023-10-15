@@ -92,6 +92,7 @@ public class ManualDrive extends LinearOpMode {
          drive.updatePoseEstimate();
          sched.update();
          outtake.update();
+         hang.update();
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
          telemetry.update();

@@ -15,6 +15,10 @@ public abstract class AutoBase extends LinearOpMode {
     protected Outtake outtake;
     protected Intake intake;
 
+    final public void update() {
+        outtake.update();
+    }
+
     final public void runOpMode() throws InterruptedException {
         telemetry.addLine("Initializing... Please wait");
         telemetry.update();
