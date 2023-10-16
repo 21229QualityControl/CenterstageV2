@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Outtake {
-   public static PIDCoefficients outtakePID = new PIDCoefficients(0.03, 0, 0.0004);
+   public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0, 0.0004);
    public static int OUTTAKE_EXTENDED = 1521;
    public static double LATCH_SCORING = 0.976;
    public static double LATCH_OPEN = 0.9;

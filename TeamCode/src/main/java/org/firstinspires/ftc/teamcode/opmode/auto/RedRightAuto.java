@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Config
 @Autonomous(name = "Red Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
-class RedRightAuto extends AutoBase {
+public class RedRightAuto extends AutoBase {
    public static Pose2d pixel;
 
    @Override
@@ -22,9 +22,15 @@ class RedRightAuto extends AutoBase {
 
    @Override
    protected void onRun() {
-      Actions.runBlocking(
+      deliverSpike();
+      scorePreload();
+   }
 
+   private void deliverSpike() {
 
-      );
+   }
+
+   private void scorePreload() {
+
    }
 }

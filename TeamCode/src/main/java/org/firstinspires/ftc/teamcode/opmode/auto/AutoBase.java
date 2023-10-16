@@ -9,11 +9,15 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
 public abstract class AutoBase extends LinearOpMode {
     protected MecanumDrive drive;
     protected Outtake outtake;
     protected Intake intake;
+    protected Vision vision;
+
+    public static int SPIKE = -1;
 
     final public void update() {
         telemetry.addData("Time left", 30 - getRuntime());
@@ -31,6 +35,7 @@ public abstract class AutoBase extends LinearOpMode {
         this.drive = new MecanumDrive(hardwareMap, Memory.LAST_POSE);
         this.intake = new Intake(hardwareMap);
         this.outtake = new Outtake(hardwareMap);
+        this.vision = new Vision(hardwareMap);
 
         outtake.initialize();
         intake.initialize();
@@ -38,11 +43,11 @@ public abstract class AutoBase extends LinearOpMode {
         onInit();
 
         while (opModeInInit()) {
-            // Update vision
+            SPIKE = vision.objectPosition();
 
             printDescription();
-            // Print vision status
 
+            telemetry.addData("Spike Position", SPIKE);
             telemetry.update();
             idle();
         }
@@ -50,7 +55,6 @@ public abstract class AutoBase extends LinearOpMode {
         // Auto start
         resetRuntime(); // reset runtime timer
         Memory.saveStringToFile(String.valueOf(System.currentTimeMillis()), Memory.SAVED_TIME_FILE_NAME); // save auto time for persistence
-        // TODO: Stop streaming vision
 
         if (isStopRequested()) return; // exit if stopped
 

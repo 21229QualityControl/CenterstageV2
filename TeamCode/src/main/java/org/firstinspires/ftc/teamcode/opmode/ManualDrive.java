@@ -113,11 +113,12 @@ public class ManualDrive extends LinearOpMode {
 
    private void subsystemControls() {
       // Intake controls
-      if (g1.a() && !intake.isIntakeOn()) {
-         sched.queueAction(intake.intakeOn());
-      }
-      if (!g1.a() && intake.isIntakeOn()) {
-         sched.queueAction(intake.intakeOff());
+      if (g1.aOnce()) {
+         if (intake.isIntakeOn()) {
+            sched.queueAction(intake.intakeOff());
+         } else {
+            sched.queueAction(intake.intakeOn());
+         }
       }
 
       // Outtake controls
@@ -129,12 +130,13 @@ public class ManualDrive extends LinearOpMode {
          ));
       }
       if (g1.xOnce()) {
-         sched.queueAction(outtake.latchScoring());
-      }
-      if (g1.bOnce()) {
-         sched.queueAction(outtake.latchOpen());
-         sched.queueAction(outtake.wristStored());
-         sched.queueAction(outtake.retractOuttake());
+         sched.queueAction(new SequentialAction(
+                 outtake.latchScoring(),
+                 new SleepAction(0.4),
+                 outtake.latchOpen(),
+                 outtake.wristStored(),
+                 outtake.retractOuttake()
+         ));
       }
    }
 }
