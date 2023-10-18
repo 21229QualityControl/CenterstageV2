@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
@@ -76,7 +78,7 @@ public class ManualDrive extends LinearOpMode {
          }
 
          // Init opmodes
-         outtake.initialize();
+         outtake.initializeTeleop();
       }
 
       // Main loop
@@ -114,26 +116,38 @@ public class ManualDrive extends LinearOpMode {
    private void subsystemControls() {
       // Intake controls
       if (g1.aOnce()) {
-         if (intake.isIntakeOn()) {
+         if (intake.intakeState == Intake.IntakeState.On) {
             sched.queueAction(intake.intakeOff());
+            sched.queueAction(outtake.latchClosed());
          } else {
             sched.queueAction(intake.intakeOn());
+            sched.queueAction(outtake.latchOpen());
          }
+      }
+      if (g1.b()) {
+         if (intake.intakeState == Intake.IntakeState.On) {
+            sched.queueAction(outtake.latchClosed());
+         }
+         sched.queueAction(intake.intakeReverse());
+      }
+      if (!g1.b() && intake.intakeState == Intake.IntakeState.Reversing) {
+         sched.queueAction(intake.intakeOff());
       }
 
       // Outtake controls
       if (g1.yOnce()) {
+         sched.queueAction(intake.intakeOff());
          sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.1)));
          sched.queueAction(new ParallelAction(
-                 new SequentialAction(new SleepAction(0.2), outtake.wristScoring()),
+                 new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
                  outtake.extendOuttakeBlocking()
          ));
       }
       if (g1.xOnce()) {
          sched.queueAction(new SequentialAction(
                  outtake.latchScoring(),
-                 new SleepAction(0.4),
-                 outtake.latchOpen(),
+                 new SleepAction(1),
+                 outtake.latchClosed(),
                  outtake.wristStored(),
                  outtake.retractOuttake()
          ));

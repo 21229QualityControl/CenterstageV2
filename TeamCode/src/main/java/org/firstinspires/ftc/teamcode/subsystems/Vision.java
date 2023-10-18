@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Config
@@ -43,5 +44,15 @@ public class Vision {
         else {
             return 0;
         }
+    }
+
+    public void displayTelemetry(Telemetry telemetry) {
+        double lDistance = leftSensor.getDistance(DistanceUnit.INCH);
+        double mDistance = middleSensor.getDistance(DistanceUnit.INCH);
+        double rDistance = rightSensor.getDistance(DistanceUnit.INCH);
+
+        telemetry.addData("l sensor", lDistance);
+        telemetry.addData("m sensor", mDistance);
+        telemetry.addData("r sensor", rDistance);
     }
 }

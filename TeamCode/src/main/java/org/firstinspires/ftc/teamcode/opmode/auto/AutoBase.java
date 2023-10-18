@@ -44,6 +44,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         while (opModeInInit()) {
             SPIKE = vision.objectPosition();
+            vision.displayTelemetry(telemetry);
 
             printDescription();
 

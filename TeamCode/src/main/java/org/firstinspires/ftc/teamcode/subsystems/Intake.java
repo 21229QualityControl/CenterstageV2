@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -23,20 +25,50 @@ public class Intake {
          this.autoLatch = HardwareCreator.createServo(hardwareMap, "autoLatch");
    }
 
+   public enum IntakeState {
+      Off,
+      Reversing,
+      On
+   }
+   public IntakeState intakeState;
+
    public void initialize() {
       autoLatch.setPosition(AUTO_LATCH_DOWN);
    }
 
-   public boolean isIntakeOn() {
-      return intakeMotor.getPower() >= INTAKE_POWER;
+   public class IntakeStateAction implements Action {
+      IntakeState newState;
+
+      public IntakeStateAction(IntakeState newState) {
+         this.newState = newState;
+      }
+
+      @Override
+      public boolean run(TelemetryPacket packet) {
+         intakeState = newState;
+         return false;
+      }
    }
 
    public Action intakeOn() {
-      return new ActionUtil.DcMotorExPowerAction(intakeMotor, INTAKE_POWER);
+      return new SequentialAction(
+              new ActionUtil.DcMotorExPowerAction(intakeMotor, INTAKE_POWER),
+              new IntakeStateAction(IntakeState.On)
+      );
+   }
+
+   public Action intakeReverse() {
+      return new SequentialAction(
+              new ActionUtil.DcMotorExPowerAction(intakeMotor, -INTAKE_POWER),
+              new IntakeStateAction(IntakeState.Reversing)
+      );
    }
 
    public Action intakeOff() {
-      return new ActionUtil.DcMotorExPowerAction(intakeMotor, 0.0);
+      return new SequentialAction(
+              new ActionUtil.DcMotorExPowerAction(intakeMotor, 0.0),
+              new IntakeStateAction(IntakeState.Off)
+      );
    }
 
    public Action autoLatchOpen() {
