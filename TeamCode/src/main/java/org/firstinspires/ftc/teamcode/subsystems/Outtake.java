@@ -21,6 +21,7 @@ public class Outtake {
    public static double WRIST_STORED = 0.644;
    public static double WRIST_SCORING = 0.417;
    final MotorWithPID slide;
+   public boolean slidePIDEnabled = true;
    final Servo latch;
    final Servo wrist;
 
@@ -53,12 +54,22 @@ public class Outtake {
    }
 
    public void update() {
-      slide.update();
+      if (slidePIDEnabled) {
+         slide.update();
+      }
    }
 
    public Action extendOuttake() {
       return this.slide.setTargetPositionAction(OUTTAKE_EXTENDED);
    }
+
+   public void setSlidePower(double power) {
+      slide.getMotor().setPower(power);
+   }
+   public void lockPosition() {
+      this.slide.setTargetPosition(this.slide.getCurrentPosition());
+   }
+
    public Action extendOuttakeBlocking() {
       return this.slide.setTargetPositionActionBlocking(OUTTAKE_EXTENDED);
    }

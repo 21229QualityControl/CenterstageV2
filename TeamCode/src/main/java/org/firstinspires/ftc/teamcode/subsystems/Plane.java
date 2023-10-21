@@ -11,13 +11,17 @@ import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 
 @Config
 public class Plane {
-   public static int LATCH_SCORED;
-   public static int LATCH_CLOSED;
+   public static double LATCH_SCORED = 0.95;
+   public static double LATCH_CLOSED = 0.45;
 
    final Servo latch;
 
    public Plane(HardwareMap hardwareMap) {
          this.latch = HardwareCreator.createServo(hardwareMap, "planeLatch");
+   }
+
+   public void initialize() {
+      latch.setPosition(LATCH_CLOSED);
    }
 
    public Action latchClosed() {
