@@ -29,7 +29,7 @@ public class LocalizationTest extends LinearOpMode {
 
             telemetry.addData("x", drive.pose.position.x);
             telemetry.addData("y", drive.pose.position.y);
-            telemetry.addData("heading", Math.toDegrees(drive.pose.heading.log()));
+            telemetry.addData("heading", Math.toDegrees(Math.atan2(drive.pose.heading.real, drive.pose.heading.imag)));
             telemetry.update();
         }
     }

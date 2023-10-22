@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
 public abstract class AutoBase extends LinearOpMode {
@@ -16,6 +17,7 @@ public abstract class AutoBase extends LinearOpMode {
     protected Outtake outtake;
     protected Intake intake;
     protected Vision vision;
+    protected Plane plane;
 
     public static int SPIKE = -1;
 
@@ -36,9 +38,11 @@ public abstract class AutoBase extends LinearOpMode {
         this.intake = new Intake(hardwareMap);
         this.outtake = new Outtake(hardwareMap);
         this.vision = new Vision(hardwareMap);
+        this.plane = new Plane(hardwareMap);
 
         outtake.initialize();
         intake.initialize();
+        plane.initialize();
 
         onInit();
 
