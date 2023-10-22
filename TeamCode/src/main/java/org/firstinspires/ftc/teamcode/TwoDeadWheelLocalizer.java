@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.Twist2dDual;
 import com.acmerobotics.roadrunner.Vector2dDual;
 import com.acmerobotics.roadrunner.ftc.Encoder;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
+import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
 import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -35,10 +36,12 @@ public final class TwoDeadWheelLocalizer implements Localizer {
 
         private final double inPerTick;
 
+        private double lastRawHeadingVel, headingVelOffset;
+
         public TwoDeadWheelLocalizer(HardwareMap hardwareMap, IMU imu, double inPerTick) {
-                par = new OverflowEncoder(HardwareCreator.createMotor(hardwareMap, "leftFront"));
+                par = new OverflowEncoder(new RawEncoder(HardwareCreator.createMotor(hardwareMap, "leftFront")));
                 par.setDirection(DcMotorSimple.Direction.REVERSE);
-                perp = new OverflowEncoder(HardwareCreator.createMotor(hardwareMap, "rightFront"));
+                perp = new OverflowEncoder(new RawEncoder(HardwareCreator.createMotor(hardwareMap, "rightFront")));
                 this.imu = imu;
 
                 lastParPos = par.getPositionAndVelocity().position;
