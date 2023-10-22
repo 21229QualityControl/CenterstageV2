@@ -11,11 +11,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Config
 @Autonomous(name = "Red Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class RedRightAuto extends AutoBase {
-   public static Vector2d[] spike = {new Vector2d(-40, -36), new Vector2d(-40, -36), new Vector2d(-40, -36)};
+   public static Vector2d[] spike = {new Vector2d(9, -20), new Vector2d(9, -20), new Vector2d(9, -20)};
    // 0 = right, 1 = middle, 2 = left
-   public static Pose2d start = new Pose2d(-64, -36, Math.toRadians(-90));
-   public static Pose2d scoring = new Pose2d(-40, -56, Math.toRadians(-180));
-   public static Pose2d parking = new Pose2d(-60, -64, Math.toRadians(-90));
+   public static Pose2d start = new Pose2d(9, -40, Math.toRadians(90));
+   public static Pose2d scoring = new Pose2d(36, -27, Math.toRadians(0));
+   public static Pose2d parking = new Pose2d(45, -40, Math.toRadians(0));
 
    @Override
    protected Pose2d getStartPose() {
@@ -38,7 +38,7 @@ public class RedRightAuto extends AutoBase {
       Actions.runBlocking(
               new SequentialAction(
                       drive.actionBuilder(getStartPose())
-                              .lineToX(spike[SPIKE].x)
+                              .strafeTo(spike[SPIKE])
                               .build(),
                       intake.autoLatchOpen()
               )

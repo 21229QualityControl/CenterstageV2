@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 @Config
 public final class TwoDeadWheelLocalizer implements Localizer {
     public static class Params {
-        public double parYTicks = 0.0; // y position of the parallel encoder (in tick units)
-        public double perpXTicks = 0.0; // x position of the perpendicular encoder (in tick units)
+        public double parYTicks = -1858; // y position of the parallel encoder (in tick units)
+        public double perpXTicks = -2322; // x position of the perpendicular encoder (in tick units)
     }
 
     public static Params PARAMS = new Params();

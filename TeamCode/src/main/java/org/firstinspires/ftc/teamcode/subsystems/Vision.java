@@ -28,7 +28,7 @@ public class Vision {
         double rDistance = rightSensor.getDistance(DistanceUnit.INCH);
 
         if (lDistance > 300 & mDistance > 300 & rDistance > 300) {
-            return -1;
+            return 1;
         }
         else if (lDistance > mDistance) {
             if (mDistance > rDistance) {
