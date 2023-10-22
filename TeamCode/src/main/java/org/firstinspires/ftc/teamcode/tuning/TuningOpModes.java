@@ -34,7 +34,8 @@ public final class TuningOpModes {
     public static final String GROUP = "quickstart";
     public static final boolean DISABLED = false;
 
-    private TuningOpModes() {}
+    private TuningOpModes() {
+    }
 
     private static OpModeMeta metaForClass(Class<? extends OpMode> cls) {
         return new OpModeMeta.Builder()
@@ -46,44 +47,42 @@ public final class TuningOpModes {
 
     @OpModeRegistrar
     public static void register(OpModeManager manager) {
-        if (DISABLED) return;
+        if (DISABLED)
+            return;
 
         DriveViewFactory dvf;
-            dvf = hardwareMap -> {
-                MecanumDrive md = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+        dvf = hardwareMap -> {
+            MecanumDrive md = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
-                List<Encoder> leftEncs = new ArrayList<>(), rightEncs = new ArrayList<>();
-                List<Encoder> parEncs = new ArrayList<>(), perpEncs = new ArrayList<>();
-                TwoDeadWheelLocalizer dl = (TwoDeadWheelLocalizer) md.localizer;
-                parEncs.add(dl.par);
-                perpEncs.add(dl.perp);
+            List<Encoder> leftEncs = new ArrayList<>(), rightEncs = new ArrayList<>();
+            List<Encoder> parEncs = new ArrayList<>(), perpEncs = new ArrayList<>();
+            TwoDeadWheelLocalizer dl = (TwoDeadWheelLocalizer) md.localizer;
+            parEncs.add(dl.par);
+            perpEncs.add(dl.perp);
 
-                return new DriveView(
-                        DriveType.MECANUM,
-                        MecanumDrive.PARAMS.inPerTick,
-                        MecanumDrive.PARAMS.maxWheelVel,
-                        MecanumDrive.PARAMS.minProfileAccel,
-                        MecanumDrive.PARAMS.maxProfileAccel,
-                        hardwareMap.getAll(LynxModule.class),
-                        Arrays.asList(
-                                md.leftFront,
-                                md.leftBack
-                        ),
-                        Arrays.asList(
-                                md.rightFront,
-                                md.rightBack
-                        ),
-                        leftEncs,
-                        rightEncs,
-                        parEncs,
-                        perpEncs,
-                        md.imu,
-                        md.voltageSensor,
-                        new MotorFeedforward(MecanumDrive.PARAMS.kS,
-                                MecanumDrive.PARAMS.kV / MecanumDrive.PARAMS.inPerTick,
-                                MecanumDrive.PARAMS.kA / MecanumDrive.PARAMS.inPerTick)
-                );
-            };
+            return new DriveView(
+                    DriveType.MECANUM,
+                    MecanumDrive.PARAMS.inPerTick,
+                    MecanumDrive.PARAMS.maxWheelVel,
+                    MecanumDrive.PARAMS.minProfileAccel,
+                    MecanumDrive.PARAMS.maxProfileAccel,
+                    hardwareMap.getAll(LynxModule.class),
+                    Arrays.asList(
+                            md.leftFront,
+                            md.leftBack),
+                    Arrays.asList(
+                            md.rightFront,
+                            md.rightBack),
+                    leftEncs,
+                    rightEncs,
+                    parEncs,
+                    perpEncs,
+                    md.imu,
+                    md.voltageSensor,
+                    new MotorFeedforward(MecanumDrive.PARAMS.kS,
+                            MecanumDrive.PARAMS.kV / MecanumDrive.PARAMS.inPerTick,
+                            MecanumDrive.PARAMS.kA / MecanumDrive.PARAMS.inPerTick));
+        };
 
         manager.register(metaForClass(AngularRampLogger.class), new AngularRampLogger(dvf));
         manager.register(metaForClass(ForwardPushTest.class), new ForwardPushTest(dvf));
@@ -104,8 +103,7 @@ public final class TuningOpModes {
                     LateralRampLogger.class,
                     ManualFeedforwardTuner.class,
                     MecanumMotorDirectionDebugger.class,
-                    ManualFeedbackTuner.class
-            )) {
+                    ManualFeedbackTuner.class)) {
                 configRoot.putVariable(c.getSimpleName(), ReflectionConfig.createVariableFromClass(c));
             }
         });
