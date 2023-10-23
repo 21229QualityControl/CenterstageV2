@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 public class Intake {
    public static double INTAKE_POWER = 0.7;
    public static double AUTO_LATCH_OPEN = 0.74;
-   public static double AUTO_LATCH_DOWN = 0.363;
+   public static double AUTO_LATCH_DOWN = 0.74;
 
    final DcMotorEx intakeMotor;
    final Servo autoLatch;

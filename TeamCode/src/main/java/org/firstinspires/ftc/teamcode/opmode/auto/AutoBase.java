@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
+import org.firstinspires.ftc.teamcode.util.AutoActionScheduler;
 
 public abstract class AutoBase extends LinearOpMode {
     protected MecanumDrive drive;
@@ -18,6 +19,7 @@ public abstract class AutoBase extends LinearOpMode {
     protected Intake intake;
     protected Vision vision;
     protected Plane plane;
+    protected AutoActionScheduler sched;
 
     public static int SPIKE = 1;
 
@@ -39,6 +41,9 @@ public abstract class AutoBase extends LinearOpMode {
         this.outtake = new Outtake(hardwareMap);
         this.vision = new Vision(hardwareMap);
         this.plane = new Plane(hardwareMap);
+        this.sched = new AutoActionScheduler(this::update);
+
+        outtake.resetMotors();
 
         outtake.initialize();
         intake.initialize();
@@ -59,11 +64,13 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Auto start
         resetRuntime(); // reset runtime timer
+        drive.pose = getStartPose();
         Memory.saveStringToFile(String.valueOf(System.currentTimeMillis()), Memory.SAVED_TIME_FILE_NAME); // save auto time for persistence
 
         if (isStopRequested()) return; // exit if stopped
 
         onRun();
+        sched.run();
 
         Log.d("Auto", "Auto ended at " + getRuntime());
     }

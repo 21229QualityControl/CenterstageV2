@@ -14,7 +14,8 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 @Config
 public class Outtake {
    public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0, 0.0004);
-   public static int OUTTAKE_EXTENDED = 1521;
+   public static int OUTTAKE_MID = 1521;
+   public static int OUTTAKE_LOW = 1000;
    public static double LATCH_SCORING = 0.9055;
    public static double LATCH_OPEN = 0.872;
    public static double LATCH_CLOSED = 0.9356;
@@ -44,13 +45,11 @@ public class Outtake {
    public void initialize() {
       this.slide.setTargetPosition(0);
       this.wrist.setPosition(WRIST_STORED);
-      this.latch.setPosition(LATCH_OPEN);
+      this.latch.setPosition(LATCH_CLOSED);
    }
 
-   public void initializeTeleop() {
-      this.slide.setTargetPosition(0);
-      this.wrist.setPosition(WRIST_STORED);
-      this.latch.setPosition(LATCH_CLOSED);
+   public void resetMotors() {
+      this.slide.setCurrentPosition(0);
    }
 
    public void update() {
@@ -60,7 +59,7 @@ public class Outtake {
    }
 
    public Action extendOuttake() {
-      return this.slide.setTargetPositionAction(OUTTAKE_EXTENDED);
+      return this.slide.setTargetPositionAction(OUTTAKE_MID);
    }
 
    public void setSlidePower(double power) {
@@ -70,8 +69,11 @@ public class Outtake {
       this.slide.setTargetPosition(this.slide.getCurrentPosition());
    }
 
-   public Action extendOuttakeBlocking() {
-      return this.slide.setTargetPositionActionBlocking(OUTTAKE_EXTENDED);
+   public Action extendOuttakeMidBlocking() {
+      return this.slide.setTargetPositionActionBlocking(OUTTAKE_MID);
+   }
+   public Action extendOuttakeLowBlocking() {
+      return this.slide.setTargetPositionActionBlocking(OUTTAKE_LOW);
    }
    public Action retractOuttake() {
       return this.slide.setTargetPositionAction(0);

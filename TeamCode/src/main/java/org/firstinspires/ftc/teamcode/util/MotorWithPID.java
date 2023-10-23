@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.util;
 
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -94,8 +96,14 @@ public class MotorWithPID {
 
         @Override
         public boolean run(TelemetryPacket packet) {
-            setTargetPosition(position);
+            if (getTargetPosition() != position) {
+                setTargetPosition(position);
+                if (blocking) {
+                    return true;
+                }
+            }
             if (blocking) {
+                Log.d("BLOCKING", isBusy() ? "true" : "false");
                 return isBusy();
             }
             return false;

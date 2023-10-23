@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
@@ -78,7 +76,7 @@ public class ManualDrive extends LinearOpMode {
          }
 
          // Init opmodes
-         outtake.initializeTeleop();
+         outtake.initialize();
          plane.initialize();
       }
 
@@ -141,7 +139,7 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.1)));
          sched.queueAction(new ParallelAction(
                  new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
-                 outtake.extendOuttakeBlocking()
+                 outtake.extendOuttakeMidBlocking()
          ));
       }
       if (g1.xOnce()) {
