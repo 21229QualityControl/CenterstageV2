@@ -18,6 +18,8 @@ public final class ManualFeedbackTuner extends LinearOpMode {
 
         waitForStart();
 
+        drive.pose =  new Pose2d(0, 0, 0);
+
         while (opModeIsActive()) {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)

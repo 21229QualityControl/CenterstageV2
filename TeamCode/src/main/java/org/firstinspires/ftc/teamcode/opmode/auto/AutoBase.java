@@ -19,7 +19,7 @@ public abstract class AutoBase extends LinearOpMode {
     protected Vision vision;
     protected Plane plane;
 
-    public static int SPIKE = -1;
+    public static int SPIKE = 1;
 
     final public void update() {
         telemetry.addData("Time left", 30 - getRuntime());
