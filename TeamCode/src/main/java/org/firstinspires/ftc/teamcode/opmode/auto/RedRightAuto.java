@@ -7,13 +7,15 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import java.util.Vector;
+
 @Config
 @Autonomous(name = "Red Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class RedRightAuto extends AutoBase {
-   public static Vector2d[] spike = {new Vector2d(12, -24), new Vector2d(12, -32), new Vector2d(12, -40)};
+   public static Vector2d[] spike = {new Vector2d(24, -40), new Vector2d(12, -36), new Vector2d(0, -34)};
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d start = new Pose2d(12, -64, Math.toRadians(-90));
-   public static Pose2d[] scoring = {new Pose2d(40, -36, Math.toRadians(180)), new Pose2d(40, -36, Math.toRadians(180)), new Pose2d(40, -36, Math.toRadians(180))};
+   public static Pose2d[] scoring = {new Pose2d(40, -38, Math.toRadians(180)), new Pose2d(40, -34, Math.toRadians(180)), new Pose2d(40, -28, Math.toRadians(180))};
    public static Pose2d parking = new Pose2d(64, -60, Math.toRadians(180));
 
    @Override
@@ -34,12 +36,24 @@ public class RedRightAuto extends AutoBase {
    }
 
    private void deliverSpike() {
+      if (SPIKE != 2) {
+         sched.addAction(
+                 drive.actionBuilder(getStartPose())
+                    .strafeTo(spike[SPIKE])
+                    .build()
+         );
+      } else {
+         sched.addAction(
+                 drive.actionBuilder(getStartPose())
+                         .strafeTo(new Vector2d(12, -40))
+                         .strafeTo(spike[SPIKE])
+                         .build()
+         );
+      }
       sched.addAction(
               new SequentialAction(
-                      drive.actionBuilder(getStartPose())
-                              .strafeTo(spike[SPIKE])
-                              .build(),
-                      intake.autoLatchOpen()
+                      intake.autoLatchOpen(),
+                     new SleepAction(0.5)
               )
       );
    }
@@ -48,13 +62,14 @@ public class RedRightAuto extends AutoBase {
       sched.addAction(
               new SequentialAction(
                       drive.actionBuilder(new Pose2d(spike[SPIKE], getStartPose().heading))
-                              .lineToY(spike[SPIKE].y - 4)
+                              .lineToY(spike[SPIKE].y - 8)
                               .strafeToLinearHeading(scoring[SPIKE].position, scoring[SPIKE].heading)
                               .build(),
                       outtake.wristScoring(),
                       outtake.extendOuttakeLowBlocking(),
                       drive.actionBuilder(scoring[SPIKE])
-                              .lineToX(scoring[SPIKE].position.x + 8)
+                              //.lineToX(scoring[SPIKE].position.x + 8)
+                              .strafeToLinearHeading(scoring[SPIKE].position.plus(new Vector2d(8, 0)), scoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
                       outtake.latchScoring(),
                       new SleepAction(0.5),
@@ -69,7 +84,7 @@ public class RedRightAuto extends AutoBase {
 
    private void park() {
       sched.addAction(
-              drive.actionBuilder(new Pose2d(scoring[SPIKE].position.plus(new Vector2d(8, 0)),
+              drive.actionBuilder(new Pose2d(scoring[SPIKE].position.plus(new Vector2d(SPIKE != 2 ? 8 : 28, 0)),
                   scoring[SPIKE].heading))
                       .strafeTo(scoring[SPIKE].position)
                       .strafeTo(parking.position)
