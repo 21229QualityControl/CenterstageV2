@@ -10,6 +10,8 @@ import java.util.Scanner;
 
 import com.acmerobotics.roadrunner.Pose2d;
 
+import org.firstinspires.ftc.teamcode.util.MotorWithPID;
+
 /**
  * Static class to transition auto values into manual
  */
@@ -18,6 +20,7 @@ public class Memory {
     private static final String memoryDirectory = "/FIRST/data";
     public static boolean RAN_AUTO = false;
     public static Pose2d LAST_POSE = new Pose2d(0, 0, 0);
+    public static MotorWithPID outtakeSlide;
 
     // For time persistence
     public static String SAVED_TIME_FILE_NAME = "AutoStartTime";

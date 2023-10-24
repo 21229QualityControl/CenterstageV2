@@ -32,8 +32,12 @@ public class Intake {
    }
    public IntakeState intakeState;
 
-   public void initialize() {
+   public void initializeAuto() {
       autoLatch.setPosition(AUTO_LATCH_DOWN);
+   }
+
+   public void initializeTeleop() {
+      autoLatch.setPosition(AUTO_LATCH_OPEN);
    }
 
    public class IntakeStateAction implements Action {

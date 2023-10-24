@@ -27,7 +27,12 @@ public class Outtake {
    final Servo wrist;
 
    public Outtake(HardwareMap hardwareMap) {
-      this.slide = new MotorWithPID(HardwareCreator.createMotor(hardwareMap, "outtakeSlide"), outtakePID);
+      if (Memory.outtakeSlide != null) { // Preserve motor zero position
+         this.slide = Memory.outtakeSlide;
+      } else {
+         this.slide = new MotorWithPID(HardwareCreator.createMotor(hardwareMap, "outtakeSlide"), outtakePID);
+         Memory.outtakeSlide = this.slide;
+      }
       this.slide.setMaxPower(1.0);
       this.slide.getMotor().setDirection(DcMotorSimple.Direction.REVERSE);
       this.latch = HardwareCreator.createServo(hardwareMap, "outtakeLatch");
