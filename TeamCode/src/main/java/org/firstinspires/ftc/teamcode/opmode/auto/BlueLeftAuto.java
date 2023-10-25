@@ -70,11 +70,6 @@ public class BlueLeftAuto extends AutoBase {
                               .strafeToLinearHeading(scoring[SPIKE].position.plus(new Vector2d(8, 0)), scoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
                       outtake.latchScoring(),
-                      new SleepAction(0.5),
-                      outtake.wristStored(),
-                      new SleepAction(0.5),
-                      outtake.retractOuttake(),
-                      outtake.latchClosed(),
                       new SleepAction(0.5)
               )
       );
@@ -82,11 +77,17 @@ public class BlueLeftAuto extends AutoBase {
 
    private void park() {
       sched.addAction(
-              drive.actionBuilder(new Pose2d(scoring[SPIKE].position.plus(new Vector2d(SPIKE != 0 ? 8 : 28, 0)),
-                  scoring[SPIKE].heading))
-                      .strafeTo(scoring[SPIKE].position)
-                      .strafeTo(parking.position)
-                      .build()
+                   drive.actionBuilder(new Pose2d(scoring[SPIKE].position.plus(new Vector2d(SPIKE != 0 ? 8 : 32, 0)),
+                                   scoring[SPIKE].heading))
+                           .afterDisp(8, new SequentialAction(
+                                   outtake.wristStored(),
+                                   new SleepAction(0.5),
+                                   outtake.retractOuttake(),
+                                   outtake.latchClosed()
+                           ))
+                           .strafeTo(scoring[SPIKE].position)
+                           .strafeTo(parking.position)
+                           .build()
       );
    }
 }
