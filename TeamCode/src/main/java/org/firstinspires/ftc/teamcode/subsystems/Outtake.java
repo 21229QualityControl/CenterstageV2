@@ -16,9 +16,9 @@ public class Outtake {
    public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0, 0.0004);
    public static int OUTTAKE_MID = 1521;
    public static int OUTTAKE_LOW = 400;
-   public static double LATCH_SCORING = 0.9055;
-   public static double LATCH_OPEN = 0.872;
-   public static double LATCH_CLOSED = 0.9356;
+   public static double LATCH_SCORING = 0.86;
+   public static double LATCH_OPEN = 0.8;
+   public static double LATCH_CLOSED = 0.89;
    public static double WRIST_STORED = 0.644;
    public static double WRIST_SCORING = 0.36;
    final MotorWithPID slide;
