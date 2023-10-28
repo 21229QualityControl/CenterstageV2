@@ -113,6 +113,7 @@ public class ManualDrive extends LinearOpMode {
       drive.setDrivePowers(new PoseVelocity2d(new Vector2d(input_x, input_y), input_turn));
    }
 
+   boolean slideHigh = false;
    private void subsystemControls() {
       // Intake controls
       if (g1.aOnce()) {
@@ -125,6 +126,11 @@ public class ManualDrive extends LinearOpMode {
          }
       }
       if (g1.b()) {
+         if (slideHigh) {
+            slideHigh = false;
+            sched.queueAction(outtake.retractOuttake());
+            sched.queueAction(outtake.wristStored());
+         }
          if (intake.intakeState == Intake.IntakeState.On) {
             sched.queueAction(outtake.latchClosed());
          }
@@ -136,6 +142,7 @@ public class ManualDrive extends LinearOpMode {
 
       // Outtake controls
       if (g1.yOnce()) {
+         slideHigh = true;
          sched.queueAction(intake.intakeOff());
          sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.1)));
          sched.queueAction(new ParallelAction(
@@ -144,6 +151,7 @@ public class ManualDrive extends LinearOpMode {
          ));
       }
       if (g1.xOnce()) {
+         slideHigh = false;
          sched.queueAction(new SequentialAction(
                  outtake.latchScoring(),
                  new SleepAction(1),
@@ -157,6 +165,7 @@ public class ManualDrive extends LinearOpMode {
          outtake.setSlidePower(-g1.right_stick_y);
       } else if (!outtake.slidePIDEnabled) {
          outtake.slidePIDEnabled = true;
+         slideHigh = true;
          outtake.lockPosition();
       }
 

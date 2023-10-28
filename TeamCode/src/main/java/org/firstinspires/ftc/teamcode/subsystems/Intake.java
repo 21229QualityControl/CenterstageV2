@@ -14,8 +14,9 @@ import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 @Config
 public class Intake {
    public static double INTAKE_POWER = 0.7;
-   public static double AUTO_LATCH_OPEN = 0.92;
+   public static double AUTO_LATCH_STORE = 0.92;
    public static double AUTO_LATCH_DOWN = 0.65;
+   public static double AUTO_LATCH_RELEASE = 0.3; // Pushes against robot but moves in right direction, temporarily used to push latch the right way
 
    final DcMotorEx intakeMotor;
    final Servo autoLatch;
@@ -37,7 +38,7 @@ public class Intake {
    }
 
    public void initializeTeleop() {
-      autoLatch.setPosition(AUTO_LATCH_OPEN);
+      autoLatch.setPosition(AUTO_LATCH_STORE);
    }
 
    public class IntakeStateAction implements Action {
@@ -75,11 +76,11 @@ public class Intake {
       );
    }
 
-   public Action autoLatchOpen() {
-      return new ActionUtil.ServoPositionAction(autoLatch, AUTO_LATCH_OPEN);
+   public Action autoLatchStore() {
+      return new ActionUtil.ServoPositionAction(autoLatch, AUTO_LATCH_STORE);
    }
 
-   public Action autoLatchDown() {
-      return new ActionUtil.ServoPositionAction(autoLatch, AUTO_LATCH_DOWN);
+   public Action autoLatchRelease() {
+      return new ActionUtil.ServoPositionAction(autoLatch, AUTO_LATCH_RELEASE);
    }
 }

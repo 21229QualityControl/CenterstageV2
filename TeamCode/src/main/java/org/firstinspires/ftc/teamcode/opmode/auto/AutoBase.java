@@ -66,12 +66,12 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Auto start
         resetRuntime(); // reset runtime timer
-        drive.pose = getStartPose();
         Memory.saveStringToFile(String.valueOf(System.currentTimeMillis()), Memory.SAVED_TIME_FILE_NAME); // save auto time for persistence
 
         if (isStopRequested()) return; // exit if stopped
 
         onRun();
+        drive.pose = getStartPose();
         sched.run();
 
         Log.d("Auto", "Auto ended at " + getRuntime());

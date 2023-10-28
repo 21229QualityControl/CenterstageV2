@@ -7,8 +7,6 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import java.util.Vector;
-
 @Config
 @Autonomous(name = "Red Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class RedRightAuto extends AutoBase {
@@ -52,7 +50,7 @@ public class RedRightAuto extends AutoBase {
       }
       sched.addAction(
               new SequentialAction(
-                      intake.autoLatchOpen(),
+                      intake.autoLatchRelease(),
                      new SleepAction(0.5)
               )
       );
@@ -63,13 +61,14 @@ public class RedRightAuto extends AutoBase {
               new SequentialAction(
                       drive.actionBuilder(new Pose2d(spike[SPIKE], getStartPose().heading))
                               .lineToY(spike[SPIKE].y - 8)
+                              .afterDisp(10, intake.autoLatchStore())
                               .strafeToLinearHeading(scoring[SPIKE].position, scoring[SPIKE].heading)
                               .build(),
                       outtake.wristScoring(),
                       outtake.extendOuttakeLowBlocking(),
                       drive.actionBuilder(scoring[SPIKE])
                               //.lineToX(scoring[SPIKE].position.x + 8)
-                              .strafeToLinearHeading(scoring[SPIKE].position.plus(new Vector2d(8, 0)), scoring[SPIKE].heading) // Correct for any turning that occured during the previous move
+                              .strafeToLinearHeading(scoring[SPIKE].position.plus(new Vector2d(SPIKE != 2 ? 8 : 32, 0)), scoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
                       outtake.latchScoring(),
                       new SleepAction(0.5)

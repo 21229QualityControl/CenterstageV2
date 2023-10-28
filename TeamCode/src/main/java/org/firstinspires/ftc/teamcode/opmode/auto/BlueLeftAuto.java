@@ -50,7 +50,7 @@ public class BlueLeftAuto extends AutoBase {
       }
       sched.addAction(
               new SequentialAction(
-                      intake.autoLatchOpen(),
+                      intake.autoLatchRelease(),
                      new SleepAction(0.5)
               )
       );
@@ -61,13 +61,14 @@ public class BlueLeftAuto extends AutoBase {
               new SequentialAction(
                       drive.actionBuilder(new Pose2d(spike[SPIKE], getStartPose().heading))
                               .lineToY(spike[SPIKE].y + 8)
+                              .afterDisp(10, intake.autoLatchStore())
                               .strafeToLinearHeading(scoring[SPIKE].position, scoring[SPIKE].heading)
                               .build(),
                       outtake.wristScoring(),
                       outtake.extendOuttakeLowBlocking(),
                       drive.actionBuilder(scoring[SPIKE])
                               //.lineToX(scoring[SPIKE].position.x + 8)
-                              .strafeToLinearHeading(scoring[SPIKE].position.plus(new Vector2d(8, 0)), scoring[SPIKE].heading) // Correct for any turning that occured during the previous move
+                              .strafeToLinearHeading(scoring[SPIKE].position.plus(new Vector2d(SPIKE != 0 ? 8 : 32, 0)), scoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
                       outtake.latchScoring(),
                       new SleepAction(0.5)
