@@ -129,6 +129,7 @@ public class ManualDrive extends LinearOpMode {
             slideHigh = false;
             sched.queueAction(outtake.retractOuttake());
             sched.queueAction(outtake.wristStored());
+            sched.queueAction(outtake.latchClosed());
          }
          if (intake.intakeState == Intake.IntakeState.On) {
             sched.queueAction(outtake.latchClosed());
@@ -150,14 +151,7 @@ public class ManualDrive extends LinearOpMode {
          ));
       }
       if (g1.xOnce()) {
-         slideHigh = false;
-         sched.queueAction(new SequentialAction(
-                 outtake.latchScoring(),
-                 new SleepAction(1),
-                 outtake.latchClosed(),
-                 outtake.wristStored(),
-                 outtake.retractOuttake()
-         ));
+         sched.queueAction(outtake.latchScoring());
       }
       if (Math.abs(g1.right_stick_y) > 0.01) {
          outtake.slidePIDEnabled = false;
