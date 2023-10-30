@@ -23,7 +23,7 @@ public abstract class AutoBase extends LinearOpMode {
     protected Plane plane;
     protected AutoActionScheduler sched;
 
-    public static int SPIKE = 1;
+    public static int SPIKE = 0;
 
     final public void update() {
         telemetry.addData("Time left", 30 - getRuntime());
@@ -48,7 +48,6 @@ public abstract class AutoBase extends LinearOpMode {
         outtake.resetMotors();
 
         outtake.initialize();
-        intake.initializeAuto();
         plane.initialize();
 
         onInit();

@@ -78,7 +78,6 @@ public class ManualDrive extends LinearOpMode {
          // Init opmodes
          outtake.initialize();
          plane.initialize();
-         intake.initializeTeleop();
       }
 
       // Main loop
