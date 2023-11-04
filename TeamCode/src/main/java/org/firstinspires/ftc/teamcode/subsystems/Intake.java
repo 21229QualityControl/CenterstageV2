@@ -10,15 +10,18 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
+import org.firstinspires.ftc.teamcode.util.MotorWithVelocityPID;
+import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static double INTAKE_POWER = 0.7;
+   public static int INTAKE_SPEED = 700;
 
-   final DcMotorEx intakeMotor;
+   final MotorWithVelocityPID intakeMotor;
+   public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.1, 0, 0);
 
    public Intake(HardwareMap hardwareMap) {
-         this.intakeMotor = HardwareCreator.createMotor(hardwareMap, "intakeMotor");
+         this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
    }
 
    public enum IntakeState {
@@ -44,21 +47,21 @@ public class Intake {
 
    public Action intakeOn() {
       return new SequentialAction(
-              new ActionUtil.DcMotorExPowerAction(intakeMotor, INTAKE_POWER),
+              intakeMotor.setTargetVelocityAction(INTAKE_SPEED),
               new IntakeStateAction(IntakeState.On)
       );
    }
 
    public Action intakeReverse() {
       return new SequentialAction(
-              new ActionUtil.DcMotorExPowerAction(intakeMotor, -INTAKE_POWER),
+              intakeMotor.setTargetVelocityAction(-INTAKE_SPEED),
               new IntakeStateAction(IntakeState.Reversing)
       );
    }
 
    public Action intakeOff() {
       return new SequentialAction(
-              new ActionUtil.DcMotorExPowerAction(intakeMotor, 0.0),
+              intakeMotor.setTargetVelocityAction(0),
               new IntakeStateAction(IntakeState.Off)
       );
    }
