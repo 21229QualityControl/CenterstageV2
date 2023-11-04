@@ -25,6 +25,7 @@ public class ManualDrive extends LinearOpMode {
    public static double TURN_SPEED = 0.75;
    public static double DRIVE_SPEED = 1;
    public static double SLOW_TURN_SPEED = 0.3;
+   public static double SLOW_DRIVE_SPEED = 0.3;
 
    private SmartGameTimer smartGameTimer;
    private GamePadController g1, g2;
@@ -102,8 +103,9 @@ public class ManualDrive extends LinearOpMode {
    }
 
    private void move() {
-      double input_x = Math.pow(-g1.left_stick_y, 3) * DRIVE_SPEED;
-      double input_y = Math.pow(-g1.left_stick_x, 3) * DRIVE_SPEED;
+      double speed = Math.abs(g1.right_stick_x) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
+      double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
+      double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       double input_turn = Math.pow(g1.left_trigger - g1.right_trigger, 3) * TURN_SPEED;
 
       if (g1.leftBumper()) input_turn += SLOW_TURN_SPEED;
@@ -147,7 +149,7 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.1)));
          sched.queueAction(new ParallelAction(
                  new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
-                 outtake.extendOuttakeMidBlocking()
+                 outtake.extendOuttakeTeleopBlocking()
          ));
       }
       if (g1.xOnce()) {
