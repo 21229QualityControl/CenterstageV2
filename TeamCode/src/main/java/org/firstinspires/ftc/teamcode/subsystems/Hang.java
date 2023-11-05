@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 @Config
 public class Hang {
    public static PIDCoefficients hangPID = new PIDCoefficients(0.0025, 0, 0.0004);
-   public static int HANG_EXTENDED = 8764;
+   public static int HANG_EXTENDED = 9300;
    final MotorWithPID hang;
 
    public Hang(HardwareMap hardwareMap) {

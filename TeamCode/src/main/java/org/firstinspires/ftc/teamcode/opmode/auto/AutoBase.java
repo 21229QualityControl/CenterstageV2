@@ -28,6 +28,7 @@ public abstract class AutoBase extends LinearOpMode {
     final public void update() {
         telemetry.addData("Time left", 30 - getRuntime());
         outtake.update();
+        intake.update();
     }
 
     final public void runOpMode() throws InterruptedException {

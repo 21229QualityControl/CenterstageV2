@@ -92,6 +92,7 @@ public class ManualDrive extends LinearOpMode {
          drive.updatePoseEstimate();
          sched.update();
          outtake.update();
+         intake.update();
          hang.update();
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
@@ -103,7 +104,7 @@ public class ManualDrive extends LinearOpMode {
    }
 
    private void move() {
-      double speed = Math.abs(g1.right_stick_x) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
+      double speed = (1-Math.abs(g1.right_stick_x)) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
       double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       double input_turn = Math.pow(g1.left_trigger - g1.right_trigger, 3) * TURN_SPEED;
@@ -144,23 +145,34 @@ public class ManualDrive extends LinearOpMode {
 
       // Outtake controls
       if (g1.yOnce()) {
-         slideHigh = true;
-         sched.queueAction(intake.intakeOff());
-         sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.1)));
-         sched.queueAction(new ParallelAction(
-                 new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
-                 outtake.extendOuttakeTeleopBlocking()
-         ));
+         if (slideHigh) {
+            sched.queueAction(new SequentialAction(
+                    outtake.wristHolding(),
+                    new SleepAction(0.5),
+                    outtake.latchOpen(),
+                    new SleepAction(0.5),
+                    outtake.latchClosed(),
+                    new SleepAction(0.3),
+                    outtake.wristScoring()
+            ));
+         } else {
+            slideHigh = true;
+            sched.queueAction(intake.intakeOff());
+            sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.1)));
+            sched.queueAction(new ParallelAction(
+                    new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
+                    outtake.extendOuttakeTeleopBlocking()
+            ));
+         }
       }
       if (g1.xOnce()) {
          sched.queueAction(outtake.latchScoring());
       }
-      if (Math.abs(g1.right_stick_y) > 0.01) {
+      if (Math.abs(g1.right_stick_y) > 0.01  && slideHigh) {
          outtake.slidePIDEnabled = false;
          outtake.setSlidePower(-g1.right_stick_y);
       } else if (!outtake.slidePIDEnabled) {
          outtake.slidePIDEnabled = true;
-         slideHigh = true;
          outtake.lockPosition();
       }
 
@@ -172,7 +184,7 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(hang.retractHang());
       }
       if (g1.startOnce()) {
-         sched.queueAction(plane.latchScored());
+         sched.queueAction(plane.scorePlane());
       }
    }
 }

@@ -18,10 +18,11 @@ public class Intake {
    public static int INTAKE_SPEED = 700;
 
    final MotorWithVelocityPID intakeMotor;
-   public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.1, 0, 0);
+   public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.0007, 0, 0.1);
 
    public Intake(HardwareMap hardwareMap) {
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
+         this.intakeMotor.setMaxPower(1.0);
    }
 
    public enum IntakeState {
@@ -47,22 +48,29 @@ public class Intake {
 
    public Action intakeOn() {
       return new SequentialAction(
-              intakeMotor.setTargetVelocityAction(INTAKE_SPEED),
+              //intakeMotor.setTargetVelocityAction(INTAKE_SPEED),
+              new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), INTAKE_SPEED / 1000.0),
               new IntakeStateAction(IntakeState.On)
       );
    }
 
    public Action intakeReverse() {
       return new SequentialAction(
-              intakeMotor.setTargetVelocityAction(-INTAKE_SPEED),
+              //intakeMotor.setTargetVelocityAction(-INTAKE_SPEED),
+              new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), -INTAKE_SPEED / 1000.0),
               new IntakeStateAction(IntakeState.Reversing)
       );
    }
 
    public Action intakeOff() {
       return new SequentialAction(
-              intakeMotor.setTargetVelocityAction(0),
+              //intakeMotor.setTargetVelocityAction(0),
+              new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), 0),
               new IntakeStateAction(IntakeState.Off)
       );
+   }
+
+   public void update() {
+      //intakeMotor.update();
    }
 }
