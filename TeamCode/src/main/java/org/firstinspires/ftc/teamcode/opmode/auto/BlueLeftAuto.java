@@ -10,11 +10,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Config
 @Autonomous(name = "Blue Left Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueLeftAuto extends AutoBase {
-   public static Pose2d[] spike = {new Pose2d(9, 36, Math.toRadians(45)), new Pose2d(12, 40, Math.toRadians(90)), new Pose2d(24, 42, Math.toRadians(90))};
+   public static Pose2d[] spike = {new Pose2d(9, 42, Math.toRadians(45)), new Pose2d(12, 41, Math.toRadians(90)), new Pose2d(24, 42, Math.toRadians(90))};
    // 0 = right, 1 = middle, 2 = left
-   public static Pose2d[] spikeBackedOut =  {new Pose2d(17, 46, Math.toRadians(45)), new Pose2d(12, 48, Math.toRadians(90)), new Pose2d(24, 50, Math.toRadians(90))};
+   public static Pose2d[] spikeBackedOut =  {new Pose2d(17, 50, Math.toRadians(45)), new Pose2d(12, 49, Math.toRadians(90)), new Pose2d(24, 50, Math.toRadians(90))};
    public static Pose2d start = new Pose2d(12, 64, Math.toRadians(90));
-   public static Pose2d[] scoring = {new Pose2d(42, 28, Math.toRadians(180)), new Pose2d(42, 36, Math.toRadians(180)), new Pose2d(42, 42, Math.toRadians(180))};
+   public static Pose2d[] scoring = {new Pose2d(42, 28, Math.toRadians(180)), new Pose2d(42, 36, Math.toRadians(180)), new Pose2d(42, 40, Math.toRadians(180))};
    public static Pose2d parking = new Pose2d(56, 58, Math.toRadians(180));
 
    @Override
