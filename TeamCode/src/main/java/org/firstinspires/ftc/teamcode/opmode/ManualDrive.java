@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
@@ -107,12 +108,14 @@ public class ManualDrive extends LinearOpMode {
       double speed = (1-Math.abs(g1.right_stick_x)) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
       double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
-      double input_turn = Math.pow(g1.left_trigger - g1.right_trigger, 3) * TURN_SPEED;
+      Vector2d input = new Vector2d(input_x, input_y);
+      input = drive.pose.heading.times(input);
 
+      double input_turn = Math.pow(g1.left_trigger - g1.right_trigger, 3) * TURN_SPEED;
       if (g1.leftBumper()) input_turn += SLOW_TURN_SPEED;
       if (g1.rightBumper()) input_turn -= SLOW_TURN_SPEED;
 
-      drive.setDrivePowers(new PoseVelocity2d(new Vector2d(input_x, input_y), input_turn));
+      drive.setDrivePowers(new PoseVelocity2d(input, input_turn));
    }
 
    boolean slideHigh = false;

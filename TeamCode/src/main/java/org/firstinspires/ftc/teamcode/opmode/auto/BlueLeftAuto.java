@@ -7,6 +7,8 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.util.AutoConstants;
+
 @Config
 @Autonomous(name = "Blue Left Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueLeftAuto extends AutoBase {
@@ -14,7 +16,6 @@ public class BlueLeftAuto extends AutoBase {
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d[] spikeBackedOut =  {new Pose2d(17, 50, Math.toRadians(45)), new Pose2d(12, 49, Math.toRadians(90)), new Pose2d(24, 50, Math.toRadians(90))};
    public static Pose2d start = new Pose2d(12, 64, Math.toRadians(90));
-   public static Pose2d[] scoring = {new Pose2d(42, 28, Math.toRadians(180)), new Pose2d(42, 36, Math.toRadians(180)), new Pose2d(42, 40, Math.toRadians(180))};
    public static Pose2d parking = new Pose2d(56, 58, Math.toRadians(180));
 
    @Override
@@ -59,12 +60,12 @@ public class BlueLeftAuto extends AutoBase {
               new SequentialAction(
                       drive.actionBuilder(spike[SPIKE])
                               .strafeToLinearHeading(spikeBackedOut[SPIKE].position, spikeBackedOut[SPIKE].heading)
-                              .strafeToLinearHeading(scoring[SPIKE].position, scoring[SPIKE].heading)
+                              .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
                               .build(),
                       outtake.wristScoring(),
                       outtake.extendOuttakeLowBlocking(),
-                      drive.actionBuilder(scoring[SPIKE])
-                              .strafeToLinearHeading(scoring[SPIKE].position.plus(new Vector2d(10, 0)), scoring[SPIKE].heading) // Correct for any turning that occured during the previous move
+                      drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
+                              .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
                       outtake.latchScoring(),
                       new SleepAction(0.5),
@@ -75,9 +76,9 @@ public class BlueLeftAuto extends AutoBase {
 
    private void park() {
       sched.addAction(
-                   drive.actionBuilder(new Pose2d(scoring[SPIKE].position.plus(new Vector2d(10, 0)),
-                                   scoring[SPIKE].heading))
-                           .strafeToLinearHeading(scoring[SPIKE].position, scoring[SPIKE].heading)
+                   drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)),
+                                   AutoConstants.blueScoring[SPIKE].heading))
+                           .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
                            .afterDisp(10, new SequentialAction(
                                    outtake.wristStored(),
                                    new SleepAction(0.5),
@@ -85,7 +86,7 @@ public class BlueLeftAuto extends AutoBase {
                                    outtake.latchClosed(),
                                    new SleepAction(0.5)
                            ))
-                           .strafeToLinearHeading(new Vector2d(scoring[SPIKE].position.x, parking.position.y), parking.heading)
+                           .strafeToLinearHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x, parking.position.y), parking.heading)
                            .strafeToLinearHeading(parking.position, parking.heading)
                            .build()
       );
