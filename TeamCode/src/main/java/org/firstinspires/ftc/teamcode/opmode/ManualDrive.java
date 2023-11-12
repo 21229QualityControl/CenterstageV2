@@ -105,11 +105,14 @@ public class ManualDrive extends LinearOpMode {
    }
 
    private void move() {
+      if (g1.backOnce()) {
+         drive.pose = new Pose2d(0, 0, Math.toRadians(180));
+      }
       double speed = (1-Math.abs(g1.right_stick_x)) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
       double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       Vector2d input = new Vector2d(input_x, input_y);
-      input = drive.pose.heading.times(input);
+      input = drive.pose.heading.inverse().times(input);
 
       double input_turn = Math.pow(g1.left_trigger - g1.right_trigger, 3) * TURN_SPEED;
       if (g1.leftBumper()) input_turn += SLOW_TURN_SPEED;
