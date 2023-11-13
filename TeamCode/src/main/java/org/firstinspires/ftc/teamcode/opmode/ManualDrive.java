@@ -16,9 +16,11 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.util.ActionScheduler;
 import org.firstinspires.ftc.teamcode.util.GamePadController;
 import org.firstinspires.ftc.teamcode.util.SmartGameTimer;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 @Config
 @TeleOp(group = "Drive")
@@ -26,7 +28,9 @@ public class ManualDrive extends LinearOpMode {
    public static double TURN_SPEED = 0.75;
    public static double DRIVE_SPEED = 1;
    public static double SLOW_TURN_SPEED = 0.3;
-   public static double SLOW_DRIVE_SPEED = 0.3;
+   public static double SLOW_DRIVE_SPEED = 0.1;
+   public static double VISION_RANGE = 20;
+   public static double VISION_CLOSE_DIST = 5;
 
    private SmartGameTimer smartGameTimer;
    private GamePadController g1, g2;
@@ -36,6 +40,7 @@ public class ManualDrive extends LinearOpMode {
    private Outtake outtake;
    private Hang hang;
    private Plane plane;
+   private Vision vision;
 
    @Override
    public void runOpMode() throws InterruptedException {
@@ -53,6 +58,7 @@ public class ManualDrive extends LinearOpMode {
       outtake = new Outtake(hardwareMap);
       hang = new Hang(hardwareMap);
       plane = new Plane(hardwareMap);
+      vision = new Vision(hardwareMap);
 
       if (Memory.RAN_AUTO) {
          smartGameTimer = new SmartGameTimer(true);
@@ -109,7 +115,13 @@ public class ManualDrive extends LinearOpMode {
          drive.pose = new Pose2d(0, 0, Math.toRadians(180));
          drive.imu.resetYaw();
       }
-      double speed = (1-Math.abs(g1.right_stick_x)) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
+      double visionDist = vision.backdropDistance(50); // Refresh every 50 ticks unless something is within range, then 5
+      if (visionDist < VISION_CLOSE_DIST + VISION_RANGE) {
+         visionDist = vision.backdropDistance(5);
+      }
+      telemetry.addData("VISION DISTANCE", visionDist);
+      telemetry.addData("A", Math.max(0, ((visionDist - VISION_CLOSE_DIST) / VISION_RANGE)));
+      double speed = Math.min(1, Math.max(0, ((visionDist - VISION_CLOSE_DIST) / VISION_RANGE))) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
       double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       Vector2d input = new Vector2d(input_x, input_y);
