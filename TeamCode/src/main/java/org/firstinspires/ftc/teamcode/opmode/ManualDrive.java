@@ -107,6 +107,7 @@ public class ManualDrive extends LinearOpMode {
    private void move() {
       if (g1.backOnce()) {
          drive.pose = new Pose2d(0, 0, Math.toRadians(180));
+         drive.imu.resetYaw();
       }
       double speed = (1-Math.abs(g1.right_stick_x)) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
       double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
