@@ -12,10 +12,10 @@ import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 
 @Config
 public class Plane {
-   public static double LATCH_SCORED = 0.6;
-   public static double LATCH_CLOSED = 0.87;
-   public static double HOLDER_OPEN = 0.15;
-   public static double HOLDER_CLOSED = 0.30;
+   public static double LATCH_SCORED = 0.23;
+   public static double LATCH_CLOSED = 0.54;
+   public static double HOLDER_OPEN = 0.5;
+   public static double HOLDER_CLOSED = 0.5;
 
    final Servo latch;
    final Servo holder;
