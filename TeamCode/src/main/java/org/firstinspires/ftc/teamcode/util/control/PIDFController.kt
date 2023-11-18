@@ -29,7 +29,7 @@ class PIDFController
     private val kV: Double = 0.0,
     private val kA: Double = 0.0,
     private val kStatic: Double = 0.0,
-    private val kF: (Double, Double?) -> Double = { _, _ -> 0.0 },
+    private val kF: (Double, Double, Double?) -> Double = { _, _, _ -> 0.0 },
 ) {
     private var errorSum: Double = 0.0
     private var lastUpdateTimestamp: Double = Double.NaN
@@ -132,7 +132,7 @@ class PIDFController
             // determination of the sign of kStatic
             val baseOutput = pid.kP * error + pid.kI * errorSum +
                 pid.kD * (measuredVelocity?.let { targetVelocity - it } ?: errorDeriv) +
-                kV * targetVelocity + kA * targetAcceleration + kF(measuredPosition, measuredVelocity)
+                kV * targetVelocity + kA * targetAcceleration + kF(targetPosition, measuredPosition, measuredVelocity)
             val output = if (baseOutput epsilonEquals 0.0) 0.0 else baseOutput + sign(baseOutput) * kStatic
 
             if (outputBounded) {

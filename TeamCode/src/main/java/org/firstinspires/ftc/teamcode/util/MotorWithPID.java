@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.control.PIDFController;
 
-import kotlin.jvm.functions.Function2;
+import kotlin.jvm.functions.Function3;
 
 public class MotorWithPID {
     private DcMotorEx motor;
@@ -26,10 +26,10 @@ public class MotorWithPID {
     private double maxPower = 0;
 
     public MotorWithPID(DcMotorEx motor, PIDCoefficients pid) {
-        this(motor, pid, (x, v) -> 0.0);
+        this(motor, pid, (t, x, v) -> 0.0);
     }
 
-    public MotorWithPID(DcMotorEx motor, PIDCoefficients pid, Function2<Double, Double, Double> f) {
+    public MotorWithPID(DcMotorEx motor, PIDCoefficients pid, Function3<Double, Double, Double, Double> f) {
         this.motor = motor;
         this.pid = pid;
         this.pidfController = new PIDFController(pid, 0, 0, 0, f);

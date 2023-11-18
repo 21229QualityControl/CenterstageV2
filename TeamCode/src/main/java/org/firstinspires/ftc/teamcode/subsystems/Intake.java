@@ -15,13 +15,21 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static int INTAKE_SPEED = 700;
+   public static int INTAKE_SPEED = 1600;
+   private double intake_mult = 0.0004;
 
    final MotorWithVelocityPID intakeMotor;
-   public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.0007, 0, 0.1);
+   public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00001, 0, 0);
 
    public Intake(HardwareMap hardwareMap) {
-         this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
+         this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid, (t, x, v) -> {
+            if (Math.abs(x) < Math.abs(t)) {
+               intake_mult += 0.000001;
+            } else {
+               intake_mult -= 0.000001;
+            }
+            return t * intake_mult;
+         });
          this.intakeMotor.setMaxPower(1.0);
    }
 
@@ -48,29 +56,29 @@ public class Intake {
 
    public Action intakeOn() {
       return new SequentialAction(
-              //intakeMotor.setTargetVelocityAction(INTAKE_SPEED),
-              new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), INTAKE_SPEED / 1000.0),
+              intakeMotor.setTargetVelocityAction(INTAKE_SPEED),
+              //new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), INTAKE_SPEED / 1000.0),
               new IntakeStateAction(IntakeState.On)
       );
    }
 
    public Action intakeReverse() {
       return new SequentialAction(
-              //intakeMotor.setTargetVelocityAction(-INTAKE_SPEED),
-              new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), -INTAKE_SPEED / 1000.0),
+              intakeMotor.setTargetVelocityAction(-INTAKE_SPEED),
+              //new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), -INTAKE_SPEED / 1000.0),
               new IntakeStateAction(IntakeState.Reversing)
       );
    }
 
    public Action intakeOff() {
       return new SequentialAction(
-              //intakeMotor.setTargetVelocityAction(0),
-              new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), 0),
+              intakeMotor.setTargetVelocityAction(0),
+              //new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), 0),
               new IntakeStateAction(IntakeState.Off)
       );
    }
 
    public void update() {
-      //intakeMotor.update();
+      intakeMotor.update();
    }
 }
