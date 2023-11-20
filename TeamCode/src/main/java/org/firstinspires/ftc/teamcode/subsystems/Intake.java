@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static int INTAKE_SPEED = 1600;
+   public static int INTAKE_SPEED = 10000; // Max speed
    private double intake_mult = 0.0004;
 
    final MotorWithVelocityPID intakeMotor;
@@ -23,10 +24,12 @@ public class Intake {
 
    public Intake(HardwareMap hardwareMap) {
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid, (t, x, v) -> {
-            if (Math.abs(x) < Math.abs(t)) {
-               intake_mult += 0.000001;
-            } else {
-               intake_mult -= 0.000001;
+            if (t != 0) {
+               if ((t - x) * (t/Math.abs(t)) > 0) {
+                  intake_mult += 0.000001;
+               } else {
+                  intake_mult -= 0.000001;
+               }
             }
             return t * intake_mult;
          });
