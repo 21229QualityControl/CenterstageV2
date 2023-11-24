@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static int INTAKE_SPEED = 10000; // Max speed
+   public static int INTAKE_SPEED = 8000; // Max speed: 10000
    private double intake_mult = 0.0004;
 
    final MotorWithVelocityPID intakeMotor;
