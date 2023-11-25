@@ -16,10 +16,10 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static int INTAKE_SPEED = 10000; // Max speed
+   public static int INTAKE_SPEED = 1000; // Max speed is 2400
 
    final MotorWithVelocityPID intakeMotor;
-   public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00001, 0, 0);
+   public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00005, 0, 0);
 
    public Intake(HardwareMap hardwareMap) {
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
@@ -64,6 +64,7 @@ public class Intake {
    }
 
    public Action intakeOff() {
+      intakeMotor.resetIntegralGain();
       return new SequentialAction(
               intakeMotor.setTargetVelocityAction(0),
               //new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), 0),

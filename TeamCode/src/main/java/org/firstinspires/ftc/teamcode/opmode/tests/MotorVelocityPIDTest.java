@@ -30,7 +30,7 @@ import java.util.List;
 @TeleOp(group = "Test")
 public class MotorVelocityPIDTest extends LinearOpMode {
    public static String NAME = "intakeMotor";
-   public static PIDCoefficients pid = new PIDCoefficients(0.0001, 0.000001, 0);
+   public static PIDCoefficients pid = new PIDCoefficients(0.00005, 0, 0);
    public static int TARGET_VELOCITY = 1600;
    private MotorWithVelocityPID motor;
 
