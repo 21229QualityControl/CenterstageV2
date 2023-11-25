@@ -21,7 +21,7 @@ public class Intake {
    final MotorWithVelocityPID intakeMotor;
    public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00005, 0, 0);
 
-   public Intake(HardwareMap hardwareMap) {
+   public Intake(HardwareMap hardwareMap) { 
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
          this.intakeMotor.setMaxPower(1.0);
    }

@@ -128,7 +128,7 @@ public class ManualDrive extends LinearOpMode {
       double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       Vector2d input = new Vector2d(input_x, input_y);
-      input = drive.pose.heading.inverse().times(input);
+      //input = drive.pose.heading.inverse().times(input); // Field centric
 
       double input_turn = Math.pow(g1.left_trigger - g1.right_trigger, 3) * TURN_SPEED;
       if (g1.leftBumper()) input_turn += SLOW_TURN_SPEED;
