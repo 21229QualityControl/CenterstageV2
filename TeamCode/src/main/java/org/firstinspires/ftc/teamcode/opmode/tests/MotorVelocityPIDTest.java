@@ -30,10 +30,8 @@ import java.util.List;
 @TeleOp(group = "Test")
 public class MotorVelocityPIDTest extends LinearOpMode {
    public static String NAME = "intakeMotor";
-   public static PIDCoefficients pid = new PIDCoefficients(0.00001, 0, 0);
-   public static double MULT_SPEED = 0.000001;
+   public static PIDCoefficients pid = new PIDCoefficients(0.0001, 0.000001, 0);
    public static int TARGET_VELOCITY = 1600;
-   public static double mult = 0.004;
    private MotorWithVelocityPID motor;
 
    @Override
@@ -41,14 +39,7 @@ public class MotorVelocityPIDTest extends LinearOpMode {
 
       // Communicate to dashboard
       telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-      motor = new MotorWithVelocityPID(hardwareMap.get(DcMotorEx.class, NAME), pid, (t, x, v) -> {
-         if (Math.abs(x) < Math.abs(t)) {
-            mult += MULT_SPEED;
-         } else {
-            mult -= MULT_SPEED;
-         }
-         return t * mult;
-      });
+      motor = new MotorWithVelocityPID(hardwareMap.get(DcMotorEx.class, NAME), pid);
       motor.setMaxPower(1.0);
       telemetry.addData("Motor", NAME);
       telemetry.update();

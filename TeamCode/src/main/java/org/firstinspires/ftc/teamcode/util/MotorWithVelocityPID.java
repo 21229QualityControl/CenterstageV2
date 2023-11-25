@@ -22,6 +22,7 @@ public class MotorWithVelocityPID {
     private int targetVelocity = 0;
     private int internalOffset = 0;
     private double maxPower = 0;
+    private double power = 0;
 
     public MotorWithVelocityPID(DcMotorEx motor, PIDCoefficients pid) {
         this(motor, pid, (t, x, v) -> 0.0);
@@ -43,17 +44,9 @@ public class MotorWithVelocityPID {
      * Updates the power sent to the motor according to the pidf controller.
      */
     public void update() {
-        double newPower = Range.clip(this.pidfController.update(motor.getVelocity()), -maxPower, maxPower);
-        motor.setPower(newPower);
-    }
-
-    /**
-     * Updates the power sent to the motor according to the pidf controller,
-     * but scale pid output with a current and target voltage
-     */
-    public void update(double currentVoltage, double targetVoltage) {
-        double newPower = Range.clip(this.pidfController.update(motor.getVelocity()) * targetVoltage / currentVoltage, -maxPower, maxPower);
-        motor.setPower(newPower);
+        double change = Range.clip(this.pidfController.update(motor.getVelocity()), -maxPower, maxPower);
+        power += change;
+        motor.setPower(power);
     }
 
     /**

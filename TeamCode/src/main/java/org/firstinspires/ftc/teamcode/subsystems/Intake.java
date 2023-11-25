@@ -17,22 +17,12 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 @Config
 public class Intake {
    public static int INTAKE_SPEED = 10000; // Max speed
-   private double intake_mult = 0.0004;
 
    final MotorWithVelocityPID intakeMotor;
    public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00001, 0, 0);
 
    public Intake(HardwareMap hardwareMap) {
-         this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid, (t, x, v) -> {
-            if (t != 0) {
-               if ((t - x) * (t/Math.abs(t)) > 0) {
-                  intake_mult += 0.000001;
-               } else {
-                  intake_mult -= 0.000001;
-               }
-            }
-            return t * intake_mult;
-         });
+         this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
          this.intakeMotor.setMaxPower(1.0);
    }
 
