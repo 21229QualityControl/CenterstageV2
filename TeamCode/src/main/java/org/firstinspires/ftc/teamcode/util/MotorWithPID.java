@@ -22,7 +22,7 @@ public class MotorWithPID {
     private PIDCoefficients pid;
     private int targetPosition = 0;
     private int internalOffset = 0;
-    private int tolerance = 25;
+    private int tolerance = 100;
     private double maxPower = 0;
 
     public MotorWithPID(DcMotorEx motor, PIDCoefficients pid) {

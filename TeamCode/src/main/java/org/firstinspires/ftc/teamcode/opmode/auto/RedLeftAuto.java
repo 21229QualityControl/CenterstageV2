@@ -14,12 +14,12 @@ import java.util.Vector;
 @Config
 @Autonomous(name = "Red Left Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class RedLeftAuto extends AutoBase {
-   public static Pose2d[] spike = {new Pose2d(-33, -40, Math.toRadians(-135)), new Pose2d(-36, -38, Math.toRadians(-90)), new Pose2d(-48, -44, Math.toRadians(-90))};
+   public static Pose2d[] spike = {new Pose2d(-33, -37, Math.toRadians(-135)), new Pose2d(-36, -35, Math.toRadians(-90)), new Pose2d(-48, -41, Math.toRadians(-90))};
    // 0 = right, 1 = middle, 2 = left
-   public static Pose2d[] spikeBackedOut =  {new Pose2d(-41, -50, Math.toRadians(-135)), new Pose2d(-36, -49, Math.toRadians(-90)), new Pose2d(-48, -50, Math.toRadians(-90))};
-   public static Pose2d start = new Pose2d(-36, -64, Math.toRadians(-90));
-   public static Pose2d parking = new Pose2d(56, -12, Math.toRadians(180));
-   public static Pose2d intermediate = new Pose2d(-40, -56, Math.toRadians(180));
+   public static Pose2d[] spikeBackedOut =  {new Pose2d(-41, -47, Math.toRadians(-135)), new Pose2d(-36, -46, Math.toRadians(-90)), new Pose2d(-48, -47, Math.toRadians(-90))};
+   public static Pose2d start = new Pose2d(-36, -61, Math.toRadians(-90));
+   public static Pose2d parking = new Pose2d(56, -7, Math.toRadians(180));
+   public static Pose2d intermediate = new Pose2d(-40, -54, Math.toRadians(180));
 
    @Override
    protected Pose2d getStartPose() {
@@ -33,6 +33,7 @@ public class RedLeftAuto extends AutoBase {
 
    @Override
    protected void onRun() {
+      //sched.addAction(new SleepAction(10));
       deliverSpike();
       driveToScoring();
       scorePreload();

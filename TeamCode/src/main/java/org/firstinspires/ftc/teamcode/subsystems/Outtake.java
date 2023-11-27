@@ -14,9 +14,9 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 @Config
 public class Outtake {
    public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0, 0.0004);
-   public static int OUTTAKE_TELEOP = 660;
+   public static int OUTTAKE_TELEOP = 500;
    public static int OUTTAKE_MID = 1200;
-   public static int OUTTAKE_LOW = 400;
+   public static int OUTTAKE_LOW = 300;
    public static double LATCH_SCORING = 0.3;
    public static double LATCH_OPEN = 0.54;
    public static double LATCH_CLOSED = 0.62;

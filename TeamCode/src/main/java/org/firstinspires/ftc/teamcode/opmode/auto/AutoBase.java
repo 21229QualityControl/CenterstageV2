@@ -72,7 +72,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         onRun();
         drive.pose = getStartPose();
-        drive.imu.resetYaw();
+        //drive.imu.resetYaw();
 
         sched.run();
         Memory.LAST_POSE = drive.pose;

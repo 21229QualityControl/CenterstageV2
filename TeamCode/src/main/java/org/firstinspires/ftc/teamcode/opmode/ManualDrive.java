@@ -27,6 +27,7 @@ public class ManualDrive extends LinearOpMode {
    public static double TURN_SPEED = 0.75;
    public static double DRIVE_SPEED = 1;
    public static double SLOW_TURN_SPEED = 0.3;
+   public static double D2_SLOW_TURN = 0.2;
    public static double SLOW_DRIVE_SPEED = 0.3;
    public static double VISION_RANGE = 20;
    public static double VISION_CLOSE_DIST = 5;
@@ -136,6 +137,8 @@ public class ManualDrive extends LinearOpMode {
 
       // Driver 2 slow strafe
       input = input.plus(new Vector2d(g2.left_stick_y * SLOW_DRIVE_SPEED, g2.left_stick_x * SLOW_DRIVE_SPEED));
+      if (g2.leftBumper()) input_turn += D2_SLOW_TURN;
+      if (g2.rightBumper()) input_turn -= D2_SLOW_TURN;
 
       drive.setDrivePowers(new PoseVelocity2d(input, input_turn));
    }
