@@ -20,7 +20,7 @@ public class Outtake {
    public static double LATCH_SCORING = 0.3;
    public static double LATCH_OPEN = 0.54;
    public static double LATCH_CLOSED = 0.62;
-   public static double WRIST_STORED = 0.66;
+   public static double WRIST_STORED = 0.67;
    public static double WRIST_SCORING = 0.34;
    final MotorWithPID slide;
    public boolean slidePIDEnabled = true;
