@@ -9,14 +9,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
+import java.util.Vector;
+
 @Config
 @Autonomous(name = "Blue Left Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueLeftAuto extends AutoBase {
    public static Pose2d[] spike = {new Pose2d(9, 42, Math.toRadians(45)), new Pose2d(12, 41, Math.toRadians(90)), new Pose2d(24, 42, Math.toRadians(90))};
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d[] spikeBackedOut =  {new Pose2d(17, 50, Math.toRadians(45)), new Pose2d(12, 49, Math.toRadians(90)), new Pose2d(24, 50, Math.toRadians(90))};
-   public static Pose2d start = new Pose2d(12, 64, Math.toRadians(90));
+   public static Pose2d start = new Pose2d(12, 63, Math.toRadians(90));
    public static Pose2d parking = new Pose2d(56, 58, Math.toRadians(180));
+   public static Pose2d stack = new Pose2d(-60, 18, Math.toRadians(180));
 
    @Override
    protected Pose2d getStartPose() {
@@ -31,7 +34,9 @@ public class BlueLeftAuto extends AutoBase {
    @Override
    protected void onRun() {
       deliverSpike();
-      scorePreload();
+      scorePreload(false);
+      intakeStack();
+      scorePreload(true);
       park();
    }
 
@@ -51,25 +56,63 @@ public class BlueLeftAuto extends AutoBase {
          );
       }
       sched.addAction(
-             new SleepAction(0.5)
-      );
-   }
-
-   private void scorePreload() {
-      sched.addAction(
               new SequentialAction(
+                      new SleepAction(0.5),
                       drive.actionBuilder(spike[SPIKE])
                               .strafeToLinearHeading(spikeBackedOut[SPIKE].position, spikeBackedOut[SPIKE].heading)
                               .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
-                              .build(),
+                              .build()
+              )
+      );
+   }
+
+   private void scorePreload(boolean mid) {
+      sched.addAction(
+              new SequentialAction(
                       outtake.wristScoring(),
-                      outtake.extendOuttakeLowBlocking(),
+                      mid ? outtake.extendOuttakeTeleopBlocking() : outtake.extendOuttakeLowBlocking(),
                       drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
                               .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
-                      outtake.latchScoring(),
+                      outtake.latchOpen(),
                       new SleepAction(0.5),
                       outtake.extendOuttakeMidBlocking()
+              )
+      );
+   }
+
+   private void intakeStack() {
+      sched.addAction(
+              new SequentialAction(
+                      drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.blueScoring[SPIKE].heading))
+                              .afterDisp(10, new SequentialAction(
+                                      outtake.wristStored(),
+                                      new SleepAction(0.5),
+                                      outtake.retractOuttake(),
+                                      outtake.latchOpen(),
+                                      new SleepAction(0.5)
+                              ))
+                              .strafeToLinearHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x, stack.position.y), stack.heading)
+                              .afterDisp(60, intake.intakeOn())
+                              .strafeToLinearHeading(stack.position.plus(new Vector2d(30, -4)), stack.heading)
+                              .strafeToLinearHeading(stack.position, stack.heading)
+                              .build(),
+                      new SleepAction(0.5),
+                      intake.stackClosed(),
+                      new SleepAction(0.3),
+                      intake.stackOpen(),
+                      new SleepAction(0.3),
+                      intake.stackClosed(),
+                      new SleepAction(0.3),
+                      intake.stackOpen(),
+                      drive.actionBuilder(stack)
+                              .afterTime(2, new SequentialAction(
+                                      intake.intakeOff(),
+                                      outtake.latchClosed()
+                              ))
+                              .strafeToLinearHeading(new Vector2d((AutoConstants.blueScoring[SPIKE].position.x*4 + stack.position.x)/5, stack.position.y), AutoConstants.blueScoring[SPIKE].heading)
+                              .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
+                              .build()
               )
       );
    }

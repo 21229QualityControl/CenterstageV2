@@ -14,7 +14,8 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 @Config
 public class Outtake {
    public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0, 0.0004);
-   public static int OUTTAKE_TELEOP = 500;
+   public static int OUTTAKE_TELEOP = 0;
+   public static int OUTTAKE_MIDLOW = 500;
    public static int OUTTAKE_MID = 1200;
    public static int OUTTAKE_LOW = 300;
    public static double LATCH_SCORING = 0.3;
@@ -52,6 +53,7 @@ public class Outtake {
       this.slide.setTargetPosition(0);
       this.wrist.setPosition(WRIST_STORED);
       this.latch.setPosition(LATCH_CLOSED);
+      OUTTAKE_TELEOP = OUTTAKE_MIDLOW;
    }
 
    public void resetMotors() {
