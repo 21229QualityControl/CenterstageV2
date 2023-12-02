@@ -86,6 +86,7 @@ public class ManualDrive extends LinearOpMode {
          // Init opmodes
          outtake.initialize();
          plane.initialize();
+         intake.initialize();
       }
 
       // Main loop
@@ -171,8 +172,16 @@ public class ManualDrive extends LinearOpMode {
       if (g1.dpadDownOnce()) {
          sched.queueAction(hang.retractHang());
       }
-      if (g1.startOnce() || g1.backOnce()) {
+      if (g1.backOnce()) {
          sched.queueAction(plane.scorePlane());
+      }
+      if (g1.startOnce()) {
+         sched.queueAction(new SequentialAction(
+                 intake.stackClosed(),
+                 new SleepAction(0.3),
+                 intake.stackOpen(),
+                 new SleepAction(0.3)
+         ));
       }
    }
 
@@ -212,7 +221,7 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(outtake.latchScoring());
       }
       if (g2.dpadDownOnce()) {
-         sched.queueAction(outtake.latchOpen());
+         sched.queueAction(outtake.latchClosed());
       }
    }
 }

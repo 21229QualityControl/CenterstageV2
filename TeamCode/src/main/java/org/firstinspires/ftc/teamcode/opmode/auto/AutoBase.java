@@ -50,6 +50,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         outtake.initialize();
         plane.initialize();
+        intake.initialize();
 
         onInit();
 

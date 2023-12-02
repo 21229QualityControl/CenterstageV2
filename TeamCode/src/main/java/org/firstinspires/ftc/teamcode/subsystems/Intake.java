@@ -19,11 +19,24 @@ public class Intake {
    public static int INTAKE_SPEED = 1000; // Max speed is 2400
 
    final MotorWithVelocityPID intakeMotor;
+   final Servo leftStack;
+   final Servo rightStack;
+   public static double LEFT_STACK_OPEN = 0.69;
+   public static double LEFT_STACK_CLOSED = 0.24;
+   public static double RIGHT_STACK_OPEN = 0.37;
+   public static double RIGHT_STACK_CLOSED = 0.81;
    public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00005, 0, 0);
 
    public Intake(HardwareMap hardwareMap) { 
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
          this.intakeMotor.setMaxPower(1.0);
+         this.leftStack = HardwareCreator.createServo(hardwareMap, "leftStack");
+         this.rightStack = HardwareCreator.createServo(hardwareMap, "rightStack");
+   }
+
+   public void initialize() {
+      this.leftStack.setPosition(LEFT_STACK_OPEN);
+      this.rightStack.setPosition(RIGHT_STACK_OPEN);
    }
 
    public enum IntakeState {
@@ -74,5 +87,19 @@ public class Intake {
 
    public void update() {
       intakeMotor.update();
+   }
+
+   public Action stackOpen() {
+      return new SequentialAction(
+              new ActionUtil.ServoPositionAction(leftStack, LEFT_STACK_OPEN),
+              new ActionUtil.ServoPositionAction(rightStack, RIGHT_STACK_OPEN)
+      );
+   }
+
+   public Action stackClosed() {
+      return new SequentialAction(
+              new ActionUtil.ServoPositionAction(leftStack, LEFT_STACK_CLOSED),
+              new ActionUtil.ServoPositionAction(rightStack, RIGHT_STACK_CLOSED)
+      );
    }
 }
