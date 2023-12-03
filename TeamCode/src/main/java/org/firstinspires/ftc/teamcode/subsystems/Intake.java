@@ -21,10 +21,10 @@ public class Intake {
    final MotorWithVelocityPID intakeMotor;
    final Servo leftStack;
    final Servo rightStack;
-   public static double LEFT_STACK_OPEN = 0.63;
-   public static double LEFT_STACK_CLOSED = 0.2;
+   public static double LEFT_STACK_OPEN = 0.6;
+   public static double LEFT_STACK_CLOSED = 0.1;
    public static double RIGHT_STACK_OPEN = 0.03;
-   public static double RIGHT_STACK_CLOSED = 0.45;
+   public static double RIGHT_STACK_CLOSED = 0.47;
    public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00005, 0, 0);
 
    public Intake(HardwareMap hardwareMap) { 
