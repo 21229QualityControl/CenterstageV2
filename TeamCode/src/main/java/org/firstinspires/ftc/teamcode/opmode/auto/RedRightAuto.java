@@ -95,7 +95,7 @@ public class RedRightAuto extends AutoBase {
                                       outtake.latchOpen(),
                                       new SleepAction(0.5)
                               ))
-                              .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y), stack.heading)
+                              .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y + 12), stack.heading)
                               .afterDisp(60, intake.intakeOn())
                               .strafeToLinearHeading(stack.position.plus(new Vector2d(30, 14)), stack.heading)
                               .strafeToLinearHeading(stack.position, stack.heading)

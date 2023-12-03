@@ -221,7 +221,11 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(outtake.latchScoring());
       }
       if (g2.dpadDownOnce()) {
-         sched.queueAction(outtake.latchClosed());
+         if (intake.intakeState == Intake.IntakeState.On) {
+            sched.queueAction(outtake.latchOpen());
+         } else {
+            sched.queueAction(outtake.latchClosed());
+         }
       }
    }
 }
