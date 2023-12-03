@@ -178,9 +178,9 @@ public class ManualDrive extends LinearOpMode {
       if (g1.startOnce()) {
          sched.queueAction(new SequentialAction(
                  intake.stackClosed(),
-                 new SleepAction(0.3),
+                 new SleepAction(0.6),
                  intake.stackOpen(),
-                 new SleepAction(0.3)
+                 new SleepAction(0.6)
          ));
       }
    }

@@ -9,17 +9,15 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
-import java.util.Vector;
-
 @Config
-@Autonomous(name = "Blue Left Auto", group = "Auto", preselectTeleOp = "Manual Drive")
-public class BlueLeftAuto extends AutoBase {
+@Autonomous(name = "Blue Left Auto Cringe", group = "Auto", preselectTeleOp = "Manual Drive")
+public class BlueLeftAutoCringe extends AutoBase {
    public static Pose2d[] spike = {new Pose2d(9, 42, Math.toRadians(45)), new Pose2d(12, 41, Math.toRadians(90)), new Pose2d(24, 42, Math.toRadians(90))};
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d[] spikeBackedOut =  {new Pose2d(17, 50, Math.toRadians(45)), new Pose2d(12, 49, Math.toRadians(90)), new Pose2d(24, 50, Math.toRadians(90))};
    public static Pose2d start = new Pose2d(12, 63, Math.toRadians(90));
    public static Pose2d parking = new Pose2d(56, 60, Math.toRadians(180));
-   public static Pose2d stack = new Pose2d(-55, 16, Math.toRadians(180));
+   public static Pose2d stack = new Pose2d(-63, 20, Math.toRadians(180));
 
    @Override
    protected Pose2d getStartPose() {
@@ -35,8 +33,8 @@ public class BlueLeftAuto extends AutoBase {
    protected void onRun() {
       deliverSpike();
       scorePreload(false);
-      intakeStack();
-      scorePreload(true);
+      //intakeStack();
+      //scorePreload(true);
       park();
    }
 
@@ -92,25 +90,19 @@ public class BlueLeftAuto extends AutoBase {
                                       outtake.latchOpen(),
                                       new SleepAction(0.5)
                               ))
-                              .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
                               .strafeToLinearHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x, stack.position.y - 8), stack.heading)
                               .afterDisp(60, intake.intakeOn())
-                              .strafeToLinearHeading(stack.position.plus(new Vector2d(34, -8)), stack.heading)
+                              .strafeToLinearHeading(stack.position.plus(new Vector2d(30, -8)), stack.heading)
                               .strafeToLinearHeading(stack.position, stack.heading)
                               .build(),
-                      drive.actionBuilder(stack)
-                              .afterTime(0, new SequentialAction(
-                                      new SleepAction(0.6),
-                                      intake.stackClosed(),
-                                      new SleepAction(0.6),
-                                      intake.stackOpen(),
-                                      new SleepAction(0.6),
-                                      intake.stackClosed(),
-                                      new SleepAction(1.0),
-                                      intake.stackOpen()
-                              ))
-                              .strafeToLinearHeading(stack.position.plus(new Vector2d(-10, 0)), stack.heading)
-                              .build(),
+                      new SleepAction(0.5),
+                      intake.stackClosed(),
+                      new SleepAction(0.3),
+                      intake.stackOpen(),
+                      new SleepAction(0.3),
+                      intake.stackClosed(),
+                      new SleepAction(0.3),
+                      intake.stackOpen(),
                       drive.actionBuilder(stack)
                               .afterTime(2, new SequentialAction(
                                       intake.intakeOff(),
