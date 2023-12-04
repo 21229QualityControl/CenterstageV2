@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -7,6 +9,7 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
 import java.util.Vector;
@@ -67,6 +70,9 @@ public class BlueLeftAuto extends AutoBase {
    }
 
    private void scorePreload(boolean mid) {
+      if (mid) {
+         SPIKE = (SPIKE + 1) % 3;
+      }
       sched.addAction(
               new SequentialAction(
                       outtake.wristScoring(),
@@ -98,6 +104,10 @@ public class BlueLeftAuto extends AutoBase {
                               .strafeToLinearHeading(stack.position.plus(new Vector2d(34, -8)), stack.heading)
                               .strafeToLinearHeading(stack.position, stack.heading)
                               .build(),
+                      new ActionUtil.RunnableAction(() -> {
+                         SPIKE = (SPIKE + 1) % 3;
+                         return false;
+                      }),
                       drive.actionBuilder(stack)
                               .afterTime(0, new SequentialAction(
                                       new SleepAction(0.6),

@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
 import java.util.Vector;
@@ -70,6 +71,9 @@ public class RedRightAuto extends AutoBase {
    }
 
    private void scorePreload(boolean mid) {
+      if (mid) {
+         SPIKE = (SPIKE + 1) % 3;
+      }
       sched.addAction(
               new SequentialAction(
                       outtake.wristScoring(),
@@ -101,6 +105,10 @@ public class RedRightAuto extends AutoBase {
                               .strafeToLinearHeading(stack.position.plus(new Vector2d(34, 14)), stack.heading)
                               .strafeToLinearHeading(stack.position, stack.heading)
                               .build(),
+                      new ActionUtil.RunnableAction(() -> {
+                         SPIKE = (SPIKE + 1) % 3;
+                         return false;
+                      }),
                       drive.actionBuilder(stack)
                               .afterTime(0, new SequentialAction(
                                       new SleepAction(0.6),

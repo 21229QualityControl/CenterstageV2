@@ -33,7 +33,7 @@ public class RedLeftAuto extends AutoBase {
 
    @Override
    protected void onRun() {
-      //sched.addAction(new SleepAction(10));
+      sched.addAction(new SleepAction(10));
       deliverSpike();
       driveToScoring();
       scorePreload();

@@ -16,7 +16,7 @@ public class BlueLeftAutoCringe extends AutoBase {
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d[] spikeBackedOut =  {new Pose2d(17, 50, Math.toRadians(45)), new Pose2d(12, 49, Math.toRadians(90)), new Pose2d(24, 50, Math.toRadians(90))};
    public static Pose2d start = new Pose2d(12, 63, Math.toRadians(90));
-   public static Pose2d parking = new Pose2d(56, 60, Math.toRadians(180));
+   public static Pose2d parking = new Pose2d(56, 7, Math.toRadians(180));
    public static Pose2d stack = new Pose2d(-63, 20, Math.toRadians(180));
 
    @Override

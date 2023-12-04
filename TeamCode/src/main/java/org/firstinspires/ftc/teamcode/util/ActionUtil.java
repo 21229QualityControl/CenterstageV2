@@ -6,6 +6,8 @@ import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import java.util.concurrent.Callable;
+
 public class ActionUtil {
    public static class DcMotorExPowerAction implements Action {
       double power;
@@ -20,6 +22,23 @@ public class ActionUtil {
       public boolean run(TelemetryPacket packet) {
          motor.setPower(power);
          return false;
+      }
+   }
+
+   public static class RunnableAction implements Action {
+      Callable<Boolean> action;
+
+      public RunnableAction(Callable<Boolean> action) {
+         this.action = action;
+      }
+
+      @Override
+      public boolean run(TelemetryPacket packet) {
+         try {
+            return action.call();
+         } catch (Exception e) {
+            throw new RuntimeException(e);
+         }
       }
    }
 
