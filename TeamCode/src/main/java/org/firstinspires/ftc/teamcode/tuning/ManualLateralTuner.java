@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.tuning;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
-// TODO: remove Actions from the core module?
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,7 +10,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @TeleOp(group = "Test")
-public final class ManualFeedbackTuner extends LinearOpMode {
+@Config
+public final class ManualLateralTuner extends LinearOpMode {
     public static double DISTANCE = 64;
 
     @Override
@@ -17,14 +19,14 @@ public final class ManualFeedbackTuner extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
         waitForStart();
-
-        drive.pose =  new Pose2d(0, 0, 0);
+        Pose2d start = new Pose2d(0, 0, 0);
+        drive.pose = start;
 
         while (opModeIsActive()) {
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .lineToX(DISTANCE)
-                            .lineToX(0)
+                    drive.actionBuilder(start)
+                            .strafeTo(start.position.plus(new Vector2d(0, DISTANCE)))
+                            .strafeTo(start.position)
                             .build());
         }
     }
