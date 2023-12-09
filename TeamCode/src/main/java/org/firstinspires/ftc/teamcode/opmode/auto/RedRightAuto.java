@@ -17,8 +17,8 @@ import java.util.Vector;
 @Config
 @Autonomous(name = "Red Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class RedRightAuto extends AutoBase {
-   public static Pose2d[] spike = {new Pose2d(24, -40, Math.toRadians(-90)), new Pose2d(10, -38, Math.toRadians(-90)), new Pose2d(8, -37, Math.toRadians(-45))};
-   public static Pose2d[] spikeBackedOut =  {new Pose2d(22, -48, Math.toRadians(-90)), new Pose2d(10, -46, Math.toRadians(-90)), new Pose2d(16, -45, Math.toRadians(-45))};
+   public static Pose2d[] spike = {new Pose2d(24, -36, Math.toRadians(-90)), new Pose2d(10, -28, Math.toRadians(-90)), new Pose2d(4, -32, Math.toRadians(-45))};
+   public static Pose2d[] spikeBackedOut =  {new Pose2d(24, -46, Math.toRadians(-90)), new Pose2d(10, -38, Math.toRadians(-90)), new Pose2d(16, -42, Math.toRadians(-45))};
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d start = new Pose2d(12, -61, Math.toRadians(-90));
    public static Pose2d parking = new Pose2d(56, -60, Math.toRadians(180));
@@ -100,9 +100,8 @@ public class RedRightAuto extends AutoBase {
                                       new SleepAction(0.5)
                               ))
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
-                              .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y + 12), stack.heading)
+                              .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y), stack.heading)
                               .afterDisp(60, intake.intakeOn())
-                              .strafeToLinearHeading(stack.position.plus(new Vector2d(34, 14)), stack.heading)
                               .strafeToLinearHeading(stack.position, stack.heading)
                               .build(),
                       new ActionUtil.RunnableAction(() -> {
@@ -127,8 +126,8 @@ public class RedRightAuto extends AutoBase {
                                       intake.intakeOff(),
                                       outtake.latchClosed()
                               ))
-                              .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y + 14), AutoConstants.redScoring[SPIKE].heading)
-                              .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
+                              .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y), AutoConstants.redScoring[SPIKE].heading)
+                              .strafeToLinearHeading(AutoConstants.redScoring[(SPIKE + 1) % 3].position, AutoConstants.redScoring[(SPIKE + 1) % 3].heading)
                               .build()
               )
       );
