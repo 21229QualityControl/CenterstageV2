@@ -25,6 +25,9 @@ public class Intake {
    public static double LEFT_STACK_CLOSED = 0.1;
    public static double RIGHT_STACK_OPEN = 0.03;
    public static double RIGHT_STACK_CLOSED = 0.47;
+   public static double RIGHT_STACK_HALF = (RIGHT_STACK_OPEN + RIGHT_STACK_CLOSED) / 2;
+   public static double LEFT_STACK_HALF = (LEFT_STACK_OPEN + RIGHT_STACK_OPEN) / 2;
+
    public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00005, 0, 0);
 
    public Intake(HardwareMap hardwareMap) { 
@@ -93,6 +96,13 @@ public class Intake {
       return new SequentialAction(
               new ActionUtil.ServoPositionAction(leftStack, LEFT_STACK_OPEN),
               new ActionUtil.ServoPositionAction(rightStack, RIGHT_STACK_OPEN)
+      );
+   }
+
+   public Action stackHalf() {
+      return new SequentialAction(
+              new ActionUtil.ServoPositionAction(leftStack, LEFT_STACK_HALF),
+              new ActionUtil.ServoPositionAction(rightStack, RIGHT_STACK_HALF)
       );
    }
 
