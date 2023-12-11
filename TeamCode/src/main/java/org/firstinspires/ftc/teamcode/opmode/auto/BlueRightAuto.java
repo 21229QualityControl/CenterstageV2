@@ -9,8 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
-import java.util.Vector;
-
 @Config
 @Autonomous(name = "Blue Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueRightAuto extends AutoBase {
