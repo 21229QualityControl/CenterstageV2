@@ -78,6 +78,11 @@ public class Outtake {
       return this.slide.setTargetPositionActionBlocking(OUTTAKE_MID);
    }
 
+   public Action extendOuttakeMid() {
+      return this.slide.setTargetPositionAction(OUTTAKE_MID);
+   }
+
+
    public Action extendOuttakeTeleopBlocking() {
       return this.slide.setTargetPositionActionBlocking(OUTTAKE_TELEOP);
    }
