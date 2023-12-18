@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.util.ActionScheduler;
 import org.firstinspires.ftc.teamcode.util.GamePadController;
+import org.firstinspires.ftc.teamcode.util.LED;
 import org.firstinspires.ftc.teamcode.util.SmartGameTimer;
 
 @Config
@@ -41,6 +43,7 @@ public class ManualDrive extends LinearOpMode {
    private Hang hang;
    private Plane plane;
    private Vision vision;
+   private LED led;
 
    @Override
    public void runOpMode() throws InterruptedException {
@@ -59,6 +62,7 @@ public class ManualDrive extends LinearOpMode {
       hang = new Hang(hardwareMap);
       plane = new Plane(hardwareMap);
       vision = new Vision(hardwareMap);
+      led = new LED(hardwareMap);
 
       if (Memory.RAN_AUTO) {
          smartGameTimer = new SmartGameTimer(true);
@@ -97,6 +101,7 @@ public class ManualDrive extends LinearOpMode {
          move();
          intakeControls();
          outtakeControls();
+         ledUpdate();
 
          drive.updatePoseEstimate();
          sched.update();
@@ -185,11 +190,9 @@ public class ManualDrive extends LinearOpMode {
       }
    }
 
-   int outtakePixelCount = 0;
    private void outtakeControls() {
       // Outtake controls
       if (g2.yOnce()) {
-         outtakePixelCount = 2; // TODO: Use sensors
          sched.queueAction(intake.intakeOff());
          sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.1)));
          sched.queueAction(new ParallelAction(
@@ -198,11 +201,12 @@ public class ManualDrive extends LinearOpMode {
          ));
       }
       if (g2.xOnce()) {
-         if (outtakePixelCount == 2) {
+         if (intake.pixelCount >= 2) {
             sched.queueAction(outtake.latchScoring());
-            outtakePixelCount = 1;
+            sched.queueAction(intake.setPixelCount(1));
          } else {
             sched.queueAction(outtake.latchOpen());
+            sched.queueAction(intake.setPixelCount(0));
          }
       }
       if (Math.abs(g2.right_stick_y) > 0.01) {
@@ -226,6 +230,46 @@ public class ManualDrive extends LinearOpMode {
          } else {
             sched.queueAction(outtake.latchClosed());
          }
+      }
+   }
+
+   private double timeLeft() {
+      if (!isStarted()) return 120;
+      return 120 - smartGameTimer.seconds();
+   }
+   private boolean isBetween(double number, double min, double max) {
+      return min <= number && number < max;
+   }
+   boolean warning1 = false;
+   boolean warning2 = false;
+   boolean warning3 = false;
+   private void ledUpdate() {
+      if (intake.pixelCount == 1) {
+         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+      } else if (intake.pixelCount == 2) {
+         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+      } else if (intake.pixelCount > 2) {
+            led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_LAVA_PALETTE);
+      } else if (isBetween(timeLeft(), 31, 35)) { // 35-31; prepare for endgame
+         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
+         if (!warning1) {
+            g1.rumbleBlips(3);
+            warning1 = true;
+         }
+      } else if (isBetween(timeLeft(), 25, 30)) { // 30-25; endgame starts
+         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_WITH_GLITTER);
+         if (!warning2) {
+            g1.rumbleBlips(3);
+            warning2 = true;
+         }
+      } else if (isBetween(timeLeft(), 0, 5)) { // last 5 sec, go park
+         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+         if (!warning3) {
+            g1.rumbleBlips(3);
+            warning3 = true;
+         }
+      } else { // default lights, put here for lower priority
+         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
       }
    }
 }

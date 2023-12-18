@@ -4,12 +4,14 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
+import org.firstinspires.ftc.teamcode.util.BeamBreakSensor;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 import org.firstinspires.ftc.teamcode.util.MotorWithVelocityPID;
 import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
@@ -21,6 +23,11 @@ public class Intake {
    final MotorWithVelocityPID intakeMotor;
    final Servo leftStack;
    final Servo rightStack;
+   final BeamBreakSensor beamBreak;
+   boolean beamBroken;
+
+   public int pixelCount = 0;
+
    public static double LEFT_STACK_OPEN = 0.6;
    public static double LEFT_STACK_CLOSED = 0.1;
    public static double RIGHT_STACK_OPEN = 0.03;
@@ -35,6 +42,7 @@ public class Intake {
          this.intakeMotor.setMaxPower(1.0);
          this.leftStack = HardwareCreator.createServo(hardwareMap, "leftStack");
          this.rightStack = HardwareCreator.createServo(hardwareMap, "rightStack");
+         this.beamBreak = new BeamBreakSensor(hardwareMap, "intakeBeam");
    }
 
    public void initialize() {
@@ -59,6 +67,19 @@ public class Intake {
       @Override
       public boolean run(TelemetryPacket packet) {
          intakeState = newState;
+         return false;
+      }
+   }
+   public class IntakePixelCountAction implements Action {
+      int newPixelCount;
+
+      public IntakePixelCountAction(int newPixelCount) {
+         this.newPixelCount = newPixelCount;
+      }
+
+      @Override
+      public boolean run(TelemetryPacket packet) {
+         pixelCount = newPixelCount;
          return false;
       }
    }
@@ -90,6 +111,13 @@ public class Intake {
 
    public void update() {
       intakeMotor.update();
+      if (!beamBreak.isBeamBroken() && beamBroken) {
+         pixelCount++;
+         if (pixelCount == 2 && intakeState == IntakeState.On) {
+            //Actions.runBlocking(intakeOff()); // TODO: Increase beam break reliability
+         }
+      }
+      beamBroken = beamBreak.isBeamBroken();
    }
 
    public Action stackOpen() {
@@ -111,5 +139,9 @@ public class Intake {
               new ActionUtil.ServoPositionAction(leftStack, LEFT_STACK_CLOSED),
               new ActionUtil.ServoPositionAction(rightStack, RIGHT_STACK_CLOSED)
       );
+   }
+
+   public Action setPixelCount(int newPixelCount) {
+      return new IntakePixelCountAction(newPixelCount);
    }
 }

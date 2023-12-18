@@ -13,16 +13,16 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Outtake {
-   public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0, 0.0004);
+   public static PIDCoefficients outtakePID = new PIDCoefficients(0.007, 0, 0.0004);
    public static int OUTTAKE_TELEOP = 0;
    public static int OUTTAKE_MIDLOW = 500;
    public static int OUTTAKE_MID = 1200;
    public static int OUTTAKE_LOW = 300;
-   public static double LATCH_SCORING = 0.3;
-   public static double LATCH_OPEN = 0.54;
-   public static double LATCH_CLOSED = 0.62;
-   public static double WRIST_STORED = 0.67;
-   public static double WRIST_SCORING = 0.34;
+   public static double LATCH_SCORING = 0.6;
+   public static double LATCH_OPEN = 0.8;
+   public static double LATCH_CLOSED = 0.9;
+   public static double WRIST_STORED = 0.805;
+   public static double WRIST_SCORING = 1;
    final MotorWithPID slide;
    public boolean slidePIDEnabled = true;
    final Servo latch;
