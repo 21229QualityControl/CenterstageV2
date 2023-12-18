@@ -18,8 +18,7 @@ public class BlueLeftAutoSpline extends AutoBase {
    public static Pose2d[] spikeBackedOut =  {new Pose2d(17, 46, Math.toRadians(45)), new Pose2d(12, 44, Math.toRadians(90)), new Pose2d(24, 55, Math.toRadians(90))};
    public static Pose2d start = new Pose2d(12, 63, Math.toRadians(90));
    public static Pose2d parking = new Pose2d(56, 60, Math.toRadians(180));
-   public static Pose2d[] stackPositions = {new Pose2d( -68, 13, Math.toRadians(180)), new Pose2d(-68, 13, Math.toRadians(180)), new Pose2d(-68, 14, Math.toRadians(180))}; // TODO: Figure out why it has to be different based on spike
-   private Pose2d stack;
+   private Pose2d stack = new Pose2d( -68, 13, Math.toRadians(180));
 
    @Override
    protected Pose2d getStartPose() {
@@ -33,7 +32,6 @@ public class BlueLeftAutoSpline extends AutoBase {
 
    @Override
    protected void onRun() {
-      stack = stackPositions[SPIKE];
       deliverSpike();
       scorePreload();
       intakeStack(true);
@@ -103,8 +101,11 @@ public class BlueLeftAutoSpline extends AutoBase {
                       .afterDisp(0, new SequentialAction(
                               intake.stackClosed(),
                               new SleepAction(0.3),
+                              intake.stackHalf(),
+                              new SleepAction(0.3),
+                              intake.stackClosed(),
+                              new SleepAction(0.3),
                               intake.stackHalf()
-                              // continues in scoreStack()
                       ))
                       .build()
       );
@@ -117,13 +118,6 @@ public class BlueLeftAutoSpline extends AutoBase {
       sched.addAction(
               drive.actionBuilder(stack)
                       .setReversed(true)
-                      .afterTime(0, new SequentialAction(
-                              // starts in intakeStack()
-                              new SleepAction(0.3),
-                              intake.stackClosed(),
-                              new SleepAction(0.3),
-                              intake.stackHalf()
-                      ))
                       .splineToConstantHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x - 12, stack.position.y), stack.heading)
                       .afterDisp(0, new SequentialAction(
                               intake.intakeOff(),
