@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.util.ActionScheduler;
+import org.firstinspires.ftc.teamcode.util.BeamBreakSensor;
 import org.firstinspires.ftc.teamcode.util.GamePadController;
 import org.firstinspires.ftc.teamcode.util.LED;
 import org.firstinspires.ftc.teamcode.util.SmartGameTimer;
@@ -44,6 +45,7 @@ public class ManualDrive extends LinearOpMode {
    private Plane plane;
    private Vision vision;
    private LED led;
+   private BeamBreakSensor sensor;
 
    @Override
    public void runOpMode() throws InterruptedException {
@@ -63,6 +65,7 @@ public class ManualDrive extends LinearOpMode {
       plane = new Plane(hardwareMap);
       vision = new Vision(hardwareMap);
       led = new LED(hardwareMap);
+      sensor = new BeamBreakSensor(hardwareMap, "intakeBeam");
 
       if (Memory.RAN_AUTO) {
          smartGameTimer = new SmartGameTimer(true);
@@ -110,6 +113,10 @@ public class ManualDrive extends LinearOpMode {
          hang.update();
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
+         telemetry.addData("Beam Broken", sensor.isBeamBroken());
+         telemetry.update();
+
+         telemetry.update();
          telemetry.update();
       }
 
@@ -170,7 +177,7 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(intake.intakeOff());
       }
 
-      // Other subsystems
+      // Other susbsystems
       if (g1.dpadUpOnce()) {
          sched.queueAction(hang.extendHang());
       }
@@ -199,6 +206,8 @@ public class ManualDrive extends LinearOpMode {
                  new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
                  outtake.extendOuttakeTeleopBlocking()
          ));
+         intake.pixelCount = 2; // If the outtake slide's are extended and ready for deposit we probably have 2 pixels.
+         //Since the beam breaks aren't finalized yet I'm using this just to test whether the outtake can release one by one.
       }
       if (g2.xOnce()) {
          if (intake.pixelCount >= 2) {
@@ -217,8 +226,9 @@ public class ManualDrive extends LinearOpMode {
          outtake.lockPosition();
       }
       if (g2.bOnce()) {
-         sched.queueAction(outtake.retractOuttake());
          sched.queueAction(outtake.wristStored());
+         new SleepAction(1);
+         sched.queueAction(outtake.retractOuttake());
          sched.queueAction(outtake.latchClosed());
       }
       if (g2.dpadUpOnce()) {

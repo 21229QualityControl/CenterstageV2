@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static int INTAKE_SPEED = 1000; // Max speed is 2400
+   public static int INTAKE_SPEED = 800; // Max speed is 2400
 
    final MotorWithVelocityPID intakeMotor;
    final Servo leftStack;
@@ -28,8 +28,8 @@ public class Intake {
 
    public int pixelCount = 0;
 
-   public static double LEFT_STACK_OPEN = 0.6;
-   public static double LEFT_STACK_CLOSED = 0.1;
+   public static double LEFT_STACK_OPEN = 0.97;
+   public static double LEFT_STACK_CLOSED = 0.475;
    public static double RIGHT_STACK_OPEN = 0.03;
    public static double RIGHT_STACK_CLOSED = 0.47;
    public static double RIGHT_STACK_HALF = (RIGHT_STACK_OPEN + RIGHT_STACK_CLOSED) / 2;
@@ -114,7 +114,7 @@ public class Intake {
       if (!beamBreak.isBeamBroken() && beamBroken) {
          pixelCount++;
          if (pixelCount == 2 && intakeState == IntakeState.On) {
-            //Actions.runBlocking(intakeOff()); // TODO: Increase beam break reliability
+            Actions.runBlocking(intakeOff()); // TODO: Increase beam break reliability
          }
       }
       beamBroken = beamBreak.isBeamBroken();
