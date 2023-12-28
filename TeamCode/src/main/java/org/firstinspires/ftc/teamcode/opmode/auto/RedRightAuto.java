@@ -103,24 +103,18 @@ public class RedRightAuto extends AutoBase {
                               .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y), stack.heading)
                               .afterDisp(60, intake.intakeOn())
                               .strafeToLinearHeading(stack.position, stack.heading)
+                              .strafeToLinearHeading(stack.position.plus(new Vector2d(-10, 0)), stack.heading)
                               .build(),
-                      new ActionUtil.RunnableAction(() -> {
-                         SPIKE = (SPIKE + 1) % 3;
-                         return false;
-                      }),
-                      drive.actionBuilder(stack)
-                              .afterTime(0, new SequentialAction(
-                                      new SleepAction(0.6),
-                                      intake.stackClosed(),
-                                      new SleepAction(0.6),
-                                      intake.stackOpen(),
-                                      new SleepAction(0.6),
-                                      intake.stackClosed(),
-                                      new SleepAction(1.0),
-                                      intake.stackOpen()
-                              ))
-                             .strafeToLinearHeading(stack.position.plus(new Vector2d(-10, 0)), stack.heading)
-                                     .build(),
+                      new SequentialAction(
+                              new SleepAction(0.6),
+                              intake.stackClosed(),
+                              new SleepAction(0.6),
+                              intake.stackOpen(),
+                              new SleepAction(0.6),
+                              intake.stackClosed(),
+                              new SleepAction(1.0),
+                              intake.stackOpen()
+                      ),
                       drive.actionBuilder(stack)
                               .afterTime(2, new SequentialAction(
                                       intake.intakeOff(),
