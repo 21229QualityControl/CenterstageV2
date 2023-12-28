@@ -37,7 +37,7 @@ public class Intake {
 
    public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00005, 0, 0);
 
-   public Intake(HardwareMap hardwareMap) { 
+   public Intake(HardwareMap hardwareMap) {
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
          this.intakeMotor.setMaxPower(1.0);
          this.leftStack = HardwareCreator.createServo(hardwareMap, "leftStack");
@@ -109,13 +109,12 @@ public class Intake {
       );
    }
 
+   private long lastPixel = 0;
    public void update() {
       intakeMotor.update();
-      if (!beamBreak.isBeamBroken() && beamBroken) {
+      if (!beamBreak.isBeamBroken() && beamBroken && (System.currentTimeMillis() - lastPixel) > 15) {
          pixelCount++;
-         if (pixelCount == 2 && intakeState == IntakeState.On) {
-            Actions.runBlocking(intakeOff()); // TODO: Increase beam break reliability
-         }
+         lastPixel = System.currentTimeMillis();
       }
       beamBroken = beamBreak.isBeamBroken();
    }

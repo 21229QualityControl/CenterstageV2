@@ -29,7 +29,8 @@ public class BlueLeftAuto extends AutoBase {
 
    public static Pose2d start = new Pose2d(12, 63, Math.toRadians(90));
    public static Pose2d parking = new Pose2d(56, 60, Math.toRadians(180));
-   public static Pose2d stack = new Pose2d(-55, 16, Math.toRadians(180));
+   public static Pose2d[] stackPositions = {new Pose2d(-55, 16, Math.toRadians(180)), new Pose2d(-55, 14, Math.toRadians(180)), new Pose2d(-55, 16, Math.toRadians(180))};
+   public static Pose2d stack;
 
    @Override
    protected Pose2d getStartPose() {
@@ -43,6 +44,7 @@ public class BlueLeftAuto extends AutoBase {
 
    @Override
    protected void onRun() {
+      stack = stackPositions[SPIKE];
       deliverSpike();
       scorePreload(false);
       intakeStack();
@@ -109,24 +111,18 @@ public class BlueLeftAuto extends AutoBase {
                               .strafeToLinearHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x, stack.position.y), stack.heading)
                               .afterDisp(60, intake.intakeOn())
                               .strafeToLinearHeading(stack.position, stack.heading)
-                              .build(),
-                      new ActionUtil.RunnableAction(() -> {
-                         SPIKE = (SPIKE + 1) % 3;
-                         return false;
-                      }),
-                      drive.actionBuilder(stack)
-                              .afterTime(0, new SequentialAction(
-                                      new SleepAction(0.6),
-                                      intake.stackClosed(),
-                                      new SleepAction(0.6),
-                                      intake.stackOpen(),
-                                      new SleepAction(0.6),
-                                      intake.stackClosed(),
-                                      new SleepAction(1.0),
-                                      intake.stackOpen()
-                              ))
                               .strafeToLinearHeading(stack.position.plus(new Vector2d(-10, 0)), stack.heading)
                               .build(),
+                      new SequentialAction(
+                              new SleepAction(0.6),
+                              intake.stackClosed(),
+                              new SleepAction(0.6),
+                              intake.stackOpen(),
+                              new SleepAction(0.6),
+                              intake.stackClosed(),
+                              new SleepAction(1.0),
+                              intake.stackOpen()
+                      ),
                       drive.actionBuilder(stack)
                               .afterTime(2, new SequentialAction(
                                       intake.intakeOff(),

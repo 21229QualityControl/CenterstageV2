@@ -157,6 +157,15 @@ public class ManualDrive extends LinearOpMode {
    }
 
    private void intakeControls() {
+      if (intake.pixelCount >= 2 && intake.intakeState == Intake.IntakeState.On) {
+         sched.queueAction(
+                 new SequentialAction(
+                         intake.intakeOff(),
+                         outtake.latchClosed()
+                 )
+         );
+      }
+
       // Intake controls
       if (g1.aOnce()) {
          if (intake.intakeState == Intake.IntakeState.On) {
