@@ -94,6 +94,7 @@ public class ManualDrive extends LinearOpMode {
          outtake.initialize();
          plane.initialize();
          intake.initialize();
+         smartGameTimer.resetIfStandard();
       }
 
       // Main loop
@@ -157,7 +158,8 @@ public class ManualDrive extends LinearOpMode {
    }
 
    private void intakeControls() {
-      if (intake.pixelCount >= 2 && intake.intakeState == Intake.IntakeState.On) {
+      if (intake.hit2) {
+         intake.hit2 = false;
          sched.queueAction(
                  new SequentialAction(
                          intake.intakeOff(),

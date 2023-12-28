@@ -110,10 +110,14 @@ public class Intake {
    }
 
    private long lastPixel = 0;
+   public boolean hit2;
    public void update() {
       intakeMotor.update();
       if (!beamBreak.isBeamBroken() && beamBroken && (System.currentTimeMillis() - lastPixel) > 15) {
          pixelCount++;
+         if (pixelCount >= 2 && intakeState == IntakeState.On) {
+            hit2 = true;
+         }
          lastPixel = System.currentTimeMillis();
       }
       beamBroken = beamBreak.isBeamBroken();
