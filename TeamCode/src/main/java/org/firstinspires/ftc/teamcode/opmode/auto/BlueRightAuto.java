@@ -12,12 +12,12 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 @Config
 @Autonomous(name = "Blue Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueRightAuto extends AutoBase {
-    public static Pose2d[] spike = {new Pose2d(-48, 41, Math.toRadians(90)), new Pose2d(-36, 35, Math.toRadians(90)), new Pose2d(-33, 37, Math.toRadians(45))};
+    public static Pose2d[] spike = {new Pose2d(-51, 40, Math.toRadians(90)), new Pose2d(-36, 31, Math.toRadians(90)), new Pose2d(-31, 37, Math.toRadians(135))};
     // 0 = right, 1 = middle, 2 = left
-    public static Pose2d[] spikeBackedOut =  {new Pose2d(-48, 47, Math.toRadians(90)), new Pose2d(-36, 46, Math.toRadians(90)), new Pose2d(-41, 47, Math.toRadians(45))};
-    public static Pose2d start = new Pose2d(-36, 60, Math.toRadians(90));
-    public static Pose2d parking = new Pose2d(56, 7, Math.toRadians(180));
-    public static Pose2d intermediate = new Pose2d(-40, 54, Math.toRadians(180));
+    public static Pose2d[] spikeBackedOut =  {new Pose2d(-48, 50, Math.toRadians(90)), new Pose2d(-36, 49, Math.toRadians(90)), new Pose2d(-40, 47, Math.toRadians(135))};
+    public static Pose2d start = new Pose2d(-36, 63, Math.toRadians(90));
+    public static Pose2d parking = new Pose2d(60, 10, Math.toRadians(180));
+    public static Pose2d intermediate = new Pose2d(-40, 61, Math.toRadians(180));
 
     @Override
     protected Pose2d getStartPose() {
@@ -39,7 +39,7 @@ public class BlueRightAuto extends AutoBase {
     }
 
     private void deliverSpike() {
-        if (SPIKE != 0) {
+        if (SPIKE != 2) {
             sched.addAction(
                     drive.actionBuilder(getStartPose())
                             .strafeTo(spike[SPIKE].position)
