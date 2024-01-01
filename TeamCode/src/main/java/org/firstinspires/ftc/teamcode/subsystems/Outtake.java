@@ -2,12 +2,14 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
+import org.firstinspires.ftc.teamcode.util.MagnetSwitchSensor;
 import org.firstinspires.ftc.teamcode.util.MotorWithPID;
 import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
@@ -28,6 +30,8 @@ public class Outtake {
    final Servo latch;
    final Servo wrist;
 
+   final MagnetSwitchSensor slideSensor;
+
    public Outtake(HardwareMap hardwareMap) {
       if (Memory.outtakeSlide != null) { // Preserve motor zero position
          this.slide = Memory.outtakeSlide;
@@ -39,6 +43,11 @@ public class Outtake {
       this.slide.getMotor().setDirection(DcMotorSimple.Direction.REVERSE);
       this.latch = HardwareCreator.createServo(hardwareMap, "outtakeLatch");
       this.wrist = HardwareCreator.createServo(hardwareMap, "outtakeWrist");
+      this.slideSensor = new MagnetSwitchSensor(hardwareMap, "outtakeMagnetSensor");
+   }
+
+   public MotorWithPID getSlide(){
+      return this.slide;
    }
 
    public void prepTeleop() {
@@ -111,5 +120,18 @@ public class Outtake {
 
    public Action wristScoring() {
       return new ActionUtil.ServoPositionAction(wrist, WRIST_SCORING);
+   }
+
+   public boolean isSlideMagnetPresent() {
+      return slideSensor.isMagnetPresent();
+   }
+
+   public boolean isSlideDown() {
+      return slideSensor.isMagnetPresent() && Math.abs(slide.getVelocity()) < 3 && slide.getTargetPosition() < 5;
+   }
+
+   public void zeroMotorInternals() {
+      this.slide.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      this.slide.getMotor().setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
    }
 }
