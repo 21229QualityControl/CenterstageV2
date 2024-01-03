@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
@@ -25,10 +26,16 @@ public class Outtake {
    public static double LATCH_CLOSED = 0.9;
    public static double WRIST_STORED = 0.74;
    public static double WRIST_SCORING = 1;
+
+   public static double MOSAIC_ADJUSTING = 0.54;
+   public static double MOSAIC_CLOSED = 0.11;
+
+   public double mosaicPosition;
    final MotorWithPID slide;
    public boolean slidePIDEnabled = true;
    final Servo latch;
    final Servo wrist;
+   public ServoImplEx mosaic;
 
    final MagnetSwitchSensor slideSensor;
 
@@ -44,11 +51,14 @@ public class Outtake {
       this.latch = HardwareCreator.createServo(hardwareMap, "outtakeLatch");
       this.wrist = HardwareCreator.createServo(hardwareMap, "outtakeWrist");
       this.slideSensor = new MagnetSwitchSensor(hardwareMap, "outtakeMagnetSensor");
+      this.mosaic = (ServoImplEx) HardwareCreator.createServo(hardwareMap, "mosaic");
    }
-
+   // The object outtake can get the slide motor to be directly used in Manual Drive.
    public MotorWithPID getSlide(){
       return this.slide;
    }
+   // The object outtake can get the mosaic servo to be directly used in Manual Drive.
+   public ServoImplEx getServo() {return this.mosaic; }
 
    public void prepTeleop() {
       this.slide.getMotor().setPower(-0.3);
@@ -120,6 +130,27 @@ public class Outtake {
 
    public Action wristScoring() {
       return new ActionUtil.ServoPositionAction(wrist, WRIST_SCORING);
+   }
+
+   public Action mosaicAdjust() {
+      return new ActionUtil.ServoPositionAction(mosaic, MOSAIC_ADJUSTING);
+   }
+   public Action mosaicClosed() {
+      return new ActionUtil.ServoPositionAction(mosaic, MOSAIC_CLOSED);
+   }
+
+   public Action decreaseMosaicPos() {
+      mosaicPosition = mosaic.getPosition() - 0.01;
+      return new ActionUtil.ServoPositionAction(mosaic, mosaicPosition);
+   }
+
+   public Action increaseMosaicPos() {
+      mosaicPosition = mosaic.getPosition() + 0.01;
+      return new ActionUtil.ServoPositionAction(mosaic, mosaicPosition);
+   }
+
+   public void disableMosaicServoPwm() {
+      this.mosaic.setPwmDisable();
    }
 
    public boolean isSlideMagnetPresent() {
