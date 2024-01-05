@@ -28,7 +28,7 @@ public class Intake {
 
    public int pixelCount = 0;
 
-   public static double LEFT_STACK_OPEN = 0.97;
+   public static double LEFT_STACK_OPEN = 0.92;
    public static double LEFT_STACK_CLOSED = 0.475;
    public static double RIGHT_STACK_OPEN = 0.03;
    public static double RIGHT_STACK_CLOSED = 0.47;
