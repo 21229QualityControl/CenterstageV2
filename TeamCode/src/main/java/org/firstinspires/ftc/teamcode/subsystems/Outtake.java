@@ -72,6 +72,7 @@ public class Outtake {
       this.wrist.setPosition(WRIST_STORED);
       this.latch.setPosition(LATCH_CLOSED);
       this.mosaic.setPosition(MOSAIC_CLOSED);
+      NEED_RESET = true;
       OUTTAKE_TELEOP = OUTTAKE_MIDLOW;
    }
 
