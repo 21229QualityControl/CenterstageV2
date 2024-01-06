@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
@@ -16,7 +15,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Outtake {
-   public static PIDCoefficients outtakePID = new PIDCoefficients(0.004, 0.0015, 0.0004);
+   public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0.0015, 0.0004);
    public static int OUTTAKE_TELEOP = 0;
    public static int OUTTAKE_MIDLOW = 500;
    public static int OUTTAKE_MID = 800;
@@ -29,15 +28,15 @@ public class Outtake {
 
    public static double MOSAIC_ADJUSTING = 0.54;
    public static double MOSAIC_CLOSED = 0.11;
+   public static boolean NEED_RESET = false;
 
    public double mosaicPosition;
    final MotorWithPID slide;
    public boolean slidePIDEnabled = true;
    final Servo latch;
    final Servo wrist;
-   public ServoImplEx mosaic;
-
    final MagnetSwitchSensor slideSensor;
+   final Servo mosaic;
 
    public Outtake(HardwareMap hardwareMap) {
       if (Memory.outtakeSlide != null) { // Preserve motor zero position
@@ -51,14 +50,13 @@ public class Outtake {
       this.latch = HardwareCreator.createServo(hardwareMap, "outtakeLatch");
       this.wrist = HardwareCreator.createServo(hardwareMap, "outtakeWrist");
       this.slideSensor = new MagnetSwitchSensor(hardwareMap, "outtakeMagnetSensor");
-      this.mosaic = (ServoImplEx) HardwareCreator.createServo(hardwareMap, "mosaic");
+      this.mosaic = HardwareCreator.createServo(hardwareMap, "mosaic");
    }
    // The object outtake can get the slide motor to be directly used in Manual Drive.
    public MotorWithPID getSlide(){
       return this.slide;
    }
    // The object outtake can get the mosaic servo to be directly used in Manual Drive.
-   public ServoImplEx getServo() {return this.mosaic; }
 
    public void prepTeleop() {
       this.slide.getMotor().setPower(-0.3);
@@ -69,9 +67,12 @@ public class Outtake {
    }
 
    public void initialize() {
+      this.slide.resetIntegralGain();
       this.slide.setTargetPosition(0);
       this.wrist.setPosition(WRIST_STORED);
       this.latch.setPosition(LATCH_CLOSED);
+      this.mosaic.setPosition(MOSAIC_CLOSED);
+      NEED_RESET = true;
       OUTTAKE_TELEOP = OUTTAKE_MIDLOW;
    }
 
@@ -82,6 +83,10 @@ public class Outtake {
    public void update() {
       if (slidePIDEnabled) {
          slide.update();
+      }
+      if (NEED_RESET && isSlideDown()) {
+         slide.zeroMotorInternals();
+         slide.resetIntegralGain();
       }
    }
 
@@ -109,6 +114,7 @@ public class Outtake {
       return this.slide.setTargetPositionActionBlocking(OUTTAKE_LOW);
    }
    public Action retractOuttake() {
+      NEED_RESET = true;
       return this.slide.setTargetPositionAction(0);
    }
 
@@ -149,20 +155,7 @@ public class Outtake {
       return new ActionUtil.ServoPositionAction(mosaic, mosaicPosition);
    }
 
-   public void disableMosaicServoPwm() {
-      this.mosaic.setPwmDisable();
-   }
-
-   public boolean isSlideMagnetPresent() {
-      return slideSensor.isMagnetPresent();
-   }
-
    public boolean isSlideDown() {
       return slideSensor.isMagnetPresent() && Math.abs(slide.getVelocity()) < 3 && slide.getTargetPosition() < 5;
-   }
-
-   public void zeroMotorInternals() {
-      this.slide.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      this.slide.getMotor().setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
    }
 }

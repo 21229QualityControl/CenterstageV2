@@ -206,21 +206,6 @@ public class ManualDrive extends LinearOpMode {
                  new SleepAction(0.6)
          ));
       }
-      if (g2.startOnce()) {
-         // The servo will rotate the beam so the driver can adjust pixels for mosaic creation.
-         sched.queueAction(outtake.mosaicAdjust());
-      }
-
-      if (g2.backOnce()) {
-         // The the servo will rotate the beam so it is safely inside the robot.
-         sched.queueAction(outtake.mosaicClosed());
-      }
-      if (g2.dpadLeft()) {
-         sched.queueAction(outtake.increaseMosaicPos());
-      }
-      if (g2.dpadRight()) {
-         sched.queueAction(outtake.decreaseMosaicPos());
-      }
    }
 
    private void outtakeControls() {
@@ -266,6 +251,22 @@ public class ManualDrive extends LinearOpMode {
          } else {
             sched.queueAction(outtake.latchClosed());
          }
+      }
+
+      // Mosaic controls
+      if (g2.startOnce()) {
+         // The servo will rotate the beam so the driver can adjust pixels for mosaic creation.
+         sched.queueAction(outtake.mosaicAdjust());
+      }
+      if (g2.backOnce()) {
+         // The the servo will rotate the beam so it is safely inside the robot.
+         sched.queueAction(outtake.mosaicClosed());
+      }
+      if (g2.dpadLeft()) {
+         sched.queueAction(outtake.increaseMosaicPos());
+      }
+      if (g2.dpadRight()) {
+         sched.queueAction(outtake.decreaseMosaicPos());
       }
    }
 
