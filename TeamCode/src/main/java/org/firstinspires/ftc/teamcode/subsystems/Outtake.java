@@ -155,8 +155,4 @@ public class Outtake {
    public boolean isSlideDown() {
       return slideSensor.isMagnetPresent() && Math.abs(slide.getVelocity()) < 3 && slide.getTargetPosition() < 5;
    }
-
-   public void zeroMotorInternals() {
-      this.slide.zeroMotorInternals();
-   }
 }
