@@ -28,15 +28,15 @@ public class Outtake {
 
    public static double MOSAIC_ADJUSTING = 0.54;
    public static double MOSAIC_CLOSED = 0.11;
+   public static boolean NEED_RESET = false;
 
    public double mosaicPosition;
    final MotorWithPID slide;
    public boolean slidePIDEnabled = true;
    final Servo latch;
    final Servo wrist;
-   public Servo mosaic;
-
    final MagnetSwitchSensor slideSensor;
+   final Servo mosaic;
 
    public Outtake(HardwareMap hardwareMap) {
       if (Memory.outtakeSlide != null) { // Preserve motor zero position
@@ -82,6 +82,9 @@ public class Outtake {
       if (slidePIDEnabled) {
          slide.update();
       }
+      if (NEED_RESET && isSlideDown()) {
+         slide.zeroMotorInternals();
+      }
    }
 
    public void setSlidePower(double power) {
@@ -108,6 +111,7 @@ public class Outtake {
       return this.slide.setTargetPositionActionBlocking(OUTTAKE_LOW);
    }
    public Action retractOuttake() {
+      NEED_RESET = true;
       return this.slide.setTargetPositionAction(0);
    }
 
@@ -148,16 +152,11 @@ public class Outtake {
       return new ActionUtil.ServoPositionAction(mosaic, mosaicPosition);
    }
 
-   public boolean isSlideMagnetPresent() {
-      return slideSensor.isMagnetPresent();
-   }
-
    public boolean isSlideDown() {
       return slideSensor.isMagnetPresent() && Math.abs(slide.getVelocity()) < 3 && slide.getTargetPosition() < 5;
    }
 
    public void zeroMotorInternals() {
-      this.slide.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      this.slide.getMotor().setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      this.slide.zeroMotorInternals();
    }
 }
