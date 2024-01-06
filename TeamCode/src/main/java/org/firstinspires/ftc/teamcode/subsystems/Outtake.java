@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
@@ -35,7 +34,7 @@ public class Outtake {
    public boolean slidePIDEnabled = true;
    final Servo latch;
    final Servo wrist;
-   public ServoImplEx mosaic;
+   public Servo mosaic;
 
    final MagnetSwitchSensor slideSensor;
 
@@ -51,14 +50,13 @@ public class Outtake {
       this.latch = HardwareCreator.createServo(hardwareMap, "outtakeLatch");
       this.wrist = HardwareCreator.createServo(hardwareMap, "outtakeWrist");
       this.slideSensor = new MagnetSwitchSensor(hardwareMap, "outtakeMagnetSensor");
-      this.mosaic = (ServoImplEx) HardwareCreator.createServo(hardwareMap, "mosaic");
+      this.mosaic = HardwareCreator.createServo(hardwareMap, "mosaic");
    }
    // The object outtake can get the slide motor to be directly used in Manual Drive.
    public MotorWithPID getSlide(){
       return this.slide;
    }
    // The object outtake can get the mosaic servo to be directly used in Manual Drive.
-   public ServoImplEx getServo() {return this.mosaic; }
 
    public void prepTeleop() {
       this.slide.getMotor().setPower(-0.3);
@@ -72,6 +70,7 @@ public class Outtake {
       this.slide.setTargetPosition(0);
       this.wrist.setPosition(WRIST_STORED);
       this.latch.setPosition(LATCH_CLOSED);
+      this.mosaic.setPosition(MOSAIC_CLOSED);
       OUTTAKE_TELEOP = OUTTAKE_MIDLOW;
    }
 
@@ -147,10 +146,6 @@ public class Outtake {
    public Action increaseMosaicPos() {
       mosaicPosition = mosaic.getPosition() + 0.01;
       return new ActionUtil.ServoPositionAction(mosaic, mosaicPosition);
-   }
-
-   public void disableMosaicServoPwm() {
-      this.mosaic.setPwmDisable();
    }
 
    public boolean isSlideMagnetPresent() {
