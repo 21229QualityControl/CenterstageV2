@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -113,12 +115,16 @@ public class Intake {
    public boolean hit2;
    public void update() {
       intakeMotor.update();
-      if (!beamBreak.isBeamBroken() && beamBroken && (System.currentTimeMillis() - lastPixel) > 15) {
+      long currentTime = System.currentTimeMillis();
+      if (!beamBreak.isBeamBroken() && beamBroken && (currentTime - lastPixel) > 1) {
          pixelCount++;
+         Log.d("BEAMBREAK", "beam unbroken. Time: " + (currentTime - lastPixel) + " ms");
          if (pixelCount >= 2 && intakeState == IntakeState.On) {
             hit2 = true;
          }
          lastPixel = System.currentTimeMillis();
+      } else if (!beamBreak.isBeamBroken() && beamBroken) {
+         Log.d("BEAMBREAK", "skipped beam unbroken. Time: " + (currentTime - lastPixel) + " ms");
       }
       beamBroken = beamBreak.isBeamBroken();
    }
