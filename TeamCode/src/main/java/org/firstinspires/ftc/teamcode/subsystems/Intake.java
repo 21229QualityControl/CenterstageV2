@@ -153,4 +153,8 @@ public class Intake {
    public Action setPixelCount(int newPixelCount) {
       return new IntakePixelCountAction(newPixelCount);
    }
+
+   public boolean isBeamBroken() {
+      return beamBreak.isBeamBroken();
+   }
 }

@@ -47,8 +47,7 @@ public class ManualDrive extends LinearOpMode {
    private Plane plane;
    private Vision vision;
    private LED led;
-   private BeamBreakSensor sensor;
-   private TouchSensor touchSensor;
+
    // Used to get the time when the touch sensor is first pressed.
    private int numberPressed = 0;
 
@@ -70,8 +69,6 @@ public class ManualDrive extends LinearOpMode {
       plane = new Plane(hardwareMap);
       vision = new Vision(hardwareMap);
       led = new LED(hardwareMap);
-      sensor = new BeamBreakSensor(hardwareMap, "intakeBeam");
-      touchSensor = hardwareMap.get(TouchSensor.class, "touchSensor");
 
       if (Memory.RAN_AUTO) {
          smartGameTimer = new SmartGameTimer(true);
@@ -120,7 +117,7 @@ public class ManualDrive extends LinearOpMode {
          hang.update();
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
-         telemetry.addData("Beam Broken", sensor.isBeamBroken());
+         telemetry.addData("Beam Broken", intake.isBeamBroken());
          telemetry.update();
 
          telemetry.update();
@@ -150,7 +147,7 @@ public class ManualDrive extends LinearOpMode {
       // then the gamepads will be unresponsive to any x values for 2 seconds
       // After that, the driver will be allowed to drive away.
       // Note that the driver can still strafe as the y value is still uninterfered.
-      double input_x = ((touchSensor.isPressed()) ?
+      double input_x = ((outtake.isTouchSensorPressed()) ?
               0 : Math.pow(-g1.left_stick_y, 3) * speed);
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       Vector2d input = new Vector2d(input_x, input_y);
@@ -161,7 +158,7 @@ public class ManualDrive extends LinearOpMode {
       if (g1.rightBumper()) input_turn -= SLOW_TURN_SPEED;
 
       // Driver 2 slow strafe
-      input = input.plus(new Vector2d((touchSensor.isPressed()) ? 0 : g2.left_stick_y * SLOW_DRIVE_SPEED, g2.left_stick_x * SLOW_DRIVE_SPEED));
+      input = input.plus(new Vector2d((outtake.isTouchSensorPressed()) ? 0 : g2.left_stick_y * SLOW_DRIVE_SPEED, g2.left_stick_x * SLOW_DRIVE_SPEED));
       if (g2.leftBumper()) input_turn += D2_SLOW_TURN;
       if (g2.rightBumper()) input_turn -= D2_SLOW_TURN;
 
@@ -281,13 +278,13 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(outtake.decreaseMosaicPos());
       }
 
-      if (touchSensor.isPressed()) {
-         telemetry.addLine("pressed!");
+      if (outtake.isTouchSensorPressed()) {
+         telemetry.addLine("Touch sensor pressed");
          telemetry.update();
          numberPressed += 1;
          if (numberPressed == 1) {
             touchSensorTriggerTime = smartGameTimer.seconds();
-            telemetry.addData("touch sensor", touchSensorTriggerTime);
+            telemetry.addData("Touch Sensor Trigger Time", touchSensorTriggerTime);
             telemetry.update();
          }
       }

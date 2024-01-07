@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
@@ -17,9 +18,9 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 public class Outtake {
    public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0.0015, 0.0004);
    public static int OUTTAKE_TELEOP = 0;
-   public static int OUTTAKE_MIDLOW = 500;
-   public static int OUTTAKE_MID = 800;
-   public static int OUTTAKE_LOW = 300;
+   public static int OUTTAKE_MIDLOW = 400;
+   public static int OUTTAKE_MID = 600;
+   public static int OUTTAKE_LOW = 250;
    public static double LATCH_SCORING = 0.55;
    public static double LATCH_OPEN = 0.8;
    public static double LATCH_CLOSED = 0.9;
@@ -37,6 +38,7 @@ public class Outtake {
    final Servo wrist;
    final MagnetSwitchSensor slideSensor;
    final Servo mosaic;
+   final TouchSensor touchSensor;
 
    public Outtake(HardwareMap hardwareMap) {
       if (Memory.outtakeSlide != null) { // Preserve motor zero position
@@ -51,6 +53,7 @@ public class Outtake {
       this.wrist = HardwareCreator.createServo(hardwareMap, "outtakeWrist");
       this.slideSensor = new MagnetSwitchSensor(hardwareMap, "outtakeMagnetSensor");
       this.mosaic = HardwareCreator.createServo(hardwareMap, "mosaic");
+      this.touchSensor = hardwareMap.get(TouchSensor.class, "touchSensor");
    }
    // The object outtake can get the slide motor to be directly used in Manual Drive.
    public MotorWithPID getSlide(){
@@ -157,5 +160,8 @@ public class Outtake {
 
    public boolean isSlideDown() {
       return slideSensor.isMagnetPresent() && Math.abs(slide.getVelocity()) < 3 && slide.getTargetPosition() < 5;
+   }
+   public boolean isTouchSensorPressed() {
+      return touchSensor.isPressed();
    }
 }

@@ -22,7 +22,7 @@ public class RedRightAuto extends AutoBase {
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d start = new Pose2d(12, -61, Math.toRadians(-90));
    public static Pose2d parking = new Pose2d(60, -60, Math.toRadians(180));
-   public static Pose2d stack = new Pose2d(-50, -11, Math.toRadians(180));
+   public static Pose2d stack = new Pose2d(-55, -11, Math.toRadians(180));
 
 
    @Override
