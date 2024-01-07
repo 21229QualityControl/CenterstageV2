@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Hang;
@@ -34,6 +35,7 @@ public class ManualDrive extends LinearOpMode {
    public static double SLOW_DRIVE_SPEED = 0.3;
    public static double VISION_RANGE = 20;
    public static double VISION_CLOSE_DIST = 5;
+   private double touchSensorTriggerTime = 0;
 
    private SmartGameTimer smartGameTimer;
    private GamePadController g1, g2;
@@ -46,6 +48,9 @@ public class ManualDrive extends LinearOpMode {
    private Vision vision;
    private LED led;
    private BeamBreakSensor sensor;
+   private TouchSensor touchSensor;
+   // Used to get the time when the touch sensor is first pressed.
+   private int numberPressed = 0;
 
    @Override
    public void runOpMode() throws InterruptedException {
@@ -66,6 +71,7 @@ public class ManualDrive extends LinearOpMode {
       vision = new Vision(hardwareMap);
       led = new LED(hardwareMap);
       sensor = new BeamBreakSensor(hardwareMap, "intakeBeam");
+      touchSensor = hardwareMap.get(TouchSensor.class, "touchSensor");
 
       if (Memory.RAN_AUTO) {
          smartGameTimer = new SmartGameTimer(true);
@@ -140,7 +146,12 @@ public class ManualDrive extends LinearOpMode {
       telemetry.addData("VISION DISTANCE", visionDist);*/
       double visionDist = 10000;
       double speed = Math.min(1, Math.max(0, ((visionDist - VISION_CLOSE_DIST) / VISION_RANGE))) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
-      double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
+      // If the touching sensor on the outtake is triggered (meaning the robot's at the backdrop),
+      // then the gamepads will be unresponsive to any x values for 2 seconds
+      // After that, the driver will be allowed to drive away.
+      // Note that the driver can still strafe as the y value is still uninterfered.
+      double input_x = ((touchSensor.isPressed()) ?
+              0 : Math.pow(-g1.left_stick_y, 3) * speed);
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       Vector2d input = new Vector2d(input_x, input_y);
       //input = drive.pose.heading.inverse().times(input); // Field centric
@@ -150,7 +161,7 @@ public class ManualDrive extends LinearOpMode {
       if (g1.rightBumper()) input_turn -= SLOW_TURN_SPEED;
 
       // Driver 2 slow strafe
-      input = input.plus(new Vector2d(g2.left_stick_y * SLOW_DRIVE_SPEED, g2.left_stick_x * SLOW_DRIVE_SPEED));
+      input = input.plus(new Vector2d((touchSensor.isPressed()) ? 0 : g2.left_stick_y * SLOW_DRIVE_SPEED, g2.left_stick_x * SLOW_DRIVE_SPEED));
       if (g2.leftBumper()) input_turn += D2_SLOW_TURN;
       if (g2.rightBumper()) input_turn -= D2_SLOW_TURN;
 
@@ -241,6 +252,7 @@ public class ManualDrive extends LinearOpMode {
          new SleepAction(1);
          sched.queueAction(outtake.retractOuttake());
          sched.queueAction(outtake.latchClosed());
+         numberPressed = 0;
       }
       if (g2.dpadUpOnce()) {
          sched.queueAction(outtake.latchScoring());
@@ -267,6 +279,17 @@ public class ManualDrive extends LinearOpMode {
       }
       if (g2.dpadRight()) {
          sched.queueAction(outtake.decreaseMosaicPos());
+      }
+
+      if (touchSensor.isPressed()) {
+         telemetry.addLine("pressed!");
+         telemetry.update();
+         numberPressed += 1;
+         if (numberPressed == 1) {
+            touchSensorTriggerTime = smartGameTimer.seconds();
+            telemetry.addData("touch sensor", touchSensorTriggerTime);
+            telemetry.update();
+         }
       }
    }
 
