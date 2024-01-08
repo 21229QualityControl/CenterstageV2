@@ -17,7 +17,7 @@ import java.util.Vector;
 @Config
 @Autonomous(name = "Red Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class RedRightAuto extends AutoBase {
-   public static Pose2d[] spike = {new Pose2d(24, -36, Math.toRadians(-90)), new Pose2d(10, -28, Math.toRadians(-90)), new Pose2d(4, -32, Math.toRadians(-45))};
+   public static Pose2d[] spike = {new Pose2d(24, -36, Math.toRadians(-90)), new Pose2d(10, -32, Math.toRadians(-90)), new Pose2d(4, -32, Math.toRadians(-45))};
    public static Pose2d[] spikeBackedOut =  {new Pose2d(24, -46, Math.toRadians(-90)), new Pose2d(10, -38, Math.toRadians(-90)), new Pose2d(16, -42, Math.toRadians(-45))};
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d start = new Pose2d(12, -61, Math.toRadians(-90));

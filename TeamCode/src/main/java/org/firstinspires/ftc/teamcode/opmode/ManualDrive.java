@@ -25,6 +25,8 @@ import org.firstinspires.ftc.teamcode.util.GamePadController;
 import org.firstinspires.ftc.teamcode.util.LED;
 import org.firstinspires.ftc.teamcode.util.SmartGameTimer;
 
+import java.util.Vector;
+
 @Config
 @TeleOp(group = "Drive")
 public class ManualDrive extends LinearOpMode {
@@ -76,6 +78,7 @@ public class ManualDrive extends LinearOpMode {
          smartGameTimer = new SmartGameTimer(false);
          outtake.prepTeleop();
       }
+      led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE);
 
       // Ready!
       telemetry.addLine("Ready!");
@@ -147,8 +150,7 @@ public class ManualDrive extends LinearOpMode {
       // then the gamepads will be unresponsive to any x values for 2 seconds
       // After that, the driver will be allowed to drive away.
       // Note that the driver can still strafe as the y value is still uninterfered.
-      double input_x = ((outtake.isTouchSensorPressed()) ?
-              0 : Math.pow(-g1.left_stick_y, 3) * speed);
+      double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       Vector2d input = new Vector2d(input_x, input_y);
       //input = drive.pose.heading.inverse().times(input); // Field centric
@@ -158,7 +160,10 @@ public class ManualDrive extends LinearOpMode {
       if (g1.rightBumper()) input_turn -= SLOW_TURN_SPEED;
 
       // Driver 2 slow strafe
-      input = input.plus(new Vector2d((outtake.isTouchSensorPressed()) ? 0 : g2.left_stick_y * SLOW_DRIVE_SPEED, g2.left_stick_x * SLOW_DRIVE_SPEED));
+      input = input.plus(new Vector2d(g2.left_stick_y * SLOW_DRIVE_SPEED, g2.left_stick_x * SLOW_DRIVE_SPEED));
+      if (outtake.isTouchSensorPressed() && intake.pixelCount != 0) { // Outtake touch sensor
+         input = new Vector2d(0, input.y);
+      }
       if (g2.leftBumper()) input_turn += D2_SLOW_TURN;
       if (g2.rightBumper()) input_turn -= D2_SLOW_TURN;
 

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.DualNum;
 import com.acmerobotics.roadrunner.Rotation2d;
@@ -62,6 +64,7 @@ public final class TwoDeadWheelLocalizer implements Localizer {
                         headingVelOffset -= Math.signum(rawHeadingVel) * 2 * Math.PI;
                 }
                 lastRawHeadingVel = rawHeadingVel;
+                Log.d("HEADING", String.valueOf(rawHeadingVel));
                 return headingVelOffset + rawHeadingVel;
         }
 
@@ -73,7 +76,6 @@ public final class TwoDeadWheelLocalizer implements Localizer {
                 int parPosDelta = parPosVel.position - lastParPos;
                 int perpPosDelta = perpPosVel.position - lastPerpPos;
                 double headingDelta = heading.minus(lastHeading);
-
                 double headingVel = getHeadingVelocity();
 
                 Twist2dDual<Time> twist = new Twist2dDual<>(
