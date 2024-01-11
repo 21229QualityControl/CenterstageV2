@@ -12,9 +12,9 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 @Config
 @Autonomous(name = "Blue Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueRightAuto extends AutoBase {
-    public static Pose2d[] spike = {new Pose2d(-51, 40, Math.toRadians(90)), new Pose2d(-36, 31, Math.toRadians(90)), new Pose2d(-31, 37, Math.toRadians(135))};
+    public static Pose2d[] spike = {new Pose2d(-51, 40, Math.toRadians(90)), new Pose2d(-36, 33, Math.toRadians(90)), new Pose2d(-31, 37, Math.toRadians(135))};
     // 0 = right, 1 = middle, 2 = left
-    public static Pose2d[] spikeBackedOut =  {new Pose2d(-48, 50, Math.toRadians(90)), new Pose2d(-36, 49, Math.toRadians(90)), new Pose2d(-40, 47, Math.toRadians(135))};
+    public static Pose2d[] spikeBackedOut =  {new Pose2d(-48, 50, Math.toRadians(90)), new Pose2d(-36, 53, Math.toRadians(90)), new Pose2d(-40, 47, Math.toRadians(135))};
     public static Pose2d start = new Pose2d(-36, 63, Math.toRadians(90));
     public static Pose2d parking = new Pose2d(60, 10, Math.toRadians(180));
     public static Pose2d intermediate = new Pose2d(-40, 61, Math.toRadians(180));
@@ -75,7 +75,7 @@ public class BlueRightAuto extends AutoBase {
                         outtake.wristScoring(),
                         outtake.extendOuttakeLowBlocking(),
                         drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
-                                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
+                                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(8, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                                 .build(),
                         outtake.latchScoring(),
                         new SleepAction(0.5),
@@ -86,7 +86,7 @@ public class BlueRightAuto extends AutoBase {
 
     private void park() {
         sched.addAction(
-                drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)),
+                drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(8, 0)),
                                 AutoConstants.blueScoring[SPIKE].heading))
                         .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
                         .afterDisp(10, new SequentialAction(
