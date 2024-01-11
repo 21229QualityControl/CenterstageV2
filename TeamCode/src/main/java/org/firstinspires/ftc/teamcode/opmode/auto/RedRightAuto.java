@@ -22,7 +22,7 @@ public class RedRightAuto extends AutoBase {
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d start = new Pose2d(12, -61, Math.toRadians(-90));
    public static Pose2d parking = new Pose2d(60, -60, Math.toRadians(180));
-   public static Pose2d stack = new Pose2d(-55, -11, Math.toRadians(180));
+   public static Pose2d stack = new Pose2d(-50, -11, Math.toRadians(180));
 
 
    @Override
@@ -45,6 +45,7 @@ public class RedRightAuto extends AutoBase {
    }
 
    private void deliverSpike() {
+      // Push spike
       if (SPIKE != 2) {
          sched.addAction(
                  drive.actionBuilder(getStartPose())
@@ -59,9 +60,10 @@ public class RedRightAuto extends AutoBase {
                          .build()
          );
       }
+      // Back away from spike
       sched.addAction(
               new SequentialAction(
-                      new SleepAction(0.5),
+                      new SleepAction(0.1), // do we even need this?
                       drive.actionBuilder(spike[SPIKE])
                               .strafeToLinearHeading(spikeBackedOut[SPIKE].position, spikeBackedOut[SPIKE].heading)
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
@@ -82,7 +84,7 @@ public class RedRightAuto extends AutoBase {
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.redScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
                       outtake.latchOpen(),
-                      new SleepAction(0.5),
+                      new SleepAction(0.25),
                       outtake.extendOuttakeMidBlocking()
               )
       );
@@ -91,30 +93,32 @@ public class RedRightAuto extends AutoBase {
    private void intakeStack() {
       sched.addAction(
               new SequentialAction(
+                      // retract outtake and drive to stack
                       drive.actionBuilder(new Pose2d(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.redScoring[SPIKE].heading))
                               .afterDisp(10, new SequentialAction(
                                       outtake.wristStored(),
-                                      new SleepAction(0.5),
+                                      new SleepAction(0.25),
                                       outtake.retractOuttake(),
-                                      outtake.latchOpen(),
-                                      new SleepAction(0.5)
+                                      outtake.latchOpen()
                               ))
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
                               .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y), stack.heading)
                               .afterDisp(60, intake.intakeOn())
-                              .strafeToLinearHeading(stack.position, stack.heading)
-                              .strafeToLinearHeading(stack.position.plus(new Vector2d(-10, 0)), stack.heading)
+                              .strafeTo(stack.position)
+                              .strafeTo(stack.position.plus(new Vector2d(-10, -4)), drive.slowVelConstraint, drive.slowAccelConstraint)
                               .build(),
+                      // intake 2 pixels from the stack
                       new SequentialAction(
+                              new SleepAction(0.3),
+                              intake.stackClosed(), // first close
                               new SleepAction(0.6),
-                              intake.stackClosed(),
+                              intake.stackOpen(), // open for second to fall
                               new SleepAction(0.6),
-                              intake.stackOpen(),
+                              intake.stackClosed(), // second close
                               new SleepAction(0.6),
-                              intake.stackClosed(),
-                              new SleepAction(1.0),
                               intake.stackOpen()
                       ),
+                      // stop intake and drive to scoring position
                       drive.actionBuilder(stack)
                               .afterTime(2, new SequentialAction(
                                       intake.intakeOff(),
@@ -134,10 +138,9 @@ public class RedRightAuto extends AutoBase {
                       .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
                       .afterDisp(10, new SequentialAction(
                               outtake.wristStored(),
-                              new SleepAction(0.5),
+                              new SleepAction(0.2),
                               outtake.retractOuttake(),
-                              outtake.latchClosed(),
-                              new SleepAction(0.5)
+                              outtake.latchClosed()
                       ))
                       .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, parking.position.y), parking.heading)
                       .strafeToLinearHeading(parking.position, parking.heading)
