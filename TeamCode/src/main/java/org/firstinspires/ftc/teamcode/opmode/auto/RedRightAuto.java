@@ -22,7 +22,7 @@ public class RedRightAuto extends AutoBase {
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d start = new Pose2d(12, -61, Math.toRadians(-90));
    public static Pose2d parking = new Pose2d(60, -60, Math.toRadians(180));
-   public static Pose2d stack = new Pose2d(-50, -11, Math.toRadians(180));
+   public static Pose2d stack = new Pose2d(-50.25, -11, Math.toRadians(180));
 
 
    @Override
@@ -105,15 +105,15 @@ public class RedRightAuto extends AutoBase {
                               .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y), stack.heading)
                               .afterDisp(60, intake.intakeOn())
                               .strafeTo(stack.position)
-                              .strafeTo(stack.position.plus(new Vector2d(-10, -4)), drive.slowVelConstraint, drive.slowAccelConstraint)
+                              .strafeTo(stack.position.plus(new Vector2d(-10, -1.5)), drive.slowVelConstraint, drive.slowAccelConstraint)
                               .build(),
                       // intake 2 pixels from the stack
                       new SequentialAction(
                               new SleepAction(0.3),
                               intake.stackClosed(), // first close
                               new SleepAction(0.6),
-                              intake.stackOpen(), // open for second to fall
-                              new SleepAction(0.6),
+                              intake.stackHalf(), // open for second to fall
+                              new SleepAction(0.4),
                               intake.stackClosed(), // second close
                               new SleepAction(0.6),
                               intake.stackOpen()
