@@ -37,7 +37,6 @@ public class ManualDrive extends LinearOpMode {
    public static double SLOW_DRIVE_SPEED = 0.3;
    public static double VISION_RANGE = 20;
    public static double VISION_CLOSE_DIST = 5;
-   private double touchSensorTriggerTime = 0;
 
    private SmartGameTimer smartGameTimer;
    private GamePadController g1, g2;
@@ -49,9 +48,6 @@ public class ManualDrive extends LinearOpMode {
    private Plane plane;
    private Vision vision;
    private LED led;
-
-   // Used to get the time when the touch sensor is first pressed.
-   private int numberPressed = 0;
 
    @Override
    public void runOpMode() throws InterruptedException {
@@ -121,6 +117,7 @@ public class ManualDrive extends LinearOpMode {
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
          telemetry.addData("Beam Broken", intake.isBeamBroken());
+         telemetry.addData("Touch Sensor Pressed", outtake.isTouchSensorPressed());
          telemetry.update();
 
          telemetry.update();
@@ -154,6 +151,9 @@ public class ManualDrive extends LinearOpMode {
       double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       Vector2d input = new Vector2d(input_x, input_y);
+      if (outtake.isTouchSensorPressed() && intake.pixelCount != 0) { // Outtake touch sensor
+         input = input.times(SLOW_DRIVE_SPEED);
+      }
       //input = drive.pose.heading.inverse().times(input); // Field centric
 
       double input_turn = Math.pow(g1.left_trigger - g1.right_trigger, 3) * TURN_SPEED;
@@ -162,9 +162,6 @@ public class ManualDrive extends LinearOpMode {
 
       // Driver 2 slow strafe
       input = input.plus(new Vector2d(g2.left_stick_y * SLOW_DRIVE_SPEED, g2.left_stick_x * SLOW_DRIVE_SPEED));
-      if (outtake.isTouchSensorPressed() && intake.pixelCount != 0) { // Outtake touch sensor
-         input = new Vector2d(0, input.y);
-      }
       if (g2.leftBumper()) input_turn += D2_SLOW_TURN;
       if (g2.rightBumper()) input_turn -= D2_SLOW_TURN;
 
@@ -255,7 +252,6 @@ public class ManualDrive extends LinearOpMode {
          new SleepAction(1);
          sched.queueAction(outtake.retractOuttake());
          sched.queueAction(outtake.latchClosed());
-         numberPressed = 0;
       }
       if (g2.dpadUpOnce()) {
          sched.queueAction(outtake.latchScoring());
@@ -282,18 +278,6 @@ public class ManualDrive extends LinearOpMode {
       }
       if (g2.dpadRight()) {
          sched.queueAction(outtake.decreaseMosaicPos());
-      }
-
-      if (outtake.isTouchSensorPressed()) {
-         telemetry.addLine("Touch sensor pressed");
-         telemetry.update();
-         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
-         numberPressed += 1;
-         if (numberPressed == 1) {
-            touchSensorTriggerTime = smartGameTimer.seconds();
-            telemetry.addData("Touch Sensor Trigger Time", touchSensorTriggerTime);
-            telemetry.update();
-         }
       }
    }
 

@@ -18,21 +18,21 @@ import java.util.Vector;
 @Autonomous(name = "Blue Left Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueLeftAuto extends AutoBase {
    public static Pose2d[] spike = {
-           new Pose2d(4, 36, Math.toRadians(45)),
-           new Pose2d(12, 33, Math.toRadians(90)),
+           new Pose2d(7, 36, Math.toRadians(45)),
+           new Pose2d(16, 32, Math.toRadians(90)),
            new Pose2d(24, 42, Math.toRadians(90))};
    // 0 = right, 1 = middle, 2 = left
-   public static Pose2d[] spikeBackedOut =  {
-           new Pose2d(17, 46, Math.toRadians(45)),
-           new Pose2d(12, 44, Math.toRadians(90)),
+   public static Pose2d[] spikeBackedOut = {
+           new Pose2d(20, 46, Math.toRadians(45)),
+           new Pose2d(16, 43, Math.toRadians(90)),
            new Pose2d(24, 55, Math.toRadians(90))};
 
    public static Pose2d start = new Pose2d(12, 63, Math.toRadians(90));
    public static Pose2d parking = new Pose2d(56, 60, Math.toRadians(180));
    public static Pose2d[] stackPositions = {
-           new Pose2d(-50.5, 16, Math.toRadians(180)),
-           new Pose2d(-50.5, 14, Math.toRadians(180)),
-           new Pose2d(-50.5, 16, Math.toRadians(180))
+           new Pose2d(-53, 14, Math.toRadians(180)),
+           new Pose2d(-53, 14, Math.toRadians(180)),
+           new Pose2d(-53, 14, Math.toRadians(180))
    };
    public static Pose2d stack;
 
@@ -93,8 +93,11 @@ public class BlueLeftAuto extends AutoBase {
                       drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
                               .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
+                      // release pixels one at a time to prevent them from bouncing and fall off the backdrop
+                      outtake.latchScoring(),
+                      new SleepAction(0.4),
                       outtake.latchOpen(),
-                      new SleepAction(0.5),
+                      new SleepAction(0.2),
                       outtake.extendOuttakeMidBlocking()
               )
       );
@@ -132,7 +135,7 @@ public class BlueLeftAuto extends AutoBase {
                                       intake.intakeOff(),
                                       outtake.latchClosed()
                               ))
-                              .strafeToLinearHeading(new Vector2d((AutoConstants.blueScoring[SPIKE].position.x*4 + stack.position.x)/5, stack.position.y), AutoConstants.blueScoring[SPIKE].heading)
+                              .strafeToLinearHeading(new Vector2d((AutoConstants.blueScoring[SPIKE].position.x*8 + stack.position.x)/9, stack.position.y), AutoConstants.blueScoring[SPIKE].heading)
                               .strafeToLinearHeading(AutoConstants.blueScoring[(SPIKE + 1) % 3].position, AutoConstants.blueScoring[(SPIKE + 1) % 3].heading)
                               .build()
               )

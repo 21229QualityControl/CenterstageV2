@@ -35,7 +35,7 @@ public abstract class AutoBase extends LinearOpMode {
     protected int w = 1920;
     protected int h = 1080;
 
-    public static int SPIKE = 0;
+    public static int SPIKE = -1;
 
     final public void update() {
         telemetry.addData("Time left", 30 - getRuntime());
@@ -74,18 +74,21 @@ public abstract class AutoBase extends LinearOpMode {
 
         onInit();
 
-        int i = 0;
-        while (opModeInInit() && i < 3) {
-            telemetry.addData("camera check", "working");
-            telemetry.addData("Position:", processor.position);
-            telemetry.addData("Left Rectangle Saturation:", processor.getSatRectLeft());
-            telemetry.addData("Center Rectangle Saturation:", processor.getSatRectCenter());
-            telemetry.addData("Right Rectangle Saturation:", processor.getSatRectRight());
-            telemetry.update();
+        SPIKE = -1;
+        while (opModeInInit()) {
             // Below is the code for the distance sensors
             // SPIKE = vision.objectPosition();
             // Below is the code for the camera vision
-            SPIKE = processor.position;
+            if (SPIKE <= -1) {
+                telemetry.addData("camera check", "working");
+                telemetry.addData("Position:", processor.position);
+                telemetry.addData("Left Rectangle Saturation:", processor.getSatRectLeft());
+                telemetry.addData("Center Rectangle Saturation:", processor.getSatRectCenter());
+                telemetry.addData("Right Rectangle Saturation:", processor.getSatRectRight());
+                telemetry.update();
+
+                SPIKE = processor.position;
+            }
             //vision.displayTelemetry(telemetry);
             printDescription();
 
@@ -93,9 +96,7 @@ public abstract class AutoBase extends LinearOpMode {
             telemetry.update();
             if (SPIKE > -1) {
                 portal.stopStreaming();
-                break;
             }
-            i++;
             idle();
         }
 
