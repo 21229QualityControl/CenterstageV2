@@ -29,7 +29,11 @@ public class BlueLeftAuto extends AutoBase {
 
    public static Pose2d start = new Pose2d(12, 63, Math.toRadians(90));
    public static Pose2d parking = new Pose2d(56, 60, Math.toRadians(180));
-   public static Pose2d[] stackPositions = {new Pose2d(-55, 16, Math.toRadians(180)), new Pose2d(-55, 14, Math.toRadians(180)), new Pose2d(-55, 16, Math.toRadians(180))};
+   public static Pose2d[] stackPositions = {
+           new Pose2d(-50.5, 16, Math.toRadians(180)),
+           new Pose2d(-50.5, 14, Math.toRadians(180)),
+           new Pose2d(-50.5, 16, Math.toRadians(180))
+   };
    public static Pose2d stack;
 
    @Override
