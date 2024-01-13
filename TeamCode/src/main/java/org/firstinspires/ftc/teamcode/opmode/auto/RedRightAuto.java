@@ -17,7 +17,7 @@ import java.util.Vector;
 @Config
 @Autonomous(name = "Red Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class RedRightAuto extends AutoBase {
-   public static Pose2d[] spike = {new Pose2d(24, -36, Math.toRadians(-90)), new Pose2d(10, -32, Math.toRadians(-90)), new Pose2d(4, -32, Math.toRadians(-45))};
+   public static Pose2d[] spike = {new Pose2d(24, -36, Math.toRadians(-90)), new Pose2d(10, -32, Math.toRadians(-90)), new Pose2d(6, -32, Math.toRadians(-45))};
    public static Pose2d[] spikeBackedOut =  {new Pose2d(24, -46, Math.toRadians(-90)), new Pose2d(10, -38, Math.toRadians(-90)), new Pose2d(16, -42, Math.toRadians(-45))};
    // 0 = right, 1 = middle, 2 = left
    public static Pose2d start = new Pose2d(12, -61, Math.toRadians(-90));
@@ -83,8 +83,11 @@ public class RedRightAuto extends AutoBase {
                       drive.actionBuilder(AutoConstants.redScoring[SPIKE])
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.redScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
+                      // release pixels one at a time to prevent them from bouncing and fall off the backdrop
+                      outtake.latchScoring(),
+                      new SleepAction(0.4),
                       outtake.latchOpen(),
-                      new SleepAction(0.25),
+                      new SleepAction(0.2),
                       outtake.extendOuttakeMidBlocking()
               )
       );
@@ -109,7 +112,7 @@ public class RedRightAuto extends AutoBase {
                               .build(),
                       // intake 2 pixels from the stack
                       new SequentialAction(
-                              new SleepAction(0.3),
+//                              new SleepAction(0.1),
                               intake.stackClosed(), // first close
                               new SleepAction(0.6),
                               intake.stackHalf(), // open for second to fall

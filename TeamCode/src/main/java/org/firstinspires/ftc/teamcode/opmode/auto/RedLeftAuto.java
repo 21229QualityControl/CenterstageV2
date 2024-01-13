@@ -28,7 +28,7 @@ public class RedLeftAuto extends AutoBase {
 
    @Override
    protected void printDescription() {
-      telemetry.addData("Description", "Red Right Auto");
+      telemetry.addData("Description", "Red Left Auto");
    }
 
    @Override
