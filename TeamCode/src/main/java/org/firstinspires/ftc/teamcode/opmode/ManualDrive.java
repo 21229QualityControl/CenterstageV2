@@ -297,7 +297,7 @@ public class ManualDrive extends LinearOpMode {
       } else if (intake.pixelCount == 2) {
          led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
          if (outtake.isTouchSensorPressed()) {
-            led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GOLD);
+            led.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
          }
       } else if (intake.pixelCount > 2) {
             led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_LAVA_PALETTE);
