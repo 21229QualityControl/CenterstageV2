@@ -34,8 +34,8 @@ public class Intake {
    public static double LEFT_STACK_CLOSED = 0.475;
    public static double RIGHT_STACK_OPEN = 0.03;
    public static double RIGHT_STACK_CLOSED = 0.47;
-   public static double RIGHT_STACK_HALF = (RIGHT_STACK_OPEN + 2*RIGHT_STACK_CLOSED) / 3;
-   public static double LEFT_STACK_HALF = (LEFT_STACK_OPEN + 2*LEFT_STACK_CLOSED) / 3;
+   public static double RIGHT_STACK_HALF = (RIGHT_STACK_OPEN + RIGHT_STACK_CLOSED) / 2;
+   public static double LEFT_STACK_HALF = (LEFT_STACK_OPEN + LEFT_STACK_CLOSED) / 2;
 
    public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00005, 0, 0);
 

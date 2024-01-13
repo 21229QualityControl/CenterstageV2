@@ -150,6 +150,7 @@ public class ManualDrive extends LinearOpMode {
       // then the gamepads will be unresponsive to any x values for 2 seconds
       // After that, the driver will be allowed to drive away.
       // Note that the driver can still strafe as the y value is still uninterfered.
+      // Actually the touch sensor code got removed
       double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       Vector2d input = new Vector2d(input_x, input_y);
@@ -286,6 +287,7 @@ public class ManualDrive extends LinearOpMode {
       if (outtake.isTouchSensorPressed()) {
          telemetry.addLine("Touch sensor pressed");
          telemetry.update();
+         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
          numberPressed += 1;
          if (numberPressed == 1) {
             touchSensorTriggerTime = smartGameTimer.seconds();
@@ -310,6 +312,9 @@ public class ManualDrive extends LinearOpMode {
          led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
       } else if (intake.pixelCount == 2) {
          led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+         if (outtake.isTouchSensorPressed()) {
+            led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GOLD);
+         }
       } else if (intake.pixelCount > 2) {
             led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_LAVA_PALETTE);
       } else if (isBetween(timeLeft(), 31, 35)) { // 35-31; prepare for endgame

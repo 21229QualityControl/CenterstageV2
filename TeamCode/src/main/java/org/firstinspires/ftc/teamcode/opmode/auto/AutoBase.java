@@ -74,7 +74,8 @@ public abstract class AutoBase extends LinearOpMode {
 
         onInit();
 
-        while (opModeInInit()) {
+        int i = 0;
+        while (opModeInInit() && i < 3) {
             telemetry.addData("camera check", "working");
             telemetry.addData("Position:", processor.position);
             telemetry.addData("Left Rectangle Saturation:", processor.getSatRectLeft());
@@ -86,12 +87,21 @@ public abstract class AutoBase extends LinearOpMode {
             // Below is the code for the camera vision
             SPIKE = processor.position;
             //vision.displayTelemetry(telemetry);
-
             printDescription();
 
             telemetry.addData("Spike Position", SPIKE);
             telemetry.update();
+            if (SPIKE > -1) {
+                portal.stopStreaming();
+                break;
+            }
+            i++;
             idle();
+        }
+
+        if (SPIKE == -1) {
+            SPIKE = 0;
+            portal.stopStreaming();
         }
 
         // Auto start

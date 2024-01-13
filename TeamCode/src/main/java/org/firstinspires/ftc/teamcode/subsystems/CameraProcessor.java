@@ -34,7 +34,7 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
     public static Rect leftRect = new Rect(0, 750, 200 , 280);
     public static Rect centerRect = new Rect(550, 750, 300, 210);
     public static Rect rightRect = new Rect(1050, 780, 400, 250);
-    public int position;
+    public int position = -1;
     private double satRectLeft;
     private double satRectCenter;
     private double satRectRight;
