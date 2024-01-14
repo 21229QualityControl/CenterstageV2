@@ -118,13 +118,13 @@ public class Intake {
       long currentTime = System.currentTimeMillis();
       if (!beamBreak.isBeamBroken() && beamBroken && (currentTime - lastPixel) > 1) {
          pixelCount++;
-         Log.d("BEAMBREAK", "beam unbroken. Time: " + (currentTime - lastPixel) + " ms");
+//         Log.d("BEAMBREAK", "beam unbroken. Time: " + (currentTime - lastPixel) + " ms");
          if (pixelCount >= 2 && intakeState == IntakeState.On) {
             hit2 = true;
          }
          lastPixel = System.currentTimeMillis();
       } else if (!beamBreak.isBeamBroken() && beamBroken) {
-         Log.d("BEAMBREAK", "skipped beam unbroken. Time: " + (currentTime - lastPixel) + " ms");
+//         Log.d("BEAMBREAK", "skipped beam unbroken. Time: " + (currentTime - lastPixel) + " ms");
       }
       beamBroken = beamBreak.isBeamBroken();
    }

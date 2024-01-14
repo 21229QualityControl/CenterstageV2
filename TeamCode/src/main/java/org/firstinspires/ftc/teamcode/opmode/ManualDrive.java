@@ -10,7 +10,6 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Hang;
@@ -18,14 +17,11 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
-import org.firstinspires.ftc.teamcode.subsystems.Vision;
+import org.firstinspires.ftc.teamcode.subsystems.FrontSensors;
 import org.firstinspires.ftc.teamcode.util.ActionScheduler;
-import org.firstinspires.ftc.teamcode.util.BeamBreakSensor;
 import org.firstinspires.ftc.teamcode.util.GamePadController;
 import org.firstinspires.ftc.teamcode.util.LED;
 import org.firstinspires.ftc.teamcode.util.SmartGameTimer;
-
-import java.util.Vector;
 
 @Config
 @TeleOp(group = "Drive")
@@ -46,7 +42,7 @@ public class ManualDrive extends LinearOpMode {
    private Outtake outtake;
    private Hang hang;
    private Plane plane;
-   private Vision vision;
+   private FrontSensors frontSensors;
    private LED led;
 
    @Override
@@ -65,7 +61,7 @@ public class ManualDrive extends LinearOpMode {
       outtake = new Outtake(hardwareMap);
       hang = new Hang(hardwareMap);
       plane = new Plane(hardwareMap);
-      vision = new Vision(hardwareMap);
+      frontSensors = new FrontSensors(hardwareMap);
       led = new LED(hardwareMap);
 
       if (Memory.RAN_AUTO) {
