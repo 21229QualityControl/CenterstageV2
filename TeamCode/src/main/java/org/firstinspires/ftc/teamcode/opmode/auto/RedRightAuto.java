@@ -17,13 +17,21 @@ import java.util.Vector;
 @Config
 @Autonomous(name = "Red Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class RedRightAuto extends AutoBase {
-   public static Pose2d[] spike = {new Pose2d(24, -36, Math.toRadians(-90)), new Pose2d(18, -32, Math.toRadians(-90)), new Pose2d(6, -32, Math.toRadians(-45))};
-   public static Pose2d[] spikeBackedOut =  {new Pose2d(24, -46, Math.toRadians(-90)), new Pose2d(10, -38, Math.toRadians(-90)), new Pose2d(16, -42, Math.toRadians(-45))};
+   public static Pose2d[] spike = {
+           new Pose2d(24, -36, Math.toRadians(-90)),
+           new Pose2d(18, -32, Math.toRadians(-90)),
+           new Pose2d(6, -32, Math.toRadians(-45))
+   };
    // 0 = right, 1 = middle, 2 = left
+   public static Pose2d[] spikeBackedOut = {
+           new Pose2d(24, -46, Math.toRadians(-90)),
+           new Pose2d(10, -38, Math.toRadians(-90)),
+           new Pose2d(16, -42, Math.toRadians(-45))
+   };
+
    public static Pose2d start = new Pose2d(12, -61, Math.toRadians(-90));
    public static Pose2d parking = new Pose2d(60, -62, Math.toRadians(180));
    public static Pose2d stack = new Pose2d(-50.25, -11, Math.toRadians(180));
-
 
    @Override
    protected Pose2d getStartPose() {
@@ -112,7 +120,6 @@ public class RedRightAuto extends AutoBase {
                               .build(),
                       // intake 2 pixels from the stack
                       new SequentialAction(
-//                              new SleepAction(0.1),
                               intake.stackClosed(), // first close
                               new SleepAction(0.6),
                               intake.stackHalf(), // open for second to fall

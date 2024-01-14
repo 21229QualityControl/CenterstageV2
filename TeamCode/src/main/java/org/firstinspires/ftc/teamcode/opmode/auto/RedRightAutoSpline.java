@@ -74,9 +74,9 @@ public class RedRightAutoSpline extends AutoBase {
         sched.addAction(
                 new SequentialAction(
                         outtake.latchOpen(),
-                        new SleepAction(0.3),
+                        new SleepAction(0.1),
                         outtake.extendOuttakeMid(),
-                        new SleepAction(0.3)
+                        new SleepAction(0.2)
                 )
         );
     }
@@ -88,18 +88,20 @@ public class RedRightAutoSpline extends AutoBase {
                         .afterDisp(0, new SequentialAction(
                                 outtake.extendOuttakeMidBlocking(),
                                 outtake.wristStored(),
-                                new SleepAction(0.3),
+                                new SleepAction(0.1),
                                 outtake.retractOuttake(),
                                 outtake.latchOpen(),
-                                new SleepAction(0.3)
+                                new SleepAction(0.1)
                         ))
                         .splineToConstantHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y), stack.heading)
                         .afterDisp(0, new SequentialAction(
-                                intake.intakeOn(),
-                                intake.stackHalf()
+                                intake.intakeOn()
+//                                intake.stackHalf()
                         ))
                         .splineToConstantHeading(stack.position, stack.heading)
                         .afterDisp(0, new SequentialAction(
+                                intake.stackHalf(),
+                                new SleepAction(0.3),
                                 intake.stackClosed(),
                                 new SleepAction(0.3),
                                 intake.stackHalf(),
