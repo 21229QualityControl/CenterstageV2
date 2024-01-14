@@ -31,9 +31,9 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
     }
 
     // State the dimensions of the rectangles for the 3 locations of the team prop.
-    public static Rect leftRect = new Rect(0, 750, 200 , 280);
-    public static Rect centerRect = new Rect(550, 750, 300, 210);
-    public static Rect rightRect = new Rect(1050, 780, 400, 250);
+    public static Rect leftRect = new Rect(0, 600, 200 , 280);
+    public static Rect centerRect = new Rect(550, 600, 300, 210);
+    public static Rect rightRect = new Rect(1050, 630, 400, 250);
     public int position = -1;
     private double satRectLeft;
     private double satRectCenter;

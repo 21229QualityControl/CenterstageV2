@@ -1,13 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import android.util.Size;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -18,7 +15,7 @@ import java.util.List;
 import java.util.Queue;
 
 @Config
-public class Vision {
+public class FrontSensors {
     public static Queue<Integer> values = new LinkedList<>();
     public static int SAMPLE_COUNT = 10;
     private DistanceSensor leftSensor;
@@ -29,43 +26,43 @@ public class Vision {
     private AprilTagProcessor processor;
     private VisionPortal portal;
 
-    public Vision(HardwareMap hardwareMap) {
+    public FrontSensors(HardwareMap hardwareMap) {
         leftSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
         middleSensor = hardwareMap.get(DistanceSensor.class, "middleDistanceSensor");
         rightSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
-        processor = new AprilTagProcessor.Builder()
-                .setLensIntrinsics(578.272, 578.272, 402.145, 221.506) // TODO: Calibrate for real camera, this is for logitech c720
-                .build();
-        portal = new VisionPortal.Builder()
-                .addProcessor(processor)
-                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-                .setCamera(hardwareMap.get(WebcamName.class, "webcam"))
-                .setCameraResolution(new Size(640, 480))
-                .build();
+//        processor = new AprilTagProcessor.Builder()
+//                .setLensIntrinsics(578.272, 578.272, 402.145, 221.506) // TODO: Calibrate for real camera, this is for logitech c720
+//                .build();
+//        portal = new VisionPortal.Builder()
+//                .addProcessor(processor)
+//                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+//                .setCamera(hardwareMap.get(WebcamName.class, "webcam"))
+//                .setCameraResolution(new Size(640, 480))
+//                .build();
     }
 
-    public List<AprilTagDetection> detectTags() {
-        return processor.getDetections();
-    }
-
-    int frameCount = -1;
-    double lastValue = 0;
-    public double backdropDistance(int refreshFrames) {
-        if (frameCount > 0 && frameCount < refreshFrames) {
-            return lastValue;
-        }
-        List<AprilTagDetection> det = detectTags();
-        double lowestDistance = Double.MAX_VALUE;
-        for (AprilTagDetection d : det) {
-            if (d.metadata != null) {
-                if (d.ftcPose.range < lowestDistance) {
-                    lowestDistance = d.ftcPose.range;
-                }
-            }
-        }
-        lastValue = lowestDistance;
-        return lowestDistance;
-    }
+//    public List<AprilTagDetection> detectTags() {
+//        return processor.getDetections();
+//    }
+//
+//    int frameCount = -1;
+//    double lastValue = 0;
+//    public double backdropDistance(int refreshFrames) {
+//        if (frameCount > 0 && frameCount < refreshFrames) {
+//            return lastValue;
+//        }
+//        List<AprilTagDetection> det = detectTags();
+//        double lowestDistance = Double.MAX_VALUE;
+//        for (AprilTagDetection d : det) {
+//            if (d.metadata != null) {
+//                if (d.ftcPose.range < lowestDistance) {
+//                    lowestDistance = d.ftcPose.range;
+//                }
+//            }
+//        }
+//        lastValue = lowestDistance;
+//        return lowestDistance;
+//    }
 
     public int rawObjectPosition() {
         double lDistance = leftSensor.getDistance(DistanceUnit.INCH);
@@ -73,7 +70,7 @@ public class Vision {
         double rDistance = rightSensor.getDistance(DistanceUnit.INCH);
 
         if (lDistance > 300 & mDistance > 300 & rDistance > 300) {
-            return 0; // Default position
+            return -1; // Default position
         }
         else if (lDistance > mDistance) {
             if (mDistance > rDistance) {

@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 import android.util.Log;
 import android.util.Size;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -16,7 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
-import org.firstinspires.ftc.teamcode.subsystems.Vision;
+import org.firstinspires.ftc.teamcode.subsystems.FrontSensors;
 import org.firstinspires.ftc.teamcode.util.AutoActionScheduler;
 import org.firstinspires.ftc.vision.VisionPortal;
 
@@ -25,7 +24,7 @@ public abstract class AutoBase extends LinearOpMode {
     protected MecanumDrive drive;
     protected Outtake outtake;
     protected Intake intake;
-    protected Vision vision;
+    protected FrontSensors frontSensors;
     protected Plane plane;
     protected AutoActionScheduler sched;
 
@@ -54,7 +53,7 @@ public abstract class AutoBase extends LinearOpMode {
         this.drive = new MecanumDrive(hardwareMap, Memory.LAST_POSE);
         this.intake = new Intake(hardwareMap);
         this.outtake = new Outtake(hardwareMap);
-        // this.vision = new Vision(hardwareMap);
+         this.frontSensors = new FrontSensors(hardwareMap);
         this.plane = new Plane(hardwareMap);
         this.sched = new AutoActionScheduler(this::update);
         this.processor = new CameraProcessor();
@@ -64,6 +63,8 @@ public abstract class AutoBase extends LinearOpMode {
                 .setCameraResolution(new Size(w, h))
                 .addProcessor(processor)
                 .setCamera(BuiltinCameraDirection.BACK)
+                .enableLiveView(true)
+                .setAutoStopLiveView(true)
                 .build();
 
         outtake.resetMotors();
@@ -79,31 +80,40 @@ public abstract class AutoBase extends LinearOpMode {
             // Below is the code for the distance sensors
             // SPIKE = vision.objectPosition();
             // Below is the code for the camera vision
-            if (SPIKE <= -1) {
-                telemetry.addData("camera check", "working");
-                telemetry.addData("Position:", processor.position);
-                telemetry.addData("Left Rectangle Saturation:", processor.getSatRectLeft());
-                telemetry.addData("Center Rectangle Saturation:", processor.getSatRectCenter());
-                telemetry.addData("Right Rectangle Saturation:", processor.getSatRectRight());
-                telemetry.update();
 
-                SPIKE = processor.position;
+            int cameraReading = processor.position;
+            int sensorReading = frontSensors.rawObjectPosition();
+            if (cameraReading > -1) {
+                SPIKE = cameraReading;
+                telemetry.addData("Camera", "Working - " + cameraReading);
+                telemetry.addData("Sensor", "Unused - " + sensorReading);
+            } else if (cameraReading == -1) {
+                telemetry.addData("Camera", "Not working - " + cameraReading);
+                if (sensorReading > -1) {
+                    SPIKE = sensorReading;
+                    telemetry.addData("Backup Sensor", "Working - " + sensorReading);
+                } else {
+                    SPIKE = -1;
+                    telemetry.addData("Backup Sensor", "Not working - " + sensorReading);
+                }
             }
-            //vision.displayTelemetry(telemetry);
-            printDescription();
 
-            telemetry.addData("Spike Position", SPIKE);
+            telemetry.addData("Position:", processor.position);
+            telemetry.addData("Left Rectangle Saturation:", "%.3f", processor.getSatRectLeft());
+            telemetry.addData("Center Rectangle Saturation:", "%.3f", processor.getSatRectCenter());
+            telemetry.addData("Right Rectangle Saturation:", "%.3f", processor.getSatRectRight());
             telemetry.update();
-            if (SPIKE > -1) {
-                portal.stopStreaming();
-            }
+
+//            vision.displayTelemetry(telemetry);
+//            printDescription();
+
             idle();
         }
 
         if (SPIKE == -1) {
             SPIKE = 0;
-            portal.stopStreaming();
         }
+        portal.stopStreaming();
 
         // Auto start
         resetRuntime(); // reset runtime timer
