@@ -29,6 +29,7 @@ import com.acmerobotics.roadrunner.ftc.LynxFirmware;
 import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
 import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -39,6 +40,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.util.AxisDirection;
+import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 
 import java.lang.Math;
@@ -101,6 +104,7 @@ public final class MecanumDrive {
     public final VoltageSensor voltageSensor;
 
     public final IMU imu;
+//    public final BNO055IMU imu;
 
     public final Localizer localizer;
     public Pose2d pose;
@@ -134,6 +138,11 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.DOWN));
         imu.initialize(parameters);
+//        imu = hardwareMap.get(BNO055IMU.class, "imuExpansionHub");
+//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+//        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+//        imu.initialize(parameters);
+//        BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_Z);
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
@@ -332,6 +341,7 @@ public final class MecanumDrive {
         }
 
         FlightRecorder.write("ESTIMATED_POSE", new PoseMessage(pose));
+        FlightRecorder.write("ESTIMATED_VELO", twist.velocity().value());
 
         return twist.velocity().value();
     }

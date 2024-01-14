@@ -13,6 +13,7 @@ import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
 import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -34,6 +35,7 @@ public final class TwoDeadWheelLocalizer implements Localizer {
 
         public final Encoder par, perp;
         public final IMU imu;
+//        public final BNO055IMU imu;
 
         private int lastParPos, lastPerpPos;
         private Rotation2d lastHeading;
@@ -43,6 +45,7 @@ public final class TwoDeadWheelLocalizer implements Localizer {
         private double lastRawHeadingVel, headingVelOffset;
 
         public TwoDeadWheelLocalizer(HardwareMap hardwareMap, IMU imu, double inPerTick) {
+//        public TwoDeadWheelLocalizer(HardwareMap hardwareMap, BNO055IMU imu, double inPerTick) {
                 par = new OverflowEncoder(new RawEncoder(HardwareCreator.createMotor(hardwareMap, "leftFront")));
                 par.setDirection(DcMotorSimple.Direction.REVERSE);
                 perp = new OverflowEncoder(new RawEncoder(HardwareCreator.createMotor(hardwareMap, "rightFront")));
@@ -51,6 +54,7 @@ public final class TwoDeadWheelLocalizer implements Localizer {
                 lastParPos = par.getPositionAndVelocity().position;
                 lastPerpPos = perp.getPositionAndVelocity().position;
                 lastHeading = Rotation2d.exp(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+//                lastHeading = Rotation2d.exp(imu.getAngularOrientation().firstAngle);
 
                 this.inPerTick = inPerTick;
 
@@ -60,11 +64,11 @@ public final class TwoDeadWheelLocalizer implements Localizer {
         // see https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/617
         private double getHeadingVelocity() {
                 double rawHeadingVel = imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
+//                double rawHeadingVel = imu.getAngularVelocity().zRotationRate;
                 if (Math.abs(rawHeadingVel - lastRawHeadingVel) > Math.PI) {
                         headingVelOffset -= Math.signum(rawHeadingVel) * 2 * Math.PI;
                 }
                 lastRawHeadingVel = rawHeadingVel;
-                Log.d("HEADING", String.valueOf(rawHeadingVel));
                 return headingVelOffset + rawHeadingVel;
         }
 
@@ -72,6 +76,9 @@ public final class TwoDeadWheelLocalizer implements Localizer {
                 PositionVelocityPair parPosVel = par.getPositionAndVelocity();
                 PositionVelocityPair perpPosVel = perp.getPositionAndVelocity();
                 Rotation2d heading = Rotation2d.exp(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+//                Rotation2d heading = Rotation2d.exp(imu.getAngularOrientation().firstAngle);
+                FlightRecorder.write("IMU_HEADING", Math.toDegrees(heading.log()));
+                Log.d("IMU_HEADING", String.valueOf(Math.toDegrees(heading.log())));
 
                 int parPosDelta = parPosVel.position - lastParPos;
                 int perpPosDelta = perpPosVel.position - lastPerpPos;
