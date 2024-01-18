@@ -16,7 +16,8 @@ public class BlueRightAuto extends AutoBase {
     // 0 = right, 1 = middle, 2 = left
     public static Pose2d[] spikeBackedOut =  {new Pose2d(-48, 50, Math.toRadians(90)), new Pose2d(-36, 53, Math.toRadians(90)), new Pose2d(-40, 47, Math.toRadians(135))};
     public static Pose2d start = new Pose2d(-36, 63, Math.toRadians(90));
-    public static Pose2d parking = new Pose2d(60, 12, Math.toRadians(180));
+    public static Pose2d parking = new Pose2d(60, 12, Math.toRadians(180)); // Center
+    //public static Pose2d parking = new Pose2d(60, 62, Math.toRadians(180)); // Corner
     public static Pose2d intermediate = new Pose2d(-40, 61, Math.toRadians(180));
 
     @Override
@@ -31,7 +32,7 @@ public class BlueRightAuto extends AutoBase {
 
     @Override
     protected void onRun() {
-        //sched.addAction(new SleepAction(10));
+        sched.addAction(new SleepAction(10));
         deliverSpike();
         driveToScoring();
         scorePreload();

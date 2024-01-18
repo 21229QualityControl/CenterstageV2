@@ -5,6 +5,7 @@ import android.util.Size;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.subsystems.FrontSensors;
 import org.firstinspires.ftc.teamcode.util.AutoActionScheduler;
+import org.firstinspires.ftc.teamcode.util.LED;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Config
@@ -27,9 +29,9 @@ public abstract class AutoBase extends LinearOpMode {
     protected FrontSensors frontSensors;
     protected Plane plane;
     protected AutoActionScheduler sched;
-
     protected CameraProcessor processor;
     protected VisionPortal portal;
+    protected LED led;
 
     protected int w = 1920;
     protected int h = 1080;
@@ -53,10 +55,11 @@ public abstract class AutoBase extends LinearOpMode {
         this.drive = new MecanumDrive(hardwareMap, Memory.LAST_POSE);
         this.intake = new Intake(hardwareMap);
         this.outtake = new Outtake(hardwareMap);
-         this.frontSensors = new FrontSensors(hardwareMap);
+        this.frontSensors = new FrontSensors(hardwareMap);
         this.plane = new Plane(hardwareMap);
         this.sched = new AutoActionScheduler(this::update);
         this.processor = new CameraProcessor();
+        this.led = new LED(hardwareMap);
         this.portal = new VisionPortal.Builder()
                 // Get the actual camera on the robot, add the processor, state the orientation of the camera.
                 .setCamera(hardwareMap.get(WebcamName.class, "webcam"))
@@ -104,11 +107,15 @@ public abstract class AutoBase extends LinearOpMode {
             telemetry.addData("Right Rectangle Saturation:", "%.3f", processor.getSatRectRight());
             telemetry.update();
 
+            led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE);
+
 //            vision.displayTelemetry(telemetry);
 //            printDescription();
 
             idle();
         }
+
+        led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 
         if (SPIKE == -1) {
             SPIKE = 0;
