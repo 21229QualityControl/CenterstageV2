@@ -121,6 +121,8 @@ public abstract class AutoBase extends LinearOpMode {
 
         if (isStopRequested()) return; // exit if stopped
 
+        drive.updatePoseEstimate();
+        drive.pose = getStartPose();
         onRun();
         drive.pose = getStartPose();
         //drive.imu.resetYaw();

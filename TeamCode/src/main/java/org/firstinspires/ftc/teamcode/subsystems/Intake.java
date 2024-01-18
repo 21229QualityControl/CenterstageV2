@@ -30,10 +30,10 @@ public class Intake {
 
    public int pixelCount = 0;
 
-   public static double LEFT_STACK_OPEN = 0.92;
-   public static double LEFT_STACK_CLOSED = 0.475;
-   public static double RIGHT_STACK_OPEN = 0.03;
-   public static double RIGHT_STACK_CLOSED = 0.47;
+   public static double LEFT_STACK_OPEN = 0.55;
+   public static double LEFT_STACK_CLOSED = 0.08;
+   public static double RIGHT_STACK_OPEN = 0.45;
+   public static double RIGHT_STACK_CLOSED = 0.93;
    public static double RIGHT_STACK_HALF = (RIGHT_STACK_OPEN + RIGHT_STACK_CLOSED) / 2;
    public static double LEFT_STACK_HALF = (LEFT_STACK_OPEN + LEFT_STACK_CLOSED) / 2;
 

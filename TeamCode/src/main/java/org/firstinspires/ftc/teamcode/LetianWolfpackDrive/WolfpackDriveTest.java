@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.dev;
+package org.firstinspires.ftc.teamcode.LetianWolfpackDrive;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -82,16 +82,14 @@ public class WolfpackDriveTest extends LinearOpMode {
 
             PoseVelocity2d currentVel = baseDrive.updatePoseEstimate();
             drive.trackPosition(baseDrive.pose);
-            drive.setDrivePowers(input, input_turn, currentVel);
+            drive.driveWithCorrection(new PoseVelocity2d(input, input_turn), currentVel);
 
-            if (drive.centripetalCircleCenterDrawn == null) System.out.println("Circle stats: No circle");
-            else telemetry.addLine(String.format("Circle stats: r=%.2f, center=(%.2f, %.2f)", drive.centripetalCircleRadiusDrawn.norm(), drive.centripetalCircleCenterDrawn.x, drive.centripetalCircleCenterDrawn.y));
-            telemetry.addLine(String.format("Stick:           mag=%5.1f, angle=%5.1f°, (%5.2f, %5.2f)", input.norm(), Math.toDegrees(input.angleCast().log()), input.x, input.y));
-            telemetry.addLine(String.format("Current vel:     mag=%5.1f, angle=%5.1f°, (%5.2f, %5.2f)", currentVel.linearVel.norm(), Math.toDegrees(currentVel.linearVel.angleCast().log()), currentVel.linearVel.x, currentVel.linearVel.y));
-            telemetry.addLine(String.format("Correction:      mag=%5.1f, angle=%5.1f°, (%5.2f, %5.2f)", drive.centripetalVectorDrawn!=null?drive.centripetalVectorDrawn.norm():0, drive.centripetalVectorDrawn!=null?Math.toDegrees(drive.centripetalVectorDrawn.angleCast().log()):0, drive.centripetalVectorDrawn!=null?drive.centripetalVectorDrawn.x:0, drive.centripetalVectorDrawn!=null?drive.centripetalVectorDrawn.y:0));
-            telemetry.addLine(String.format("Drive direction: mag=%5.1f, angle=%5.1f°, (%5.2f, %5.2f)", drive.robotDriveDirectionDrawn.norm(), Math.toDegrees(drive.robotDriveDirectionDrawn.angleCast().log()), drive.robotDriveDirectionDrawn.x, drive.robotDriveDirectionDrawn.y));
-            telemetry.addLine(String.format("%+1.3f  %+1.3f", baseDrive.leftFront.getPower(), baseDrive.rightFront.getPower()));
-            telemetry.addLine(String.format("%+1.3f  %+1.3f", baseDrive.leftBack.getPower(), baseDrive.rightBack.getPower()));
+            telemetry.addData("Circle stats", drive.getCircleString());
+            telemetry.addData("Stick", drive.formatVector(input));
+            telemetry.addData("Current vel", drive.formatVector(currentVel.linearVel));
+            telemetry.addData("Correction", drive.getCorrectionString());
+            telemetry.addData("Drive direction", drive.getDriveDirectionString());
+            telemetry.addLine(drive.getWheelPowerString());
 
             sched.update();
         }

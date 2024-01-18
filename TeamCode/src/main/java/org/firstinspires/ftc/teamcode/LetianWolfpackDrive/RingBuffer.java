@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.dev;
+package org.firstinspires.ftc.teamcode.LetianWolfpackDrive;
 
 import androidx.annotation.NonNull;
 
@@ -77,7 +77,7 @@ public class RingBuffer {
     @NonNull
     @Override
     public String toString() {
-        if (array.length - 1 == 0) return "[]";
+        if (size() == 0) return "[]";
 
         int readHead = head == -1 ? 0 : head; // if empty, read from 0
 
@@ -85,7 +85,8 @@ public class RingBuffer {
         b.append('[');
 
         for (int i = readHead; ; i = (i - 1 + array.length) % array.length) {
-            b.append(String.format("(%.2f, %.2f, %.2f°)", array[i].position.x, array[i].position.y, Math.toDegrees(array[i].heading.log())));
+            if (array[i] == null) b.append("null");
+            else b.append(String.format("(%.2f, %.2f, %.2f°)", array[i].position.x, array[i].position.y, Math.toDegrees(array[i].heading.log())));
             if ((i - 1 + array.length) % array.length == readHead) // check if i is last element
                 return b.append(']').toString();
             b.append(", ");
