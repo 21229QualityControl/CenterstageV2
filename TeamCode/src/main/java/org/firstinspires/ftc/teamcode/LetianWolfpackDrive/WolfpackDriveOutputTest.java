@@ -9,34 +9,46 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class WolfpackDriveOutputTest {
 
+    private static final String greenColor = "\033[0;32m";
+    private static final String yellowColor = "\033[0;33m";
+    private static final String redColor = "\033[0;31m";
+    private static final String resetColor = "\033[0m"; // must use reset after using red so effect clears
+    private static final String errorString = redColor + "ERROR" + resetColor;
+    private static final String okString = greenColor + "OKAY" + resetColor;
+    private static final String naString = yellowColor + "N/A (Correction or Turning Applied)" + resetColor;
+
     // Run isolated. Might need to run with coverage.
     public static void main(String[] args)
     {
         System.out.println();
         updateWheelForceVectors();
+//        updateWheelForceVectorsRandom(-1, 1, 30);
 
+        test(1, 0, 0, 0, 0, 0, 0, 10, 2, 20, 0);
         test(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 180, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 210, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 240, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 270, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 330, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 360, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        test(1, 90, 0, 0, 0, 0, 0, 0, 12, 0, 30);
+        test(1, 0, 0, 0, 0, 0, 0, 10, -2, 20, 0);
+        test(0.5, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 180, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 210, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 240, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 270, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 330, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 360, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        test(0.5, 90, 0, 0, 0, 0, 0, 0, 12, 0, 30);
         test(0, 90, 0, 0, 0, 0, 0, 0, 12, 0, 30);
-//        test(0.5, 180, 0, 30, 30, 0, 0, 16, 12, 30, 30);
+        test(0, 180, 1, 0, 0, 0, 0, 0, 12, 0, 30);
+        test(0.5, 180, 0, 30, 30, 0, 0, 16, 12, 30, 30);
 
     }
 
     public static double maxVelocityX = 50; // max positive straight velocity. Record using MaxVelStraightTest.
     public static double maxVelocityY = 50; // max positive sideways velocity. Record using MaxVelStrafeTest.
-    public static double centripetalWeighting = 0.02; // adjust by trial and error for how much smoothing you need. Wolfpack calculates it but I can't be bothered.
+    public static double centripetalWeighting = 0.00001; // adjust by trial and error for how much smoothing you need. Wolfpack calculates it but I can't be bothered.
     public static double dashboardVectorScale = 1;
 
     private static Vector2d leftFrontWheelForceVector;  // these vectors should not change during the match,
@@ -73,8 +85,8 @@ public class WolfpackDriveOutputTest {
         System.out.println(getWheelPowerString(wheelPowers));
 
         double actualDriveDirection = Math.toDegrees(leftFrontWheelForceVector.times(wheelPowers[0]).plus(leftBackWheelForceVector.times(wheelPowers[1])).plus(rightBackWheelForceVector.times(wheelPowers[2])).plus(rightFrontWheelForceVector.times(wheelPowers[3])).angleCast().log());
-        System.out.println(String.format("Actual drive direction: %5.1f°, %s", actualDriveDirection, Math.abs(AngleUnit.normalizeDegrees(actualDriveDirection-stickAngle)) <= 1e-6?"OK":"ERROR"));
-
+        boolean driveDirectionCorrect = Math.abs(AngleUnit.normalizeDegrees(actualDriveDirection-Math.toDegrees(stick.angleCast().log()))) <= 1e-6;
+        System.out.println(String.format("Actual drive direction: %f°, %s", actualDriveDirection, driveDirectionCorrect?okString:(centripetalCircleCenterDrawn==null&&turnPower==0?errorString:naString)));
         System.out.println();
     }
 
@@ -86,6 +98,17 @@ public class WolfpackDriveOutputTest {
         leftBackWheelForceVector = new Vector2d(maxVelocityX, maxVelocityY);
         rightBackWheelForceVector = new Vector2d(maxVelocityX, -maxVelocityY);
         rightFrontWheelForceVector = new Vector2d(maxVelocityX, maxVelocityY);
+        wheelForceVectorMag = getAbsMax(leftFrontWheelForceVector.norm(), leftBackWheelForceVector.norm(), rightBackWheelForceVector.norm(), rightFrontWheelForceVector.norm());
+    }
+
+    /**
+     * Flashes new maxVelocities into the force vectors.
+     */
+    public static void updateWheelForceVectorsRandom(double scaleVectorMin, double scaleVectorMax, double offsetVectorMaxRadius) {
+        leftFrontWheelForceVector = new Vector2d(maxVelocityX + (offsetVectorMaxRadius-2*offsetVectorMaxRadius*Math.random()), -maxVelocityY + (offsetVectorMaxRadius-2*offsetVectorMaxRadius*Math.random())).times(scaleVectorMin+(scaleVectorMax-scaleVectorMin)*Math.random());
+        leftBackWheelForceVector = new Vector2d(maxVelocityX + (offsetVectorMaxRadius-2*offsetVectorMaxRadius*Math.random()), maxVelocityY + (offsetVectorMaxRadius-2*offsetVectorMaxRadius*Math.random())).times(scaleVectorMin+(scaleVectorMax-scaleVectorMin)*Math.random());
+        rightBackWheelForceVector = new Vector2d(maxVelocityX + (offsetVectorMaxRadius-2*offsetVectorMaxRadius*Math.random()), -maxVelocityY + (offsetVectorMaxRadius-2*offsetVectorMaxRadius*Math.random())).times(scaleVectorMin+(scaleVectorMax-scaleVectorMin)*Math.random());
+        rightFrontWheelForceVector = new Vector2d(maxVelocityX + (offsetVectorMaxRadius-2*offsetVectorMaxRadius*Math.random()), maxVelocityY + (offsetVectorMaxRadius-2*offsetVectorMaxRadius*Math.random())).times(scaleVectorMin+(scaleVectorMax-scaleVectorMin)*Math.random());
         wheelForceVectorMag = getAbsMax(leftFrontWheelForceVector.norm(), leftBackWheelForceVector.norm(), rightBackWheelForceVector.norm(), rightFrontWheelForceVector.norm());
     }
 
@@ -162,7 +185,8 @@ public class WolfpackDriveOutputTest {
         System.out.println(String.format("(%+7.2f, %7.2f)  (%+7.2f, %7.2f)", newLeftBackWheelForceVector.x, newLeftBackWheelForceVector.y, newRightBackWheelForceVector.x, newRightBackWheelForceVector.y));
 
         Vector2d wheelForceSum = newLeftFrontWheelForceVector.plus(newLeftBackWheelForceVector).plus(newRightBackWheelForceVector).plus(newRightFrontWheelForceVector);
-        System.out.println(String.format("Adding wheel forces: mag=%5.1f, angle=%5.1f°, (%5.2f, %5.2f), %s", wheelForceSum.norm(), Math.toDegrees(wheelForceSum.angleCast().log()), wheelForceSum.x, wheelForceSum.y, Math.abs(Math.toDegrees(wheelForceSum.angleCast().log()))<=1e-6?"OK":"ERROR"));
+        boolean wheelForceSumDirectionCorrect = Math.abs(Math.toDegrees(wheelForceSum.angleCast().log()))<=1e-6;
+        System.out.println(String.format("Adding wheel forces: mag=%f, angle=%f°, (%5.2f, %5.2f), %s", wheelForceSum.norm(), Math.toDegrees(wheelForceSum.angleCast().log()), wheelForceSum.x, wheelForceSum.y, wheelForceSumDirectionCorrect?okString:errorString));
 
         // consider turn power
         leftFrontPower = leftFrontPower - powers.angVel;
