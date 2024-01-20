@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 public class WolfpackDrive {
     public static double maxVelocityX = 50; // max positive straight velocity. Record using MaxVelStraightTest.
     public static double maxVelocityY = 50; // max positive sideways velocity. Record using MaxVelStrafeTest.
-    public static double centripetalWeighting = 0.005; // adjust by trial and error for how much smoothing you need. Wolfpack calculates it but I can't be bothered.
+    public static double centripetalWeighting = 0.00001; // adjust by trial and error for how much smoothing you need. Wolfpack calculates it but I can't be bothered.
     public static double dashboardVectorScale = 1;
 
     private Vector2d leftFrontWheelForceVector;  // these vectors should not change during the match,
@@ -61,7 +61,6 @@ public class WolfpackDrive {
         // scale down extraneous strafe
         double frontNegScale = -Math.signum(newLeftFrontWheelForceVector.y * newRightFrontWheelForceVector.y);
         if (Math.abs(newLeftFrontWheelForceVector.y) >= Math.abs(newRightFrontWheelForceVector.y)) {
-            System.out.println("Scale down leftFront");
             double pairedY = newRightFrontWheelForceVector.y;
             double selfY = newLeftFrontWheelForceVector.y;
             double factor = frontNegScale * Math.abs(pairedY / selfY);
@@ -69,7 +68,6 @@ public class WolfpackDrive {
             newLeftFrontWheelForceVector = newLeftFrontWheelForceVector.times(factor);
             leftFrontPower = leftFrontPower * factor;
         } else {
-            System.out.println("Scale down rightFront");
             double pairedY = newLeftFrontWheelForceVector.y;
             double selfY = newRightFrontWheelForceVector.y;
             double factor = frontNegScale * Math.abs(pairedY / selfY);
@@ -79,7 +77,6 @@ public class WolfpackDrive {
         }
         double backNegScale = -Math.signum(newLeftBackWheelForceVector.y * newRightBackWheelForceVector.y);
         if (Math.abs(newLeftBackWheelForceVector.y) > Math.abs(newRightBackWheelForceVector.y)) {
-            System.out.println("Scale down leftBack");
             double pairedY = newRightBackWheelForceVector.y;
             double selfY = newLeftBackWheelForceVector.y;
             double factor = backNegScale * Math.abs(pairedY / selfY);
@@ -87,13 +84,37 @@ public class WolfpackDrive {
             newLeftBackWheelForceVector = newLeftBackWheelForceVector.times(factor);
             leftBackPower = leftBackPower * factor;
         } else {
-            System.out.println("Scale down rightBack");
             double pairedY = newLeftBackWheelForceVector.y;
             double selfY = newRightBackWheelForceVector.y;
             double factor = backNegScale * Math.abs(pairedY / selfY);
             if (!Double.isFinite(factor)) factor = 0;
             newRightBackWheelForceVector = newRightBackWheelForceVector.times(factor);
             rightBackPower = rightBackPower * factor;
+        }
+
+        // Correct signs if majority is negative x
+        if (newLeftFrontWheelForceVector.x + newLeftBackWheelForceVector.x + newRightBackWheelForceVector.x + newRightFrontWheelForceVector.x < 0) {
+            newLeftFrontWheelForceVector = newLeftFrontWheelForceVector.times(-1);
+            newLeftBackWheelForceVector = newLeftBackWheelForceVector.times(-1);
+            newRightBackWheelForceVector = newRightBackWheelForceVector.times(-1);
+            newRightFrontWheelForceVector = newRightFrontWheelForceVector.times(-1);
+            leftFrontPower = -leftFrontPower;
+            leftBackPower = -leftBackPower;
+            rightBackPower = -rightBackPower;
+            rightFrontPower = -rightFrontPower;
+        }
+
+        // consider turn power
+        leftFrontPower = leftFrontPower - powers.angVel;
+        leftBackPower = leftBackPower - powers.angVel;
+        rightBackPower = rightBackPower + powers.angVel;
+        rightFrontPower = rightFrontPower + powers.angVel;
+        double maxPower = getAbsMax(leftFrontPower, leftBackPower, rightBackPower, rightFrontPower);
+        if (maxPower > 1) {
+            leftFrontPower = leftFrontPower / maxPower;
+            leftBackPower = leftBackPower / maxPower;
+            rightBackPower = rightBackPower / maxPower;
+            rightFrontPower = rightFrontPower / maxPower;
         }
 
         // set motor powers
