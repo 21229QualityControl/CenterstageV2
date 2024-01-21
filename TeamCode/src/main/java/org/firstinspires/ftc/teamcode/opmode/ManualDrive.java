@@ -208,9 +208,9 @@ public class ManualDrive extends LinearOpMode {
       if (g1.startOnce()) {
          sched.queueAction(new SequentialAction(
                  intake.stackClosed(),
-                 new SleepAction(0.3),
+                 new SleepAction(0.6),
                  intake.stackOpen(),
-                 new SleepAction(0.3)
+                 new SleepAction(0.6)
          ));
       }
    }
@@ -241,7 +241,7 @@ public class ManualDrive extends LinearOpMode {
          outtake.setSlidePower(-g2.right_stick_y);
       } else if (!outtake.slidePIDEnabled) {
          outtake.slidePIDEnabled = true;
-         outtake.lockPosition();
+         sched.queueAction(outtake.lockPosition());
       }
       if (g2.bOnce()) {
          sched.queueAction(outtake.wristStored());
@@ -249,15 +249,22 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(outtake.retractOuttake());
          sched.queueAction(outtake.latchClosed());
       }
+      if (g2.aOnce()) {
+         if (outtake.isLatchScoring()) {
+            sched.queueAction(outtake.latchScoring());
+         } else {
+            if (intake.intakeState == Intake.IntakeState.On) {
+               sched.queueAction(outtake.latchOpen());
+            } else {
+               sched.queueAction(outtake.latchClosed());
+            }
+         }
+      }
       if (g2.dpadUpOnce()) {
-         sched.queueAction(outtake.latchScoring());
+         sched.queueAction(outtake.increaseSlideLayer(1));
       }
       if (g2.dpadDownOnce()) {
-         if (intake.intakeState == Intake.IntakeState.On) {
-            sched.queueAction(outtake.latchOpen());
-         } else {
-            sched.queueAction(outtake.latchClosed());
-         }
+         sched.queueAction(outtake.increaseSlideLayer(-1));
       }
 
       // Mosaic controls

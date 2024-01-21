@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.util.control.PIDFControllerKt.EPSILON;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -18,6 +21,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 public class Outtake {
    public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0.0015, 0.0004);
    public static int OUTTAKE_TELEOP = 0;
+   public static int LAYER_HEIGHT = 100; // Height of a layer of pixels for the slide, used for teleop
    public static int OUTTAKE_MIDLOW = 400;
    public static int OUTTAKE_MID = 600;
    public static int OUTTAKE_LOW = 250;
@@ -96,9 +100,13 @@ public class Outtake {
    public void setSlidePower(double power) {
       slide.getMotor().setPower(power);
    }
-   public void lockPosition() {
-      OUTTAKE_TELEOP = this.slide.getCurrentPosition();
-      this.slide.setTargetPosition(OUTTAKE_TELEOP);
+   public Action lockPosition() {
+      int pos = this.slide.getCurrentPosition();
+      return this.slide.setTargetPositionAction(pos);
+   }
+   public Action increaseSlideLayer(int cnt) {
+      OUTTAKE_TELEOP += LAYER_HEIGHT * cnt;
+      return this.slide.setTargetPositionAction(OUTTAKE_TELEOP);
    }
 
    public Action extendOuttakeMidBlocking() {
@@ -127,6 +135,9 @@ public class Outtake {
 
    public Action latchScoring() {
       return new ActionUtil.ServoPositionAction(latch, LATCH_SCORING);
+   }
+   public boolean isLatchScoring() {
+      return (latch.getPosition() - LATCH_OPEN) < EPSILON;
    }
 
    public Action latchClosed() {
