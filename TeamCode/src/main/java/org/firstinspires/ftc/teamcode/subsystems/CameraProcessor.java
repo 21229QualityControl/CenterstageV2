@@ -56,27 +56,7 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
 
     public Object processFrame(Mat frame, long captureTimeNanos) {
         if (debugMode == CameraUtil.DebugMode.Dashboard) {
-            // Create a Bitmap that is called "b" and give it the dimensions of the frame that we input to the function.
-            Bitmap b = Bitmap.createBitmap(frame.width(), frame.height(), Bitmap.Config.RGB_565);
-            // Convert the frame to the Bitmap "b."
-            Utils.matToBitmap(frame, b);
-            // Set the "lastFrame" to the Bitmap "b." So that AtomicReference container ACTUALLY holds the Bitmap.
-            lastFrame.set(b);
-
-            // Make a color "green."
-            Scalar green = new Scalar(0, 255, 0);
-            // Clone the Matrix. The original matrix is for the processing purposes and the cloned matrix is for the display purposes.
-            Mat frameWithBoundingRect = frame.clone();
-            // Draw rectangles on the cloned matrix.
-            Imgproc.rectangle(frameWithBoundingRect, new Point(leftRect.x, leftRect.y), new Point(leftRect.x + leftRect.width, leftRect.y + leftRect.height), green, 4);
-            Imgproc.rectangle(frameWithBoundingRect, new Point(centerRect.x, centerRect.y), new Point(centerRect.x + centerRect.width, centerRect.y + centerRect.height), green, 4);
-            Imgproc.rectangle(frameWithBoundingRect, new Point(rightRect.x, rightRect.y), new Point(rightRect.x + rightRect.width, rightRect.y + rightRect.height), green, 4);
-            // Create a Bitmap "bb" that is the same size as "frameWithBoundingRect."
-            Bitmap bb = Bitmap.createBitmap(frameWithBoundingRect.width(), frameWithBoundingRect.height(), Bitmap.Config.RGB_565);
-            // Convert the cloned matrix to the Bitmap "bb."
-            Utils.matToBitmap(frameWithBoundingRect, bb);
-            // Set the "lastFrameWithBoundingRect" to the Bitmap "bb." So that AtomicReference container ACTUALLY holds the Bitmap.
-            lastFrameWithBoundingRect.set(bb);
+            saveDebugMat(frame);
         }
 
         //-----
@@ -152,5 +132,28 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
         int bottom=top+Math.round(rect.height * scaleBmpPxToCanvasPx);
 
         return new android.graphics.Rect(left,top,right,bottom);
+    }
+
+    private void saveDebugMat(Mat frame) {
+        Bitmap b = Bitmap.createBitmap(frame.width(), frame.height(), Bitmap.Config.RGB_565);
+        // Convert the frame to the Bitmap "b."
+        Utils.matToBitmap(frame, b);
+        // Set the "lastFrame" to the Bitmap "b." So that AtomicReference container ACTUALLY holds the Bitmap.
+        lastFrame.set(b);
+
+        // Make a color "green."
+        Scalar green = new Scalar(0, 255, 0);
+        // Clone the Matrix. The original matrix is for the processing purposes and the cloned matrix is for the display purposes.
+        Mat frameWithBoundingRect = frame.clone();
+        // Draw rectangles on the cloned matrix.
+        Imgproc.rectangle(frameWithBoundingRect, new Point(leftRect.x, leftRect.y), new Point(leftRect.x + leftRect.width, leftRect.y + leftRect.height), green, 4);
+        Imgproc.rectangle(frameWithBoundingRect, new Point(centerRect.x, centerRect.y), new Point(centerRect.x + centerRect.width, centerRect.y + centerRect.height), green, 4);
+        Imgproc.rectangle(frameWithBoundingRect, new Point(rightRect.x, rightRect.y), new Point(rightRect.x + rightRect.width, rightRect.y + rightRect.height), green, 4);
+        // Create a Bitmap "bb" that is the same size as "frameWithBoundingRect."
+        Bitmap bb = Bitmap.createBitmap(frameWithBoundingRect.width(), frameWithBoundingRect.height(), Bitmap.Config.RGB_565);
+        // Convert the cloned matrix to the Bitmap "bb."
+        Utils.matToBitmap(frameWithBoundingRect, bb);
+        // Set the "lastFrameWithBoundingRect" to the Bitmap "bb." So that AtomicReference container ACTUALLY holds the Bitmap.
+        lastFrameWithBoundingRect.set(bb);
     }
 }

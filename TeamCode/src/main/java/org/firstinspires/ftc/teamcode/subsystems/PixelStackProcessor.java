@@ -62,6 +62,22 @@ public class PixelStackProcessor implements VisionProcessor, CameraStreamSource 
         return null;
     }
 
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+
+    }
+
+    @Override
+    public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
+        if (debugMode == CameraUtil.DebugMode.Dashboard) {
+            continuation.dispatch(bitmapConsumer -> bitmapConsumer.accept(lastFrame.get()));
+        }
+    }
+
+    public void setDebugMode(CameraUtil.DebugMode debugMode) {
+        this.debugMode = debugMode;
+    }
+
     private void hsvDetection(Mat frame) {
         // The white pixel stack would appear (on an HSV image)
         // as a region of high V, and very low S. H can be anything.
@@ -80,21 +96,5 @@ public class PixelStackProcessor implements VisionProcessor, CameraStreamSource 
             Utils.matToBitmap(frame, b);
             lastFrame.set(b);
         }
-    }
-
-    @Override
-    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
-
-    }
-
-    @Override
-    public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
-        if (debugMode == CameraUtil.DebugMode.Dashboard) {
-            continuation.dispatch(bitmapConsumer -> bitmapConsumer.accept(lastFrame.get()));
-        }
-    }
-
-    public void setDebugMode(CameraUtil.DebugMode debugMode) {
-        this.debugMode = debugMode;
     }
 }
