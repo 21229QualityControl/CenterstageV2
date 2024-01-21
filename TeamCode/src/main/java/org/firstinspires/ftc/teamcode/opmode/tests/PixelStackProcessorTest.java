@@ -9,29 +9,24 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.subsystems.CameraProcessor;
-import org.firstinspires.ftc.teamcode.subsystems.FrontSensors;
+import org.firstinspires.ftc.teamcode.subsystems.PixelStackProcessor;
 import org.firstinspires.ftc.teamcode.util.CameraUtil;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Autonomous
-// This uses the CameraProcessor
-public class CameraProcessorTest extends LinearOpMode {
-    public CameraUtil.DebugMode debugMode = CameraUtil.DebugMode.DriverStation;
+public class PixelStackProcessorTest extends LinearOpMode {
+    public CameraUtil.DebugMode debugMode = CameraUtil.DebugMode.Dashboard;
     public void runOpMode() throws InterruptedException {
         if (debugMode == CameraUtil.DebugMode.Dashboard) {
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         }
 
         // Create an instance of the camera processor
-        final CameraProcessor processor = new CameraProcessor();
+        final PixelStackProcessor processor = new PixelStackProcessor();
         processor.setDebugMode(debugMode);
 
-        // Create one of the sensors too
-        final FrontSensors frontSensors = new FrontSensors(hardwareMap);
-
-        int w = 1920;
-        int h = 1080;
+        int w = 640;
+        int h = 480;
 
         VisionPortal portal = new VisionPortal.Builder()
                 // Get the actual camera on the robot, add the processor, state the orientation of the camera.
@@ -48,14 +43,7 @@ public class CameraProcessorTest extends LinearOpMode {
 
         while (opModeInInit()) {
             // the camera processor got result only when it is in active
-            int cameraReading = processor.position;
-            int sensorReading = frontSensors.rawObjectPosition();
-
-            telemetry.addData("Camera Position", cameraReading);
-            telemetry.addData("Sensor Position", sensorReading);
-            telemetry.addData("Left Rectangle Saturation:", processor.getSatRectLeft());
-            telemetry.addData("Center Rectangle Saturation:", processor.getSatRectCenter());
-            telemetry.addData("Right Rectangle Saturation:", processor.getSatRectRight());
+            telemetry.addData("Init", "init");
             telemetry.update();
 
             sleep(100);

@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.function.Consumer;
 import org.firstinspires.ftc.robotcore.external.function.Continuation;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.teamcode.util.CameraUtil;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -24,12 +25,6 @@ import org.opencv.imgproc.Imgproc;
 import java.util.concurrent.atomic.AtomicReference;
 @Config
 public class CameraProcessor implements VisionProcessor, CameraStreamSource {
-    public enum DebugMode {
-        None,
-        DriverStation,
-        Dashboard
-    }
-
     // State the dimensions of the rectangles for the 3 locations of the team prop.
     public static Rect leftRect = new Rect(0, 600, 200 , 280);
     public static Rect centerRect = new Rect(550, 600, 300, 210);
@@ -40,7 +35,7 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
     private double satRectRight;
     Mat hsvMat = new Mat();
 
-    private DebugMode debugMode = DebugMode.None;
+    private CameraUtil.DebugMode debugMode = CameraUtil.DebugMode.None;
 
     /* Create an AtomicReference that holds a Bitmap that is called "lastFrame" and give it some random dimensions.
      * The "AtomicReference" means that it is thread safe.
@@ -60,7 +55,7 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
     };
 
     public Object processFrame(Mat frame, long captureTimeNanos) {
-        if (debugMode == DebugMode.Dashboard) {
+        if (debugMode == CameraUtil.DebugMode.Dashboard) {
             // Create a Bitmap that is called "b" and give it the dimensions of the frame that we input to the function.
             Bitmap b = Bitmap.createBitmap(frame.width(), frame.height(), Bitmap.Config.RGB_565);
             // Convert the frame to the Bitmap "b."
@@ -106,7 +101,7 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
     };
 
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
-        if (debugMode == DebugMode.DriverStation) {
+        if (debugMode == CameraUtil.DebugMode.DriverStation) {
             Paint paint=new Paint();
             paint.setColor(Color.GREEN);
             paint.setStyle(Paint.Style.STROKE);
@@ -124,7 +119,7 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
 
     // This lets Dashboard get all of our Bitmaps!!!
     public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
-        if (debugMode == DebugMode.Dashboard) {
+        if (debugMode == CameraUtil.DebugMode.Dashboard) {
             continuation.dispatch(bitmapConsumer -> bitmapConsumer.accept(lastFrameWithBoundingRect.get()));
         }
     }
@@ -141,7 +136,7 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
         return satRectRight;
     }
 
-    public void setDebugMode(DebugMode debugMode) {
+    public void setDebugMode(CameraUtil.DebugMode debugMode) {
         this.debugMode = debugMode;
     }
 
