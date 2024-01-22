@@ -30,7 +30,9 @@ public class BlueLeftAuto2_4 extends AutoBase {
 
     public static Pose2d start = new Pose2d(12, 63, Math.toRadians(90));
     public static Pose2d parking = new Pose2d(58, 58, Math.toRadians(180));
-    public static Pose2d stack = new Pose2d(-50.5, 10, Math.toRadians(180));
+    public static Pose2d stack = new Pose2d(-51, 11, Math.toRadians(180));
+    public static double[] stackOffset = {0, 3.75, 3.75};
+    public static double[] backdropDistOffset = {9.3, 8.5, 9};
 
    @Override
    protected Pose2d getStartPose() {
@@ -90,8 +92,8 @@ public class BlueLeftAuto2_4 extends AutoBase {
                                  dist = 9; // failed
                              }
                              Log.d("BACKDROP_DIST", String.valueOf(dist));
-                             offsetPos = new Vector2d(-1 * (8.5 - dist), 0);
-                             drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(8.5 - dist, 0)), drive.pose.heading);
+                             offsetPos = new Vector2d(-1 * (backdropDistOffset[SPIKE] - dist), 0);
+                             drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(backdropDistOffset[SPIKE] - dist, 0)), drive.pose.heading);
                              drive.updatePoseEstimate();
                              return false;
                          }))
@@ -127,7 +129,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
                               intake.intakeOn()
                       ))
                       .splineToConstantHeading(stack.position, stack.heading, drive.speedVelConstraint, drive.speedAccelConstraint)
-                      .strafeToLinearHeading(stack.position.plus(new Vector2d(-10, 4)), stack.heading)
+                      .strafeToLinearHeading(stack.position.plus(new Vector2d(-10, stackOffset[SPIKE])), stack.heading)
                       .afterDisp(8, new SequentialAction(
                               intake.stackClosed(),
                               new SleepAction(0.3),
