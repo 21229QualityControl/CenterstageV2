@@ -89,7 +89,7 @@ public class ManualDrive extends LinearOpMode {
          }
 
          // Init opmodes
-         outtake.initialize();
+         outtake.initialize(true);
          plane.initialize();
          intake.initialize();
          smartGameTimer.resetIfStandard();
@@ -208,9 +208,9 @@ public class ManualDrive extends LinearOpMode {
       if (g1.startOnce()) {
          sched.queueAction(new SequentialAction(
                  intake.stackClosed(),
-                 new SleepAction(0.6),
+                 new SleepAction(0.3),
                  intake.stackOpen(),
-                 new SleepAction(0.6)
+                 new SleepAction(0.3)
          ));
       }
    }

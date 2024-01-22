@@ -113,4 +113,8 @@ public class FrontSensors {
         telemetry.addData("m sensor", mDistance);
         telemetry.addData("r sensor", rDistance);
     }
+
+    public double backdropDistance() {
+        return middleSensor.getDistance(DistanceUnit.INCH);
+    }
 }

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -22,6 +24,25 @@ public class LED {
     public void setPattern(BlinkinPattern pattern) {
         if (pattern != this.pattern) ledDriver.setPattern(pattern);
         this.pattern = pattern;
+    }
+
+    private class SetPatternAction implements Action {
+        BlinkinPattern newPattern;
+
+        public SetPatternAction(BlinkinPattern pattern) {
+            this.newPattern = pattern;
+        }
+
+        @Override
+        public boolean run(TelemetryPacket packet) {
+            if (newPattern != pattern) ledDriver.setPattern(newPattern);
+            pattern = newPattern;
+            return false;
+        }
+    }
+
+    public Action setPatternAction(BlinkinPattern pattern) {
+        return new SetPatternAction(pattern);
     }
 
     public BlinkinPattern getPattern() {

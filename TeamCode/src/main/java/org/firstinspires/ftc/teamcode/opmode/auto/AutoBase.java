@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.subsystems.FrontSensors;
+import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoActionScheduler;
 import org.firstinspires.ftc.teamcode.util.LED;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -72,7 +73,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         outtake.resetMotors();
 
-        outtake.initialize();
+        outtake.initialize(false);
         plane.initialize();
         intake.initialize();
 
@@ -130,7 +131,12 @@ public abstract class AutoBase extends LinearOpMode {
 
         drive.updatePoseEstimate();
         drive.pose = getStartPose();
+        Memory.FINISHED_AUTO = false;
         onRun();
+        sched.addAction(new ActionUtil.RunnableAction(() -> {
+            Memory.FINISHED_AUTO = true;
+            return false;
+        }));
         drive.pose = getStartPose();
         //drive.imu.resetYaw();
 

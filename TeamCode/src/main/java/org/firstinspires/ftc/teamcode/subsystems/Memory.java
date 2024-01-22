@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.util.MotorWithPID;
 public class Memory {
     private static final String memoryDirectory = "/FIRST/data";
     public static boolean RAN_AUTO = false;
+    public static boolean FINISHED_AUTO = true;
     public static Pose2d LAST_POSE = new Pose2d(0, 0, 0);
     public static MotorWithPID outtakeSlide;
 
