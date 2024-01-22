@@ -77,7 +77,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
    private void scorePreload() {
          sched.addAction(
                  drive.actionBuilder(spike[SPIKE])
-                         .splineToConstantHeading(spikeBackedOut[SPIKE].position, spikeBackedOut[SPIKE].heading)
+                         .splineToSplineHeading(spikeBackedOut[SPIKE], spikeBackedOut[SPIKE].heading)
                          .splineToLinearHeading(AutoConstants.blueScoring[SPIKE], AutoConstants.blueScoring[SPIKE].heading)
                          .afterDisp(0, new SequentialAction(
                                  outtake.wristScoring(),
