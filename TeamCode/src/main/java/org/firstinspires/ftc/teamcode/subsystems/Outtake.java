@@ -30,8 +30,8 @@ public class Outtake {
    public static double LATCH_SCORING = 0.55;
    public static double LATCH_OPEN = 0.8;
    public static double LATCH_CLOSED = 0.9;
-   public static double WRIST_STORED = 0.74;
-   public static double WRIST_SCORING = 1;
+   public static double WRIST_STORED = 0.651;
+   public static double WRIST_SCORING = 0.924;
 
    public static double MOSAIC_ADJUSTING = 0.55;
    public static double MOSAIC_CLOSED = 0.07;
