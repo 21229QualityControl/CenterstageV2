@@ -24,7 +24,7 @@ public class Outtake {
    public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0.0015, 0.0004);
    public static int OUTTAKE_TELEOP = 0;
    public static int LAYER_HEIGHT = 100; // Height of a layer of pixels for the slide, used for teleop
-   public static int OUTTAKE_MIDLOW = 400;
+   public static int OUTTAKE_MIDLOW = 350;
    public static int OUTTAKE_MID = 600;
    public static int OUTTAKE_LOW = 250;
    public static double LATCH_SCORING = 0.55;
@@ -127,6 +127,9 @@ public class Outtake {
       return this.slide.setTargetPositionAction(OUTTAKE_MID);
    }
 
+   public Action extendOuttakeMidLow() {
+      return this.slide.setTargetPositionAction(OUTTAKE_MIDLOW);
+   }
 
    public Action extendOuttakeTeleopBlocking() {
       return this.slide.setTargetPositionActionBlocking(OUTTAKE_TELEOP);
