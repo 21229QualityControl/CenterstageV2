@@ -33,6 +33,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
     public static Pose2d stack = new Pose2d(-50.5, 11, Math.toRadians(180));
     public static double[] stackOffset = {0, 3.75, 3.75};
     public static double[] backdropDistOffset = {9.3, 8.5, 9};
+    private int startingSpike;
 
    @Override
    protected Pose2d getStartPose() {
@@ -46,6 +47,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
 
    @Override
    protected void onRun() {
+       startingSpike = SPIKE;
        led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);
        deliverSpike();
        scorePreload();
@@ -129,7 +131,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
                               intake.intakeOn()
                       ))
                       .splineToConstantHeading(stack.position, stack.heading, drive.speedVelConstraint, drive.speedAccelConstraint)
-                      .strafeToLinearHeading(stack.position.plus(new Vector2d(-10, stackOffset[SPIKE])), stack.heading)
+                      .strafeToLinearHeading(stack.position.plus(new Vector2d(-10, stackOffset[startingSpike])), stack.heading)
                       .afterDisp(8, new SequentialAction(
                               intake.stackClosed(),
                               new SleepAction(0.3),
