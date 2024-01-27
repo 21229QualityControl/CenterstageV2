@@ -12,9 +12,15 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 @Config
 @Autonomous(name = "Blue Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueRightAuto extends AutoBase {
-    public static Pose2d[] spike = {new Pose2d(-48, 40, Math.toRadians(90)), new Pose2d(-36, 33, Math.toRadians(90)), new Pose2d(-31, 37, Math.toRadians(135))};
+    public static Pose2d[] spike = {
+            new Pose2d(-48, 40, Math.toRadians(90)),
+            new Pose2d(-36, 33, Math.toRadians(90)),
+            new Pose2d(-31, 37, Math.toRadians(135))};
     // 0 = right, 1 = middle, 2 = left
-    public static Pose2d[] spikeBackedOut =  {new Pose2d(-48, 50, Math.toRadians(90)), new Pose2d(-36, 53, Math.toRadians(90)), new Pose2d(-40, 47, Math.toRadians(135))};
+    public static Pose2d[] spikeBackedOut =  {
+            new Pose2d(-48, 50, Math.toRadians(90)),
+            new Pose2d(-36, 53, Math.toRadians(90)),
+            new Pose2d(-40, 47, Math.toRadians(135))};
     public static Pose2d start = new Pose2d(-36, 63, Math.toRadians(90));
     public static Pose2d parking = new Pose2d(60, 12, Math.toRadians(180)); // Center
     //public static Pose2d parking = new Pose2d(60, 62, Math.toRadians(180)); // Corner

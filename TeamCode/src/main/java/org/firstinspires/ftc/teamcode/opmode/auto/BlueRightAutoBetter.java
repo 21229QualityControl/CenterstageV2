@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
+import static org.firstinspires.ftc.teamcode.util.AutoConstants.blueActualScoring;
+import static org.firstinspires.ftc.teamcode.util.AutoConstants.blueScoring;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -24,8 +27,8 @@ public class BlueRightAutoBetter extends AutoBase {
     public static Pose2d start = new Pose2d(-36, 63, Math.toRadians(90));
     public static Pose2d parking = new Pose2d(60, 12, Math.toRadians(180)); // Center
     //public static Pose2d parking = new Pose2d(60, 62, Math.toRadians(180)); // Corner
-    public static Pose2d intermediate = new Pose2d(-40, 61, Math.toRadians(180));
-    public static Pose2d stack = new Pose2d(-61.5, 36, Math.toRadians(180));
+    public static Pose2d intermediate = new Pose2d(-48, 61, Math.toRadians(180));
+    public static Pose2d stack = new Pose2d(-61.5, 35.5, Math.toRadians(180));
 
     @Override
     protected Pose2d getStartPose() {
@@ -39,7 +42,7 @@ public class BlueRightAutoBetter extends AutoBase {
 
     @Override
     protected void onRun() {
-//        sched.addAction(new SleepAction(10));
+        sched.addAction(new SleepAction(7));
         deliverSpike();
         intakeStack();
         driveToScoring();
@@ -98,9 +101,10 @@ public class BlueRightAutoBetter extends AutoBase {
                                 ))
                                 .strafeToLinearHeading(intermediate.position, intermediate.heading)
                                 .strafeToLinearHeading(new Vector2d(
-                                        (AutoConstants.blueScoring[SPIKE].position.x*2 + intermediate.position.x)/3,
-                                        intermediate.position.y), AutoConstants.blueScoring[SPIKE].heading)
-                                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
+                                        (blueScoring[SPIKE].position.x*2 + intermediate.position.x)/3,
+                                        intermediate.position.y), blueScoring[SPIKE].heading)
+                                .strafeToLinearHeading(blueScoring[SPIKE == 0 ? 2 : SPIKE - 1].position,
+                                        blueScoring[SPIKE == 0 ? 2 : SPIKE - 1].heading)
                                 .build()
                 )
         );
@@ -111,16 +115,23 @@ public class BlueRightAutoBetter extends AutoBase {
                 new SequentialAction(
                         outtake.wristScoring(),
                         outtake.extendOuttakeLowBlocking(),
-                        drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
-                                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(9, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
+                        // blueScoring means the robot is at the backdrop but it needs to move forward to score.
+                        // blueActualScoring means the robot is actually ready to deposit the pixels.
+                        drive.actionBuilder(blueScoring[SPIKE == 0 ? 2 : SPIKE - 1])
+                                .strafeToLinearHeading(blueActualScoring[SPIKE == 0 ? 2 : SPIKE - 1].position,
+                                        blueActualScoring[SPIKE == 0 ? 2 : SPIKE - 1].heading) // Correct for any turning that occured during the previous move
                                 .build(),
+                        // score the white pixel
                         outtake.latchScoring(),
                         new SleepAction(0.4),
-                        drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
-                                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(9, -3)), AutoConstants.blueScoring[SPIKE].heading) // Strafe so the white doesn't block the yellow pixel.
-                                .build(),
                         outtake.extendOuttakeMidLow(),
                         new SleepAction(0.7),
+                        // move robot out of backdrop so it can strafe
+                        drive.actionBuilder(blueScoring[SPIKE == 0 ? 2 : SPIKE - 1])
+                                .strafeToLinearHeading(blueScoring[SPIKE].position, blueScoring[SPIKE].heading)
+                                .strafeToLinearHeading(blueActualScoring[SPIKE].position, blueActualScoring[SPIKE].heading) // Strafe so the white doesn't block the yellow pixel.
+                                .build(),
+                        new SleepAction(0.5),
                         outtake.latchOpen(),
                         new SleepAction(0.2),
                         outtake.extendOuttakeMidBlocking()
@@ -130,9 +141,9 @@ public class BlueRightAutoBetter extends AutoBase {
 
     private void park() {
         sched.addAction(
-                drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(9, -3)),
-                                AutoConstants.blueScoring[SPIKE].heading))
-                        .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
+                drive.actionBuilder(new Pose2d(blueScoring[SPIKE].position.plus(new Vector2d(9, -3)),
+                                blueScoring[SPIKE].heading))
+                        .strafeToLinearHeading(blueScoring[SPIKE].position, blueScoring[SPIKE].heading)
                         .afterDisp(10, new SequentialAction(
                                 outtake.wristStored(),
                                 new SleepAction(0.5),
@@ -140,8 +151,8 @@ public class BlueRightAutoBetter extends AutoBase {
                                 outtake.latchClosed(),
                                 new SleepAction(0.5)
                         ))
-                        .strafeToLinearHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x, parking.position.y), parking.heading)
-                        .strafeToLinearHeading(parking.position, parking.heading)
+//                        .strafeToLinearHeading(new Vector2d(blueScoring[SPIKE].position.x, parking.position.y), parking.heading)
+//                        .strafeToLinearHeading(parking.position, parking.heading)
                         .build()
         );
     }

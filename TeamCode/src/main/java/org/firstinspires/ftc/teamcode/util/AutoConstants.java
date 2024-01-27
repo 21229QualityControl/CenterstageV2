@@ -10,6 +10,11 @@ public class AutoConstants {
            new Pose2d(43, 36, Math.toRadians(180)),
            new Pose2d(43, 40, Math.toRadians(180))
    };
+   public static Pose2d[] blueActualScoring = {
+           new Pose2d(43+8.75, 28, Math.toRadians(180)),
+           new Pose2d(43+8.75, 34.5, Math.toRadians(180)),
+           new Pose2d(43+8.75, 43, Math.toRadians(180))
+   };
    public static Pose2d[] redScoring = {
            new Pose2d(43, -40, Math.toRadians(180)),
            new Pose2d(43, -34, Math.toRadians(180)),

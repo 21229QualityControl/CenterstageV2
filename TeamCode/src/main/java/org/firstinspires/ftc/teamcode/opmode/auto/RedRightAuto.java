@@ -31,7 +31,7 @@ public class RedRightAuto extends AutoBase {
 
    public static Pose2d start = new Pose2d(12, -61, Math.toRadians(-90));
    public static Pose2d parking = new Pose2d(60, -62, Math.toRadians(180));
-   public static Pose2d stack = new Pose2d(-50.25, -14, Math.toRadians(180));
+   public static Pose2d stack = new Pose2d(-50, -12, Math.toRadians(180));
 
    @Override
    protected Pose2d getStartPose() {
