@@ -17,21 +17,21 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 @Autonomous(name = "Red Right Auto 2+4", group = "Auto", preselectTeleOp = "Manual Drive")
 public class RedRightAuto2_4 extends AutoBase {
     public static Pose2d[] spike = {
-            new Pose2d(24, -36, Math.toRadians(-90)),
+            new Pose2d(24, -38, Math.toRadians(-90)),
             new Pose2d(18, -30, Math.toRadians(-90)),
             new Pose2d(6, -32, Math.toRadians(-45))
     };
     // 0 = right, 1 = middle, 2 = left
     public static Pose2d[] spikeBackedOut = {
-            new Pose2d(24, -46, Math.toRadians(-90)),
+            new Pose2d(24, -48, Math.toRadians(-90)),
             new Pose2d(18, -40, Math.toRadians(-90)),
             new Pose2d(16, -42, Math.toRadians (-45))
     };
 
     public static Pose2d start = new Pose2d(12, -61, Math.toRadians(-90));
     public static Pose2d parking = new Pose2d(60, -62, Math.toRadians(180));
-    public static Pose2d stack = new Pose2d(-50.25, -9, Math.toRadians(180));
-    public static double[] stackOffset = {0, -3.75, -5};
+    public static Pose2d stack = new Pose2d(-50.5, -9, Math.toRadians(180));
+    public static double[] stackOffset = {-5, -3.75, -3.75};
     public static double[] backdropDistOffset = {9, 8.5, 9.3};
 
     private int startingSpike;

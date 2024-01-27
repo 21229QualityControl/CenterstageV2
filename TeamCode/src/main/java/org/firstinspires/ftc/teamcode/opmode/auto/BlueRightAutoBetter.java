@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 import static org.firstinspires.ftc.teamcode.util.AutoConstants.blueActualScoring;
 import static org.firstinspires.ftc.teamcode.util.AutoConstants.blueScoring;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -10,6 +12,7 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
 @Config
@@ -105,6 +108,16 @@ public class BlueRightAutoBetter extends AutoBase {
                                         intermediate.position.y), blueScoring[SPIKE].heading)
                                 .strafeToLinearHeading(blueScoring[SPIKE == 0 ? 2 : SPIKE - 1].position,
                                         blueScoring[SPIKE == 0 ? 2 : SPIKE - 1].heading)
+                                .afterDisp(1, new ActionUtil.RunnableAction(() -> {
+                                    double dist = frontSensors.backdropDistance();
+                                    if (dist > 15) {
+                                        dist = 9; // failed
+                                    }
+                                    Log.d("BACKDROP_DIST", String.valueOf(dist));
+                                    drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(9 - dist, 0)), drive.pose.heading);
+                                    drive.updatePoseEstimate();
+                                    return false;
+                                }))
                                 .build()
                 )
         );
