@@ -15,14 +15,17 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 @Config
 @Autonomous(name = "Blue Left Auto Cringe", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueLeftAutoCringe extends AutoBase {
-   public static Pose2d[] spike = {
-           new Pose2d(7, 36, Math.toRadians(45)),
-           new Pose2d(16, 32, Math.toRadians(90)),
-           new Pose2d(24, 42, Math.toRadians(90))};
-   public static Pose2d[] spikeBackedOut = {
-           new Pose2d(20, 46, Math.toRadians(45)),
-           new Pose2d(16, 43, Math.toRadians(90)),
-           new Pose2d(24, 55, Math.toRadians(90))};
+    public static Pose2d[] spike = {
+            new Pose2d(7, 36, Math.toRadians(45)),
+            new Pose2d(16, 32, Math.toRadians(90)),
+            new Pose2d(24, 42, Math.toRadians(90))
+    };
+    // 0 = right, 1 = middle, 2 = left
+    public static Pose2d[] spikeBackedOut = {
+            new Pose2d(20, 46, Math.toRadians(45)),
+            new Pose2d(16, 43, Math.toRadians(90)),
+            new Pose2d(24, 55, Math.toRadians(90))
+    };
    public static Pose2d start = new Pose2d(12, 63, Math.toRadians(90));
    public static Pose2d parking = new Pose2d(56, 60, Math.toRadians(180));
    public static Pose2d stack = new Pose2d(-55, 16, Math.toRadians(180));
@@ -73,7 +76,7 @@ public class BlueLeftAutoCringe extends AutoBase {
                                     dist = 9; // failed
                                  }
                                  Log.d("BACKDROP_DIST", String.valueOf(dist));
-                                 drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(9 - dist, 0)), drive.pose.heading);
+                                 drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(10 - dist, 0)), drive.pose.heading);
                                  drive.updatePoseEstimate();
                                  return false;
                               }))
