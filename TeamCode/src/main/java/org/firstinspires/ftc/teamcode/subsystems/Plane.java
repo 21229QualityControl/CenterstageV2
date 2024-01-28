@@ -40,4 +40,10 @@ public class Plane {
               new ActionUtil.ServoPositionAction(latch, LATCH_SCORED)
       );
    }
+   public Action storePlane() {
+      return new SequentialAction(
+              new ActionUtil.ServoPositionAction(wrist, WRIST_STORED),
+              new ActionUtil.ServoPositionAction(latch, LATCH_CLOSED)
+      );
+   }
 }
