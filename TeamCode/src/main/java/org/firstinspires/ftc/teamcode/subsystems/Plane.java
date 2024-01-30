@@ -15,9 +15,7 @@ public class Plane {
    public static double LATCH_SCORED = 0.47;
    public static double LATCH_CLOSED = 0.54;
    public static double WRIST_STORED = 0.45;
-   public static double WRIST_SCORED = 0.38;
-   public static double WRIST_SCORED_BIG = 0.34;
-   public static double WRIST_SCORED_HUMONGOUS = 0.29;
+   public static double WRIST_SCORED = 0.34;
 
    final Servo latch;
    final Servo wrist;
@@ -32,18 +30,13 @@ public class Plane {
       wrist.setPosition(WRIST_STORED);
    }
 
-   public Action scorePlane(double angle) {
-//      return new ActionUtil.ServoPositionAction(latch, LATCH_SCORED);
+   public Action scorePlane() {
       return new SequentialAction(
-              new ActionUtil.ServoPositionAction(wrist, angle),
-              new SleepAction(0.5),
-              new ActionUtil.ServoPositionAction(latch, LATCH_SCORED)
-      );
-   }
-   public Action storePlane() {
-      return new SequentialAction(
-              new ActionUtil.ServoPositionAction(wrist, WRIST_STORED),
-              new ActionUtil.ServoPositionAction(latch, LATCH_CLOSED)
+              new ActionUtil.ServoPositionAction(wrist, WRIST_SCORED),
+              new SleepAction(0.4),
+              new ActionUtil.ServoPositionAction(latch, LATCH_SCORED),
+              new SleepAction(0.3),
+              new ActionUtil.ServoPositionAction(wrist, WRIST_STORED)
       );
    }
 }

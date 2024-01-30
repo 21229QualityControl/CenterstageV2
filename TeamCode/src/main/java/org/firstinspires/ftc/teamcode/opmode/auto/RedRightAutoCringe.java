@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
@@ -39,7 +40,7 @@ public class RedRightAutoCringe extends AutoBase {
 
    @Override
    protected void printDescription() {
-      telemetry.addData("Description", "Red Right Auto");
+      telemetry.addData("Description", "Red Right Auto 2+0");
    }
 
    @Override
@@ -72,16 +73,6 @@ public class RedRightAutoCringe extends AutoBase {
                       drive.actionBuilder(spike[SPIKE])
                               .strafeToLinearHeading(spikeBackedOut[SPIKE].position, spikeBackedOut[SPIKE].heading)
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
-                              .afterDisp(1, new ActionUtil.RunnableAction(() -> {
-                                  double dist = frontSensors.backdropDistance();
-                                  if (dist > 15) {
-                                     dist = 9; // failed
-                                  }
-                                  Log.d("BACKDROP_DIST", String.valueOf(dist));
-                                  drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(10 - dist, 0)), drive.pose.heading);
-                                  drive.updatePoseEstimate();
-                                  return false;
-                              }))
                               .build()
               )
       );
@@ -93,6 +84,17 @@ public class RedRightAutoCringe extends AutoBase {
                       outtake.wristScoring(),
                       mid ? outtake.extendOuttakeTeleopBlocking() : outtake.extendOuttakeLowBlocking(),
                       drive.actionBuilder(AutoConstants.redScoring[SPIKE])
+                              .afterDisp(1, new ActionUtil.RunnableAction(() -> {
+                                  double dist = frontSensors.backdropDistance();
+                                  if (dist > 15) {
+                                      dist = 11.5; // failed
+                                      led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
+                                  }
+                                  Log.d("BACKDROP_DIST", String.valueOf(dist));
+                                  drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(11.5 - dist, 0)), drive.pose.heading);
+                                  drive.updatePoseEstimate();
+                                  return false;
+                              }))
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.redScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
                       outtake.latchOpen(),

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.auto;
+package org.firstinspires.ftc.teamcode.opmode.auto.legacy;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -6,12 +6,15 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+import org.firstinspires.ftc.teamcode.opmode.auto.AutoBase;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
 import java.util.Vector;
 
 @Config
+@Disabled
 @Autonomous(name = "Red Left Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class RedLeftAuto extends AutoBase {
    public static Pose2d[] spike = {new Pose2d(-28, -37, Math.toRadians(-135)), new Pose2d(-36, -33, Math.toRadians(-90)), new Pose2d(-48, -39, Math.toRadians(-90))};

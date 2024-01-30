@@ -92,6 +92,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
                              double dist = frontSensors.backdropDistance();
                              if (dist > 15) {
                                  dist = 9; // failed
+                                 led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
                              }
                              Log.d("BACKDROP_DIST", String.valueOf(dist));
                              offsetPos = new Vector2d(-1 * (backdropDistOffset[SPIKE] - dist), 0);

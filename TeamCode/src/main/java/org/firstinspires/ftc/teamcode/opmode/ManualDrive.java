@@ -203,13 +203,7 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(hang.retractHang());
       }
       if (g1.backOnce()) {
-         sched.queueAction(plane.scorePlane(plane.WRIST_SCORED));
-      }
-      if (g1.dpadLeftOnce()) {
-         sched.queueAction(plane.storePlane());
-      }
-      if (g1.dpadRightOnce()) {
-         sched.queueAction(plane.scorePlane(plane.WRIST_SCORED_BIG));
+         sched.queueAction(plane.scorePlane());
       }
       if (g1.startOnce()) {
          sched.queueAction(new SequentialAction(

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
-import static org.firstinspires.ftc.teamcode.util.AutoConstants.blueScoring;
-
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -16,22 +14,15 @@ import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
 @Config
-@Autonomous(name = "Blue Right Auto 2+1", group = "Auto", preselectTeleOp = "Manual Drive")
-public class BlueRightAutoBetter extends AutoBase {
-    public static Pose2d[] spike = {
-            new Pose2d(-48, 40, Math.toRadians(90)),
-            new Pose2d(-36, 33, Math.toRadians(90)),
-            new Pose2d(-31, 37, Math.toRadians(135))};
+@Autonomous(name = "Red Left Auto 2+1", group = "Auto", preselectTeleOp = "Manual Drive")
+public class RedLeftAutoBetter extends AutoBase {
+    public static Pose2d[] spike = {new Pose2d(-28, -35, Math.toRadians(-135)), new Pose2d(-36, -31, Math.toRadians(-90)), new Pose2d(-48, -37, Math.toRadians(-90))};
     // 0 = right, 1 = middle, 2 = left
-    public static Pose2d[] spikeBackedOut =  {
-            new Pose2d(-48, 50, Math.toRadians(90)),
-            new Pose2d(-36, 53, Math.toRadians(90)),
-            new Pose2d(-40, 47, Math.toRadians(135))};
-    public static Pose2d start = new Pose2d(-36, 63, Math.toRadians(90));
-    public static Pose2d parking = new Pose2d(60, 12, Math.toRadians(180)); // Center
-    //public static Pose2d parking = new Pose2d(60, 62, Math.toRadians(180)); // Corner
-    public static Pose2d intermediate = new Pose2d(-48, 61, Math.toRadians(180));
-    public static Pose2d stack = new Pose2d(-61.5, 35.5, Math.toRadians(180));
+    public static Pose2d[] spikeBackedOut =  {new Pose2d(-39, -43, Math.toRadians(-135)), new Pose2d(-36, -39, Math.toRadians(-90)), new Pose2d(-48, -45, Math.toRadians(-90))};
+    public static Pose2d start = new Pose2d(-36, -61.5, Math.toRadians(-90));
+    public static Pose2d parking = new Pose2d(60, -10, Math.toRadians(180));
+    public static Pose2d intermediate = new Pose2d(-40, -59, Math.toRadians(180));
+    public static Pose2d stack = new Pose2d(-61.5, -33.5, Math.toRadians(180));
 
     @Override
     protected Pose2d getStartPose() {
@@ -40,7 +31,7 @@ public class BlueRightAutoBetter extends AutoBase {
 
     @Override
     protected void printDescription() {
-        telemetry.addData("Description", "Red Right Auto");
+        telemetry.addData("Description", "Red Left Auto 2+1");
     }
 
     @Override
@@ -55,7 +46,7 @@ public class BlueRightAutoBetter extends AutoBase {
 
     private void deliverSpike() {
         // if it doesn't need to deliver to the truss, the robot can just strafe.
-        if (SPIKE != 2) {
+        if (SPIKE != 0) {
             sched.addAction(
                     drive.actionBuilder(getStartPose())
                             .strafeTo(spike[SPIKE].position)
@@ -80,16 +71,16 @@ public class BlueRightAutoBetter extends AutoBase {
                 new SequentialAction(
                         // move the robot to the stack and start the intake
                         drive.actionBuilder(spike[SPIKE])
-                            .afterDisp(10, intake.intakeOn())
-                            .afterDisp(10, outtake.latchOpen())
-                            .strafeToLinearHeading(spikeBackedOut[SPIKE].position, spikeBackedOut[SPIKE].heading)
-                            .strafeToLinearHeading(stack.position, stack.heading)
-                            .build(),
+                                .afterDisp(10, intake.intakeOn())
+                                .afterDisp(10, outtake.latchOpen())
+                                .strafeToLinearHeading(spikeBackedOut[SPIKE].position, spikeBackedOut[SPIKE].heading)
+                                .strafeToLinearHeading(stack.position, stack.heading)
+                                .build(),
                         new SequentialAction(
-                            intake.stackClosed(),
-                            new SleepAction(0.3),
-                            intake.stackOpen(),
-                            new SleepAction(0.3)
+                                intake.stackClosed(),
+                                new SleepAction(0.3),
+                                intake.stackOpen(),
+                                new SleepAction(0.3)
                         )
                 )
         );
@@ -104,10 +95,10 @@ public class BlueRightAutoBetter extends AutoBase {
                                 ))
                                 .strafeToLinearHeading(intermediate.position, intermediate.heading)
                                 .strafeToLinearHeading(new Vector2d(
-                                        (blueScoring[SPIKE].position.x*2 + intermediate.position.x)/3,
-                                        intermediate.position.y), blueScoring[SPIKE].heading)
-                                .strafeToLinearHeading(blueScoring[(SPIKE + 1) % 3].position,
-                                        blueScoring[(SPIKE + 1) % 3].heading)
+                                        (AutoConstants.redScoring[SPIKE].position.x*2 + intermediate.position.x)/3,
+                                        intermediate.position.y), AutoConstants.redScoring[SPIKE].heading)
+                                .strafeToLinearHeading(AutoConstants.redScoring[(SPIKE + 1) % 3].position,
+                                        AutoConstants.redScoring[(SPIKE + 1) % 3].heading)
                                 .afterDisp(1, new ActionUtil.RunnableAction(() -> {
                                     double dist = frontSensors.backdropDistance();
                                     if (dist > 15) {
@@ -129,9 +120,9 @@ public class BlueRightAutoBetter extends AutoBase {
                 new SequentialAction(
                         outtake.wristScoring(),
                         outtake.extendOuttakeLowBlocking(),
-                        drive.actionBuilder(blueScoring[(SPIKE + 1) % 3])
-                                .strafeToLinearHeading(blueScoring[(SPIKE + 1) % 3].position.plus(new Vector2d(10, 0)),
-                                        blueScoring[(SPIKE + 1) % 3].heading) // Correct for any turning that occured during the previous move
+                        drive.actionBuilder(AutoConstants.redScoring[(SPIKE + 1) % 3])
+                                .strafeToLinearHeading(AutoConstants.redScoring[(SPIKE + 1) % 3].position.plus(new Vector2d(10, 0)),
+                                        AutoConstants.redScoring[(SPIKE + 1) % 3].heading) // Correct for any turning that occured during the previous move
                                 .build(),
                         // score the white pixel
                         outtake.latchScoring(),
@@ -139,9 +130,9 @@ public class BlueRightAutoBetter extends AutoBase {
                         outtake.extendOuttakeMidLow(),
                         new SleepAction(0.7),
                         // move robot out of backdrop so it can strafe
-                        drive.actionBuilder(blueScoring[(SPIKE + 1) % 3])
-                                .strafeToLinearHeading(blueScoring[SPIKE].position, blueScoring[SPIKE].heading)
-                                .strafeToLinearHeading(blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), blueScoring[SPIKE].heading) // Strafe so the white doesn't block the yellow pixel.
+                        drive.actionBuilder(AutoConstants.redScoring[(SPIKE + 1) % 3])
+                                .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
+                                .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.redScoring[SPIKE].heading) // Strafe so the white doesn't block the yellow pixel.
                                 .build(),
                         new SleepAction(0.5),
                         outtake.latchOpen(),
@@ -153,9 +144,9 @@ public class BlueRightAutoBetter extends AutoBase {
 
     private void park() {
         sched.addAction(
-                drive.actionBuilder(new Pose2d(blueScoring[SPIKE].position.plus(new Vector2d(9, -3)),
-                                blueScoring[SPIKE].heading))
-                        .strafeToLinearHeading(blueScoring[SPIKE].position, blueScoring[SPIKE].heading)
+                drive.actionBuilder(new Pose2d(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(9, -3)),
+                                AutoConstants.redScoring[SPIKE].heading))
+                        .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
                         .afterDisp(10, new SequentialAction(
                                 outtake.wristStored(),
                                 new SleepAction(0.5),
@@ -163,7 +154,7 @@ public class BlueRightAutoBetter extends AutoBase {
                                 outtake.latchClosed(),
                                 new SleepAction(0.5)
                         ))
-//                        .strafeToLinearHeading(new Vector2d(blueScoring[SPIKE].position.x, parking.position.y), parking.heading)
+//                        .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, parking.position.y), parking.heading)
 //                        .strafeToLinearHeading(parking.position, parking.heading)
                         .build()
         );
