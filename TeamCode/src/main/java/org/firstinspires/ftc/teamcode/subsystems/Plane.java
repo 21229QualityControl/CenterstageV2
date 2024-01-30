@@ -36,7 +36,8 @@ public class Plane {
               new SleepAction(0.4),
               new ActionUtil.ServoPositionAction(latch, LATCH_SCORED),
               new SleepAction(0.3),
-              new ActionUtil.ServoPositionAction(wrist, WRIST_STORED)
+              new ActionUtil.ServoPositionAction(wrist, WRIST_STORED),
+              new ActionUtil.ServoPositionAction(latch, LATCH_CLOSED)
       );
    }
 }
