@@ -79,16 +79,15 @@ public class Outtake {
       this.slide.resetIntegralGain();
       OUTTAKE_TELEOP = OUTTAKE_MIDLOW;
       this.mosaic.setPosition(MOSAIC_CLOSED);
+      this.latch.setPosition(LATCH_CLOSED);
       Log.d("BACKDROP_FINISHEDAUTO", String.valueOf(Memory.FINISHED_AUTO));
       if (!Memory.FINISHED_AUTO && teleop) {
          this.slide.setTargetPosition(OUTTAKE_MID);
          this.wrist.setPosition(WRIST_SCORING);
-         this.latch.setPosition(LATCH_OPEN);
          Memory.FINISHED_AUTO = true;
       } else {
          this.slide.setTargetPosition(0);
          this.wrist.setPosition(WRIST_STORED);
-         this.latch.setPosition(LATCH_CLOSED);
          NEED_RESET = true;
       }
    }

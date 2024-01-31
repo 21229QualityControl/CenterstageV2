@@ -167,12 +167,13 @@ public class ManualDrive extends LinearOpMode {
    private void intakeControls() {
       if (intake.hit2) {
          intake.hit2 = false;
-         sched.queueAction(
+         /*sched.queueAction(
                  new SequentialAction(
                          intake.intakeOff(),
                          outtake.latchClosed()
                  )
-         );
+         );*/
+         // TODO: Improve beam break reliability
       }
 
       // Intake controls
