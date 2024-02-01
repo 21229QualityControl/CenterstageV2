@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 public class Plane {
    public static double LATCH_SCORED = 0.42;
    public static double LATCH_CLOSED = 0.56;
-   public static double WRIST_STORED = 0.42;
+   public static double WRIST_STORED = 0.45;
    public static double WRIST_SCORED = 0.34;
 
    final Servo latch;
