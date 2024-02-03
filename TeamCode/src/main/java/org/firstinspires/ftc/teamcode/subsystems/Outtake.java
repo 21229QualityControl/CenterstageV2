@@ -163,6 +163,9 @@ public class Outtake {
    public Action wristScoring() {
       return new ActionUtil.ServoPositionAction(wrist, WRIST_SCORING);
    }
+   public boolean isWristScoring() {
+      return Math.abs(wrist.getPosition() - WRIST_SCORING) < EPSILON;
+   }
 
    public Action mosaicAdjust() {
       return new ActionUtil.ServoPositionAction(mosaic, MOSAIC_ADJUSTING);

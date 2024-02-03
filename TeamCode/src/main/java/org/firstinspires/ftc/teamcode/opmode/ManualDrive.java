@@ -182,8 +182,12 @@ public class ManualDrive extends LinearOpMode {
             sched.queueAction(intake.intakeOff());
             sched.queueAction(outtake.latchClosed());
          } else {
-            sched.queueAction(intake.intakeOn());
-            sched.queueAction(outtake.latchOpen());
+            if (outtake.isWristScoring()) {
+               g1.rumbleBlips(1); // HES TROLLING (intaking while scoring)
+            } else {
+               sched.queueAction(intake.intakeOn());
+               sched.queueAction(outtake.latchOpen());
+            }
          }
       }
       if (g1.b()) {
