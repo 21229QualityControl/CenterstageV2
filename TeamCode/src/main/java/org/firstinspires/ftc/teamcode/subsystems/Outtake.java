@@ -34,7 +34,7 @@ public class Outtake {
    public static double WRIST_SCORING = 0.924;
 
    public static double MOSAIC_ADJUSTING = 0.55;
-   public static double MOSAIC_CLOSED = 0.07;
+   public static double MOSAIC_CLOSED = 0.075;
    public static boolean NEED_RESET = false;
 
    public double mosaicPosition;
