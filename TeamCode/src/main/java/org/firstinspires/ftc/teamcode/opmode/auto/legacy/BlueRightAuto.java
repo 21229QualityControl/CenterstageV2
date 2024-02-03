@@ -1,18 +1,22 @@
 package org.firstinspires.ftc.teamcode.opmode.auto.legacy;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.opmode.auto.AutoBase;
+import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
 @Config
-@Disabled
+//@Disabled
 @Autonomous(name = "Blue Right Auto", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueRightAuto extends AutoBase {
     public static Pose2d[] spike = {
@@ -36,7 +40,7 @@ public class BlueRightAuto extends AutoBase {
 
     @Override
     protected void printDescription() {
-        telemetry.addData("Description", "Red Right Auto");
+        telemetry.addData("Description", "Blue Right Auto");
     }
 
     @Override
@@ -83,8 +87,19 @@ public class BlueRightAuto extends AutoBase {
         sched.addAction(
                 new SequentialAction(
                         outtake.wristScoring(),
-                        outtake.extendOuttakeLowBlocking(),
+                        outtake.extendOuttakeTeleopBlocking(),
                         drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
+                                .afterDisp(0, new ActionUtil.RunnableAction(() -> {
+                                    double dist = frontSensors.backdropDistance();
+                                    if (dist > 15) {
+                                        dist = 9; // failed
+                                        led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
+                                    }
+                                    Log.d("BACKDROP_DIST", String.valueOf(dist));
+                                    drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(13 - dist, 0)), drive.pose.heading);
+                                    drive.updatePoseEstimate();
+                                    return false;
+                                }))
                                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(9, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                                 .build(),
                         outtake.latchScoring(),

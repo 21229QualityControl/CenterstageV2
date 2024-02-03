@@ -11,11 +11,13 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
 @Config
+@Disabled
 @Autonomous(name = "Blue Right Auto 2+1", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueRightAutoBetter extends AutoBase {
     public static Pose2d[] spike = {
