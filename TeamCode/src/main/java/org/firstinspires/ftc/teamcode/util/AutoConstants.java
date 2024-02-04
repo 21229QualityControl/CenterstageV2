@@ -11,7 +11,7 @@ public class AutoConstants {
            new Pose2d(43, 40, Math.toRadians(180))
    };
    public static Pose2d[] redScoring = {
-           new Pose2d(43, -40, Math.toRadians(180)),
+           new Pose2d(43, -41, Math.toRadians(180)),
            new Pose2d(43, -36, Math.toRadians(180)),
            new Pose2d(43, -29, Math.toRadians(180))
    };

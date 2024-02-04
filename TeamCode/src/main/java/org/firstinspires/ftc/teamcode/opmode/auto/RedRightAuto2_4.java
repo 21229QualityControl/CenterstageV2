@@ -32,7 +32,7 @@ public class RedRightAuto2_4 extends AutoBase {
     public static Pose2d parking = new Pose2d(60, -62, Math.toRadians(180));
     public static Pose2d stack = new Pose2d(-50.5, -9, Math.toRadians(180));
     public static double[] stackOffset = {-5, -3.75, -3.75};
-    public static double[] backdropDistOffset = {9, 8.5, 9.3};
+    public static double[] backdropDistOffset = {8, 7.5, 8.3};
 
     private int startingSpike;
 

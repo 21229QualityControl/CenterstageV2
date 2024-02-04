@@ -89,7 +89,7 @@ public class BlueLeftAutoCringe extends AutoBase {
                                       led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
                                   }
                                   Log.d("BACKDROP_DIST", String.valueOf(dist));
-                                  drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(12 - dist, 0)), drive.pose.heading);
+                                  drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(11 - dist, 0)), drive.pose.heading);
                                   drive.updatePoseEstimate();
                                   return false;
                               }))
