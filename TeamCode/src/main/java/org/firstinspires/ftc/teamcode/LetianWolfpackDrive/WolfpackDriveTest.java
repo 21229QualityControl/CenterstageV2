@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.ActionScheduler;
 import org.firstinspires.ftc.teamcode.util.GamePadController;
@@ -90,6 +91,7 @@ public class WolfpackDriveTest extends LinearOpMode {
             telemetry.addData("Correction", drive.getCorrectionString());
             telemetry.addData("Drive direction", drive.getDriveDirectionString());
             telemetry.addLine(drive.getWheelPowerString());
+            telemetry.update();
 
             sched.update();
         }
