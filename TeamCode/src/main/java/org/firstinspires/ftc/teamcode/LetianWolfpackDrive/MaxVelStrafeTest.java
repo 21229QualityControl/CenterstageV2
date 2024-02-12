@@ -46,8 +46,8 @@ public class MaxVelStrafeTest extends LinearOpMode {
         while (opModeIsActive() && timer.seconds() < SECONDS) {
             PoseVelocity2d currentVelocity = drive.updatePoseEstimate();
 
-            if (Math.abs(currentVelocity.linearVel.x) > highestVelocityY) {
-                highestVelocityY = Math.abs(currentVelocity.linearVel.x);
+            if (Math.abs(currentVelocity.linearVel.y) > highestVelocityY) {
+                highestVelocityY = Math.abs(currentVelocity.linearVel.y);
             }
 
             telemetry.addData("Highest Velocity Y", highestVelocityY);
