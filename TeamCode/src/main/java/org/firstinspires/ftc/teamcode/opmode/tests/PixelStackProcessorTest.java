@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.PixelStackProcessor;
 import org.firstinspires.ftc.teamcode.util.CameraUtil;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous
+@Autonomous(name = "PixelStackProcessorTest", group = "Test")
 public class PixelStackProcessorTest extends LinearOpMode {
     public CameraUtil.DebugMode debugMode = CameraUtil.DebugMode.Dashboard;
     public void runOpMode() throws InterruptedException {

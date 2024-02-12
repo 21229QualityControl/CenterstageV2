@@ -15,12 +15,14 @@ import org.firstinspires.ftc.teamcode.subsystems.CameraProcessor;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.PartnerPreloadProcessor;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.subsystems.FrontSensors;
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoActionScheduler;
 import org.firstinspires.ftc.teamcode.util.LED;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 @Config
 public abstract class AutoBase extends LinearOpMode {
@@ -31,6 +33,8 @@ public abstract class AutoBase extends LinearOpMode {
     protected Plane plane;
     protected AutoActionScheduler sched;
     protected CameraProcessor processor;
+    protected AprilTagProcessor aprilTagProcessor;
+    protected PartnerPreloadProcessor preloadProcessor;
     protected VisionPortal portal;
     protected LED led;
 
@@ -60,16 +64,23 @@ public abstract class AutoBase extends LinearOpMode {
         this.plane = new Plane(hardwareMap);
         this.sched = new AutoActionScheduler(this::update);
         this.processor = new CameraProcessor();
+        this.aprilTagProcessor = PartnerPreloadProcessor.newAprilTagProcessor();
+        this.preloadProcessor = new PartnerPreloadProcessor(aprilTagProcessor);
         this.led = new LED(hardwareMap);
         this.portal = new VisionPortal.Builder()
                 // Get the actual camera on the robot, add the processor, state the orientation of the camera.
                 .setCamera(hardwareMap.get(WebcamName.class, "webcam"))
                 .setCameraResolution(new Size(w, h))
                 .addProcessor(processor)
+                .addProcessor(aprilTagProcessor)
+                .addProcessor(preloadProcessor)
                 .setCamera(BuiltinCameraDirection.BACK)
                 .enableLiveView(true)
                 .setAutoStopLiveView(true)
                 .build();
+
+        portal.setProcessorEnabled(aprilTagProcessor, false);
+        portal.setProcessorEnabled(preloadProcessor, false);
 
         outtake.resetMotors();
 
@@ -122,6 +133,8 @@ public abstract class AutoBase extends LinearOpMode {
             SPIKE = 0;
         }
         portal.stopStreaming();
+        portal.setProcessorEnabled(processor, false);
+        preloadProcessor.updateTarget(SPIKE, false); // TODO: Make this true on red side
 
         // Auto start
         resetRuntime(); // reset runtime timer

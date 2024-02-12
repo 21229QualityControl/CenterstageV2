@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.FrontSensors;
 import org.firstinspires.ftc.teamcode.util.CameraUtil;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous
+@Autonomous(name = "CameraProcessorTest", group = "Test")
 // This uses the CameraProcessor
 public class CameraProcessorTest extends LinearOpMode {
     public CameraUtil.DebugMode debugMode = CameraUtil.DebugMode.DriverStation;
