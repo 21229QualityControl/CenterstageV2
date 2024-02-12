@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @TeleOp(group = "Test")
 @Config
 public class MaxVelStraightTest extends LinearOpMode {
-    public static double SECONDS = 5;
+    public static double SECONDS = 1.5; // Got 77 in 2 seconds but it hit the wall
     public static double POWER = 1.0;
 
     private double highestVelocityX = 0; // this is robot relative (forwards) and not field centric.
@@ -40,7 +40,7 @@ public class MaxVelStraightTest extends LinearOpMode {
         drive.leftBack.setPower(POWER);  drive.rightBack.setPower(POWER);
 
         // track velocity until timer is up
-        while (opModeIsActive() && timer.seconds() > SECONDS) {
+        while (opModeIsActive() && timer.seconds() < SECONDS) {
             PoseVelocity2d currentVelocity = drive.updatePoseEstimate();
 
             if (currentVelocity.linearVel.x > highestVelocityX) {

@@ -43,7 +43,7 @@ public class MaxVelStrafeTest extends LinearOpMode {
         drive.leftBack.setPower(-POWER);  drive.rightBack.setPower(POWER);
 
         // track velocity until timer is up
-        while (opModeIsActive() && timer.seconds() > SECONDS) {
+        while (opModeIsActive() && timer.seconds() < SECONDS) {
             PoseVelocity2d currentVelocity = drive.updatePoseEstimate();
 
             if (Math.abs(currentVelocity.linearVel.x) > highestVelocityY) {
