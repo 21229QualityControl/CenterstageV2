@@ -177,9 +177,9 @@ public class BlueLeftAuto2_2 extends AutoBase {
                           return false;
                       }))
                       .afterDisp(8, new SequentialAction(
-                              outtake.latchScoring(),
-                              new SleepAction(0.2),
                               outtake.latchOpen(),
+                              new SleepAction(0.2),
+                              outtake.latchClosed(),
                               new SleepAction(0.1),
                               outtake.extendOuttakeMid()
                       ))

@@ -27,11 +27,21 @@ public class Outtake {
    public static int OUTTAKE_MIDLOW = 325;
    public static int OUTTAKE_MID = 600;
    public static int OUTTAKE_LOW = 250;
-   public static double LATCH_SCORING = 0.55;
-   public static double LATCH_OPEN = 0.8;
-   public static double LATCH_CLOSED = 0.9;
+   public static double CLAW_OPEN = 0.74;
+   public static double CLAW_CLOSED = 0.525;
    public static double WRIST_STORED = 0.651;
-   public static double WRIST_SCORING = 0.924;
+   public static double WRIST_SCORING = 0.9;
+   public static double CLAW_WRIST_DEFAULT = 0.33;
+   public static double CLAW_WRIST_SLANT_1 = 0.435;
+   public static double CLAW_WRIST_SLANT_2 = 0.2;
+   public static double CLAW_WRIST_HORIZONTAL_1 = 0.67;
+   public static double CLAW_WRIST_HORIZONTAL_2 = 0.01;
+
+   public static double[] clawWristPositions = {CLAW_WRIST_DEFAULT,
+                   CLAW_WRIST_SLANT_1,
+                   CLAW_WRIST_SLANT_2,
+                   CLAW_WRIST_HORIZONTAL_1,
+                   CLAW_WRIST_HORIZONTAL_2};
 
    public static double MOSAIC_ADJUSTING = 0.55;
    public static double MOSAIC_CLOSED = 0.075;
@@ -40,11 +50,12 @@ public class Outtake {
    public double mosaicPosition;
    final MotorWithPID slide;
    public boolean slidePIDEnabled = true;
-   final Servo latch;
+   final Servo claw;
    final Servo wrist;
    final MagnetSwitchSensor slideSensor;
    final Servo mosaic;
    final TouchSensor touchSensor;
+   final Servo clawWrist;
 
    public Outtake(HardwareMap hardwareMap) {
       if (Memory.outtakeSlide != null) { // Preserve motor zero position
@@ -55,17 +66,17 @@ public class Outtake {
       }
       this.slide.setMaxPower(1.0);
       this.slide.getMotor().setDirection(DcMotorSimple.Direction.REVERSE);
-      this.latch = HardwareCreator.createServo(hardwareMap, "outtakeLatch");
+      this.claw = HardwareCreator.createServo(hardwareMap, "outtakeClaw");
       this.wrist = HardwareCreator.createServo(hardwareMap, "outtakeWrist");
       this.slideSensor = new MagnetSwitchSensor(hardwareMap, "outtakeMagnetSensor");
       this.mosaic = HardwareCreator.createServo(hardwareMap, "mosaic");
       this.touchSensor = hardwareMap.get(TouchSensor.class, "touchSensor");
+      this.clawWrist = HardwareCreator.createServo(hardwareMap, "outtakeLatch");
    }
    // The object outtake can get the slide motor to be directly used in Manual Drive.
    public MotorWithPID getSlide(){
       return this.slide;
    }
-   // The object outtake can get the mosaic servo to be directly used in Manual Drive.
 
    public void prepTeleop() {
       this.slide.getMotor().setPower(-0.3);
@@ -79,7 +90,8 @@ public class Outtake {
       this.slide.resetIntegralGain();
       OUTTAKE_TELEOP = OUTTAKE_MIDLOW;
       this.mosaic.setPosition(MOSAIC_CLOSED);
-      this.latch.setPosition(LATCH_CLOSED);
+      this.claw.setPosition(CLAW_OPEN);
+      this.clawWrist.setPosition(CLAW_WRIST_DEFAULT);
       Log.d("BACKDROP_FINISHEDAUTO", String.valueOf(Memory.FINISHED_AUTO));
       if (!Memory.FINISHED_AUTO && teleop) {
          this.slide.setTargetPosition(OUTTAKE_MID);
@@ -106,6 +118,9 @@ public class Outtake {
       }
    }
 
+   public Servo getClawWrist() {
+      return clawWrist;
+   }
    public void setSlidePower(double power) {
       slide.getMotor().setPower(power);
    }
@@ -141,19 +156,17 @@ public class Outtake {
       return this.slide.setTargetPositionAction(0);
    }
 
-   public Action latchOpen() {
-      return new ActionUtil.ServoPositionAction(latch, LATCH_OPEN);
-   }
-
    public Action latchScoring() {
-      return new ActionUtil.ServoPositionAction(latch, LATCH_SCORING);
+      return new ActionUtil.ServoPositionAction(claw, CLAW_OPEN);
    }
    public boolean isLatchScoring() {
-      return (latch.getPosition() - LATCH_OPEN) < EPSILON;
+      return (claw.getPosition() - CLAW_OPEN) < EPSILON;
    }
 
+   public Action latchOpen() { return new ActionUtil.ServoPositionAction(claw, CLAW_OPEN); }
+
    public Action latchClosed() {
-      return new ActionUtil.ServoPositionAction(latch, LATCH_CLOSED);
+      return new ActionUtil.ServoPositionAction(claw, CLAW_CLOSED);
    }
 
    public Action wristStored() {

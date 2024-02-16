@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import static org.firstinspires.ftc.teamcode.subsystems.Outtake.CLAW_WRIST_DEFAULT;
+import static org.firstinspires.ftc.teamcode.subsystems.Outtake.CLAW_WRIST_SLANT_1;
+import static org.firstinspires.ftc.teamcode.subsystems.Outtake.clawWristPositions;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -33,6 +37,7 @@ public class ManualDrive extends LinearOpMode {
    public static double SLOW_DRIVE_SPEED = 0.3;
    public static double VISION_RANGE = 20;
    public static double VISION_CLOSE_DIST = 5;
+   public int CLAW_WRIST_ARRAY_NUMBER;
 
    private SmartGameTimer smartGameTimer;
    private GamePadController g1, g2;
@@ -186,7 +191,7 @@ public class ManualDrive extends LinearOpMode {
                g1.rumbleBlips(1); // HES TROLLING (intaking while scoring)
             } else {
                sched.queueAction(intake.intakeOn());
-               sched.queueAction(outtake.latchOpen());
+               sched.queueAction(outtake.latchScoring());
             }
          }
       }
@@ -224,22 +229,36 @@ public class ManualDrive extends LinearOpMode {
       // Outtake controls
       if (g2.yOnce()) {
          sched.queueAction(intake.intakeOff());
-         sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.1)));
+         sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.6)));
          sched.queueAction(new ParallelAction(
                  new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
                  outtake.extendOuttakeTeleopBlocking()
          ));
+         outtake.getClawWrist().setPosition(CLAW_WRIST_DEFAULT);
+         CLAW_WRIST_ARRAY_NUMBER = 0;
          intake.pixelCount = 2; // If the outtake slide's are extended and ready for deposit we probably have 2 pixels.
          //Since the beam breaks aren't finalized yet I'm using this just to test whether the outtake can release one by one.
       }
-      if (g2.xOnce()) {
-         if (intake.pixelCount >= 2) {
-            sched.queueAction(outtake.latchScoring());
-            sched.queueAction(intake.setPixelCount(1));
-         } else {
-            sched.queueAction(outtake.latchOpen());
-            sched.queueAction(intake.setPixelCount(0));
+
+      if (g2.leftTriggerOnce()) {
+         CLAW_WRIST_ARRAY_NUMBER -= 1;
+         if (CLAW_WRIST_ARRAY_NUMBER <= 0) {
+            CLAW_WRIST_ARRAY_NUMBER = 0;
          }
+         outtake.getClawWrist().setPosition(clawWristPositions[CLAW_WRIST_ARRAY_NUMBER]);
+      }
+
+      if (g2.rightTriggerOnce()) {
+         CLAW_WRIST_ARRAY_NUMBER += 1;
+         if (CLAW_WRIST_ARRAY_NUMBER >= 4) {
+            CLAW_WRIST_ARRAY_NUMBER = 4;
+         }
+         outtake.getClawWrist().setPosition(clawWristPositions[CLAW_WRIST_ARRAY_NUMBER]);
+      }
+
+      if (g2.xOnce()) {
+         sched.queueAction(outtake.latchScoring());
+         sched.queueAction(intake.setPixelCount(0));
       }
       if (Math.abs(g2.right_stick_y) > 0.01) {
          outtake.slidePIDEnabled = false;
@@ -250,16 +269,17 @@ public class ManualDrive extends LinearOpMode {
       }
       if (g2.bOnce()) {
          sched.queueAction(outtake.wristStored());
+         outtake.getClawWrist().setPosition(CLAW_WRIST_DEFAULT);
          new SleepAction(1);
          sched.queueAction(outtake.retractOuttake());
-         sched.queueAction(outtake.latchClosed());
+         sched.queueAction(outtake.latchOpen());
       }
       if (g2.aOnce()) {
          if (outtake.isLatchScoring()) {
             sched.queueAction(outtake.latchScoring());
          } else {
             if (intake.intakeState == Intake.IntakeState.On) {
-               sched.queueAction(outtake.latchOpen());
+               sched.queueAction(outtake.latchScoring());
             } else {
                sched.queueAction(outtake.latchClosed());
             }
