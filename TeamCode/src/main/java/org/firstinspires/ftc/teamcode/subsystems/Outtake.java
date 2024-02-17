@@ -27,6 +27,7 @@ public class Outtake {
    public static int OUTTAKE_LOW = 250;
    public static double CLAW_OPEN = 0.74;
    public static double CLAW_CLOSED = 0.525;
+   public static double CLAW_PRELOAD_CLOSED = 0.3;
    public static double WRIST_STORED = 0.651;
    public static double WRIST_SCORING = 0.9;
    public static double CLAW_VERTICAL = 0.33;
@@ -154,6 +155,10 @@ public class Outtake {
       return new ActionUtil.ServoPositionAction(claw, CLAW_CLOSED);
    }
 
+   public Action clawPreloadlosed() {
+      return new ActionUtil.ServoPositionAction(claw, CLAW_PRELOAD_CLOSED);
+   }
+
    public Action clawMosaic(boolean left) {
       if (left) {
          return new ActionUtil.ServoPositionAction(clawWrist, CLAW_MOSAIC_LEFT);
@@ -163,7 +168,7 @@ public class Outtake {
    }
 
    public boolean isClawMosaic() {
-      return clawWrist.getPosition() - CLAW_MOSAIC_LEFT < EPSILON || clawWrist.getPosition() - CLAW_MOSAIC_RIGHT < EPSILON;
+      return Math.abs(clawWrist.getPosition() - CLAW_MOSAIC_LEFT) < EPSILON || Math.abs(clawWrist.getPosition() - CLAW_MOSAIC_RIGHT) < EPSILON;
    }
 
    public Action clawSideways(boolean left) {
@@ -171,6 +176,14 @@ public class Outtake {
          return new ActionUtil.ServoPositionAction(clawWrist, CLAW_LEFT);
       } else {
          return new ActionUtil.ServoPositionAction(clawWrist, CLAW_RIGHT);
+      }
+   }
+
+   public void clawSidewaysInstant(boolean left) {
+      if (left) {
+         clawWrist.setPosition(CLAW_LEFT);
+      } else {
+         clawWrist.setPosition(CLAW_RIGHT);
       }
    }
 

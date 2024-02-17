@@ -158,8 +158,8 @@ public class ManualDrive extends LinearOpMode {
 
       // Driver 2 slow strafe
       input = input.plus(new Vector2d(g2.left_stick_y * SLOW_DRIVE_SPEED, g2.left_stick_x * SLOW_DRIVE_SPEED));
-      input_turn += g2.right_trigger * D2_SLOW_TURN;
-      input_turn -= g2.left_trigger * D2_SLOW_TURN;
+      input_turn += g2.left_trigger * D2_SLOW_TURN;
+      input_turn -= g2.right_trigger * D2_SLOW_TURN;
 
       drive.setDrivePowers(new PoseVelocity2d(input, input_turn));
    }
@@ -180,7 +180,6 @@ public class ManualDrive extends LinearOpMode {
       if (g1.aOnce()) {
          if (intake.intakeState == Intake.IntakeState.On) {
             sched.queueAction(intake.intakeOff());
-            sched.queueAction(outtake.clawClosed());
          } else {
             sched.queueAction(intake.intakeOn());
          }
@@ -218,23 +217,27 @@ public class ManualDrive extends LinearOpMode {
    private void outtakeControls() {
       // Outtake controls
       if (g2.yOnce()) {
-         sched.queueAction(intake.intakeOff());
-         sched.queueAction(new SequentialAction(outtake.clawClosed(), new SleepAction(0.6)));
-         sched.queueAction(new ParallelAction(
-                 new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
-                 outtake.extendOuttakeTeleopBlocking()
-         ));
+         if (!outtake.isWristScoring()) {
+            sched.queueAction(intake.intakeOff());
+            sched.queueAction(new SequentialAction(outtake.clawClosed(), new SleepAction(0.6)));
+            sched.queueAction(new ParallelAction(
+                    new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
+                    outtake.extendOuttakeTeleopBlocking()
+            ));
+         }
          sched.queueAction(outtake.clawVertical());
          intake.pixelCount = 2; // If the outtake slide's are extended and ready for deposit we probably have 2 pixels.
          //Since the beam breaks aren't finalized yet I'm using this just to test whether the outtake can release one by one.
       }
       if (g2.xOnce()) {
-         sched.queueAction(intake.intakeOff());
-         sched.queueAction(new SequentialAction(outtake.clawClosed(), new SleepAction(0.6)));
-         sched.queueAction(new ParallelAction(
-                 new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
-                 outtake.extendOuttakeTeleopBlocking()
-         ));
+         if (!outtake.isWristScoring()) {
+            sched.queueAction(intake.intakeOff());
+            sched.queueAction(new SequentialAction(outtake.clawClosed(), new SleepAction(0.6)));
+            sched.queueAction(new ParallelAction(
+                    new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
+                    outtake.extendOuttakeTeleopBlocking()
+            ));
+         }
          sched.queueAction(outtake.clawMosaic(true));
          intake.pixelCount = 2; // If the outtake slide's are extended and ready for deposit we probably have 2 pixels.
          //Since the beam breaks aren't finalized yet I'm using this just to test whether the outtake can release one by one.
@@ -273,6 +276,7 @@ public class ManualDrive extends LinearOpMode {
          new SleepAction(1);
          sched.queueAction(outtake.retractOuttake());
          sched.queueAction(outtake.clawOpen());
+         sched.queueAction(outtake.clawVertical());
       }
       if (g2.dpadUpOnce()) {
          sched.queueAction(outtake.increaseSlideLayer(1));

@@ -80,6 +80,12 @@ public class BlueRightAuto extends AutoBase {
                         .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
                         .build()
         );
+        sched.addAction(
+                new SequentialAction(
+                        outtake.clawPreloadlosed(),
+                        new SleepAction(0.6)
+                )
+        );
     }
 
     private void scorePreload() {
@@ -87,19 +93,32 @@ public class BlueRightAuto extends AutoBase {
                 new SequentialAction(
                         outtake.wristScoring(),
                         outtake.extendOuttakeTeleopBlocking(),
+                        new ActionUtil.RunnableAction(() -> {
+                            this.portal.setProcessorEnabled(this.aprilTagProcessor, true);
+                            this.portal.setProcessorEnabled(this.preloadProcessor, true);
+                            this.preloadProcessor.updateTarget(SPIKE, false);
+                            return false;
+                        }),
+                        new SleepAction(1),
+                        new ActionUtil.RunnableAction(() -> {
+                            outtake.clawSidewaysInstant(!preloadProcessor.preloadLeft);
+                            Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
+                            return false;
+                        }),
+                        new SleepAction(0.1),
                         drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
                                 .afterDisp(0, new ActionUtil.RunnableAction(() -> {
                                     double dist = frontSensors.backdropDistance();
-                                    if (dist > 15) {
-                                        dist = 9; // failed
+                                    if (dist > 20) {
+                                        dist = 16; // failed
                                         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
                                     }
                                     Log.d("BACKDROP_DIST", String.valueOf(dist));
-                                    drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(13 - dist, 0)), drive.pose.heading);
+                                    drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(14 - dist, 0)), drive.pose.heading);
                                     drive.updatePoseEstimate();
                                     return false;
                                 }))
-                                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(9, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
+                                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                                 .build(),
                         outtake.clawOpen(),
                         new SleepAction(0.5),
@@ -110,7 +129,7 @@ public class BlueRightAuto extends AutoBase {
 
     private void park() {
         sched.addAction(
-                drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(9, 0)),
+                drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)),
                                 AutoConstants.blueScoring[SPIKE].heading))
                         .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
                         .afterDisp(10, new SequentialAction(
