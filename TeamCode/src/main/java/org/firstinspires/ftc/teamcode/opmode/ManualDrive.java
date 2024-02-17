@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import static org.firstinspires.ftc.teamcode.subsystems.Outtake.CLAW_WRIST_DEFAULT;
-import static org.firstinspires.ftc.teamcode.subsystems.Outtake.CLAW_WRIST_SLANT_1;
 import static org.firstinspires.ftc.teamcode.subsystems.Outtake.clawWristPositions;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -37,7 +36,6 @@ public class ManualDrive extends LinearOpMode {
    public static double SLOW_DRIVE_SPEED = 0.3;
    public static double VISION_RANGE = 20;
    public static double VISION_CLOSE_DIST = 5;
-   public int CLAW_WRIST_ARRAY_NUMBER;
 
    private SmartGameTimer smartGameTimer;
    private GamePadController g1, g2;
@@ -163,8 +161,8 @@ public class ManualDrive extends LinearOpMode {
 
       // Driver 2 slow strafe
       input = input.plus(new Vector2d(g2.left_stick_y * SLOW_DRIVE_SPEED, g2.left_stick_x * SLOW_DRIVE_SPEED));
-      if (g2.leftBumper()) input_turn += D2_SLOW_TURN;
-      if (g2.rightBumper()) input_turn -= D2_SLOW_TURN;
+      input_turn += g2.right_trigger * D2_SLOW_TURN;
+      input_turn -= g2.left_trigger * D2_SLOW_TURN;
 
       drive.setDrivePowers(new PoseVelocity2d(input, input_turn));
    }
@@ -175,7 +173,7 @@ public class ManualDrive extends LinearOpMode {
          /*sched.queueAction(
                  new SequentialAction(
                          intake.intakeOff(),
-                         outtake.latchClosed()
+                         outtake.clawClosed()
                  )
          );*/
          // TODO: Improve beam break reliability
@@ -185,19 +183,14 @@ public class ManualDrive extends LinearOpMode {
       if (g1.aOnce()) {
          if (intake.intakeState == Intake.IntakeState.On) {
             sched.queueAction(intake.intakeOff());
-            sched.queueAction(outtake.latchClosed());
+            sched.queueAction(outtake.clawClosed());
          } else {
-            if (outtake.isWristScoring()) {
-               g1.rumbleBlips(1); // HES TROLLING (intaking while scoring)
-            } else {
-               sched.queueAction(intake.intakeOn());
-               sched.queueAction(outtake.latchScoring());
-            }
+            sched.queueAction(intake.intakeOn());
          }
       }
       if (g1.b()) {
          if (intake.intakeState == Intake.IntakeState.On) {
-            sched.queueAction(outtake.latchClosed());
+            sched.queueAction(outtake.clawClosed());
          }
          sched.queueAction(intake.intakeReverse());
       }
@@ -229,35 +222,45 @@ public class ManualDrive extends LinearOpMode {
       // Outtake controls
       if (g2.yOnce()) {
          sched.queueAction(intake.intakeOff());
-         sched.queueAction(new SequentialAction(outtake.latchClosed(), new SleepAction(0.6)));
+         sched.queueAction(new SequentialAction(outtake.clawClosed(), new SleepAction(0.6)));
          sched.queueAction(new ParallelAction(
                  new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
                  outtake.extendOuttakeTeleopBlocking()
          ));
-         outtake.getClawWrist().setPosition(CLAW_WRIST_DEFAULT);
-         CLAW_WRIST_ARRAY_NUMBER = 0;
+         sched.queueAction(outtake.clawVertical());
+         intake.pixelCount = 2; // If the outtake slide's are extended and ready for deposit we probably have 2 pixels.
+         //Since the beam breaks aren't finalized yet I'm using this just to test whether the outtake can release one by one.
+      }
+      if (g2.xOnce()) {
+         sched.queueAction(intake.intakeOff());
+         sched.queueAction(new SequentialAction(outtake.clawClosed(), new SleepAction(0.6)));
+         sched.queueAction(new ParallelAction(
+                 new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
+                 outtake.extendOuttakeTeleopBlocking()
+         ));
+         sched.queueAction(outtake.clawMosaic(true));
          intake.pixelCount = 2; // If the outtake slide's are extended and ready for deposit we probably have 2 pixels.
          //Since the beam breaks aren't finalized yet I'm using this just to test whether the outtake can release one by one.
       }
 
-      if (g2.leftTriggerOnce()) {
-         CLAW_WRIST_ARRAY_NUMBER -= 1;
-         if (CLAW_WRIST_ARRAY_NUMBER <= 0) {
-            CLAW_WRIST_ARRAY_NUMBER = 0;
+      if (g2.leftBumperOnce()) {
+         if (outtake.isClawMosaic()) {
+            sched.queueAction(outtake.clawMosaic(true));
+         } else {
+            sched.queueAction(outtake.clawSideways(true));
          }
-         outtake.getClawWrist().setPosition(clawWristPositions[CLAW_WRIST_ARRAY_NUMBER]);
       }
 
-      if (g2.rightTriggerOnce()) {
-         CLAW_WRIST_ARRAY_NUMBER += 1;
-         if (CLAW_WRIST_ARRAY_NUMBER >= 4) {
-            CLAW_WRIST_ARRAY_NUMBER = 4;
+      if (g2.rightBumperOnce()) {
+         if (outtake.isClawMosaic()) {
+            sched.queueAction(outtake.clawMosaic(false));
+         } else {
+            sched.queueAction(outtake.clawSideways(false));
          }
-         outtake.getClawWrist().setPosition(clawWristPositions[CLAW_WRIST_ARRAY_NUMBER]);
       }
 
-      if (g2.xOnce()) {
-         sched.queueAction(outtake.latchScoring());
+      if (g2.aOnce()) {
+         sched.queueAction(outtake.clawOpen());
          sched.queueAction(intake.setPixelCount(0));
       }
       if (Math.abs(g2.right_stick_y) > 0.01) {
@@ -269,21 +272,10 @@ public class ManualDrive extends LinearOpMode {
       }
       if (g2.bOnce()) {
          sched.queueAction(outtake.wristStored());
-         outtake.getClawWrist().setPosition(CLAW_WRIST_DEFAULT);
+         outtake.clawVertical();
          new SleepAction(1);
          sched.queueAction(outtake.retractOuttake());
-         sched.queueAction(outtake.latchOpen());
-      }
-      if (g2.aOnce()) {
-         if (outtake.isLatchScoring()) {
-            sched.queueAction(outtake.latchScoring());
-         } else {
-            if (intake.intakeState == Intake.IntakeState.On) {
-               sched.queueAction(outtake.latchScoring());
-            } else {
-               sched.queueAction(outtake.latchClosed());
-            }
-         }
+         sched.queueAction(outtake.clawOpen());
       }
       if (g2.dpadUpOnce()) {
          sched.queueAction(outtake.increaseSlideLayer(1));

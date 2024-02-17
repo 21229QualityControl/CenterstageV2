@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode.auto.legacy;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -11,10 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.opmode.auto.AutoBase;
-import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
-
-import java.util.Vector;
 
 @Config
 @Disabled
@@ -97,7 +92,7 @@ public class RedRightAuto extends AutoBase {
                       // release pixels one at a time to prevent them from bouncing and fall off the backdrop
                       outtake.latchScoring(),
                       new SleepAction(0.4),
-                      outtake.latchOpen(),
+                      outtake.clawOpen(),
                       new SleepAction(0.2),
                       outtake.extendOuttakeMidBlocking()
               )
@@ -113,7 +108,7 @@ public class RedRightAuto extends AutoBase {
                                       outtake.wristStored(),
                                       new SleepAction(0.25),
                                       outtake.retractOuttake(),
-                                      outtake.latchOpen()
+                                      outtake.clawOpen()
                               ))
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
                               .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y), stack.heading)
@@ -135,7 +130,7 @@ public class RedRightAuto extends AutoBase {
                       drive.actionBuilder(stack)
                               .afterTime(2, new SequentialAction(
                                       intake.intakeOff(),
-                                      outtake.latchClosed()
+                                      outtake.clawClosed()
                               ))
                               .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y), AutoConstants.redScoring[SPIKE].heading)
                               .strafeToLinearHeading(AutoConstants.redScoring[(SPIKE + 1) % 3].position, AutoConstants.redScoring[(SPIKE + 1) % 3].heading)
@@ -153,7 +148,7 @@ public class RedRightAuto extends AutoBase {
                               outtake.wristStored(),
                               new SleepAction(0.2),
                               outtake.retractOuttake(),
-                              outtake.latchClosed()
+                              outtake.clawClosed()
                       ))
                       .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, parking.position.y), parking.heading)
                       .strafeToLinearHeading(parking.position, parking.heading)

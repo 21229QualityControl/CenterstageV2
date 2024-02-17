@@ -6,8 +6,6 @@ import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -31,17 +29,11 @@ public class Outtake {
    public static double CLAW_CLOSED = 0.525;
    public static double WRIST_STORED = 0.651;
    public static double WRIST_SCORING = 0.9;
-   public static double CLAW_WRIST_DEFAULT = 0.33;
-   public static double CLAW_WRIST_SLANT_1 = 0.435;
-   public static double CLAW_WRIST_SLANT_2 = 0.2;
-   public static double CLAW_WRIST_HORIZONTAL_1 = 0.67;
-   public static double CLAW_WRIST_HORIZONTAL_2 = 0.01;
-
-   public static double[] clawWristPositions = {CLAW_WRIST_DEFAULT,
-                   CLAW_WRIST_SLANT_1,
-                   CLAW_WRIST_SLANT_2,
-                   CLAW_WRIST_HORIZONTAL_1,
-                   CLAW_WRIST_HORIZONTAL_2};
+   public static double CLAW_VERTICAL = 0.33;
+   public static double CLAW_MOSAIC_LEFT = 0.435;
+   public static double CLAW_MOSAIC_RIGHT = 0.2;
+   public static double CLAW_LEFT = 0.67;
+   public static double CLAW_RIGHT = 0.01;
 
    public static double MOSAIC_ADJUSTING = 0.55;
    public static double MOSAIC_CLOSED = 0.075;
@@ -91,7 +83,7 @@ public class Outtake {
       OUTTAKE_TELEOP = OUTTAKE_MIDLOW;
       this.mosaic.setPosition(MOSAIC_CLOSED);
       this.claw.setPosition(CLAW_OPEN);
-      this.clawWrist.setPosition(CLAW_WRIST_DEFAULT);
+      this.clawWrist.setPosition(CLAW_VERTICAL);
       Log.d("BACKDROP_FINISHEDAUTO", String.valueOf(Memory.FINISHED_AUTO));
       if (!Memory.FINISHED_AUTO && teleop) {
          this.slide.setTargetPosition(OUTTAKE_MID);
@@ -118,9 +110,6 @@ public class Outtake {
       }
    }
 
-   public Servo getClawWrist() {
-      return clawWrist;
-   }
    public void setSlidePower(double power) {
       slide.getMotor().setPower(power);
    }
@@ -156,17 +145,37 @@ public class Outtake {
       return this.slide.setTargetPositionAction(0);
    }
 
-   public Action latchScoring() {
-      return new ActionUtil.ServoPositionAction(claw, CLAW_OPEN);
-   }
-   public boolean isLatchScoring() {
-      return (claw.getPosition() - CLAW_OPEN) < EPSILON;
+   public Action clawOpen() { return new ActionUtil.ServoPositionAction(claw, CLAW_OPEN); }
+   public boolean isClawOpen() {
+      return claw.getPosition() - CLAW_OPEN < EPSILON;
    }
 
-   public Action latchOpen() { return new ActionUtil.ServoPositionAction(claw, CLAW_OPEN); }
-
-   public Action latchClosed() {
+   public Action clawClosed() {
       return new ActionUtil.ServoPositionAction(claw, CLAW_CLOSED);
+   }
+
+   public Action clawMosaic(boolean left) {
+      if (left) {
+         return new ActionUtil.ServoPositionAction(clawWrist, CLAW_MOSAIC_LEFT);
+      } else {
+         return new ActionUtil.ServoPositionAction(clawWrist, CLAW_MOSAIC_RIGHT);
+      }
+   }
+
+   public boolean isClawMosaic() {
+      return clawWrist.getPosition() - CLAW_MOSAIC_LEFT < EPSILON || clawWrist.getPosition() - CLAW_MOSAIC_RIGHT < EPSILON;
+   }
+
+   public Action clawSideways(boolean left) {
+      if (left) {
+         return new ActionUtil.ServoPositionAction(clawWrist, CLAW_LEFT);
+      } else {
+         return new ActionUtil.ServoPositionAction(clawWrist, CLAW_RIGHT);
+      }
+   }
+
+   public Action clawVertical() {
+      return new ActionUtil.ServoPositionAction(clawWrist, CLAW_VERTICAL);
    }
 
    public Action wristStored() {

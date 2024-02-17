@@ -102,7 +102,7 @@ public class BlueLeftAuto2_2 extends AutoBase {
          );
          sched.addAction(
                  new SequentialAction(
-                         outtake.latchOpen(),
+                         outtake.clawOpen(),
                          new SleepAction(0.3),
                          outtake.extendOuttakeMid(),
                          new SleepAction(0.1)
@@ -123,7 +123,7 @@ public class BlueLeftAuto2_2 extends AutoBase {
                               outtake.wristStored(),
                               new SleepAction(0.3),
                               outtake.retractOuttake(),
-                              outtake.latchOpen()
+                              outtake.clawOpen()
                       ))
                       .splineToConstantHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x, stack.position.y), stack.heading)
                       .afterDisp(0, new SequentialAction(
@@ -156,7 +156,7 @@ public class BlueLeftAuto2_2 extends AutoBase {
                       .splineToConstantHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x - 12, stack.position.y), stack.heading, drive.speedVelConstraint, drive.speedAccelConstraint)
                       .afterDisp(0, new SequentialAction(
                               intake.intakeOff(),
-                              outtake.latchClosed()
+                              outtake.clawClosed()
                       ))
                       .afterDisp(10, new SequentialAction(
                               firstCycle ? outtake.extendOuttakeTeleopBlocking() : outtake.extendOuttakeMidBlocking(),
@@ -177,9 +177,9 @@ public class BlueLeftAuto2_2 extends AutoBase {
                           return false;
                       }))
                       .afterDisp(8, new SequentialAction(
-                              outtake.latchOpen(),
+                              outtake.clawOpen(),
                               new SleepAction(0.2),
-                              outtake.latchClosed(),
+                              outtake.clawClosed(),
                               new SleepAction(0.1),
                               outtake.extendOuttakeMid()
                       ))
@@ -193,7 +193,7 @@ public class BlueLeftAuto2_2 extends AutoBase {
                    .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(5, 0)), AutoConstants.blueScoring[SPIKE].heading)
                    .afterDisp(0, new SequentialAction(
                            outtake.wristStored(),
-                           outtake.latchClosed(),
+                           outtake.clawClosed(),
                            outtake.retractOuttake()
                    ))
                    .build()
@@ -208,7 +208,7 @@ public class BlueLeftAuto2_2 extends AutoBase {
                                outtake.wristStored(),
                                new SleepAction(0.2),
                                outtake.retractOuttake(),
-                               outtake.latchClosed()
+                               outtake.clawClosed()
                        ))
                        .splineToConstantHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x, parking.position.y), parking.heading)
                        .splineToConstantHeading(parking.position, parking.heading)

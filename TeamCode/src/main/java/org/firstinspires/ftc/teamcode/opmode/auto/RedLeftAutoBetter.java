@@ -74,7 +74,7 @@ public class RedLeftAutoBetter extends AutoBase {
                         // move the robot to the stack and start the intake
                         drive.actionBuilder(spike[SPIKE])
                                 .afterDisp(10, intake.intakeOn())
-                                .afterDisp(10, outtake.latchOpen())
+                                .afterDisp(10, outtake.clawOpen())
                                 .strafeToLinearHeading(spikeBackedOut[SPIKE].position, spikeBackedOut[SPIKE].heading)
                                 .strafeToLinearHeading(stack.position, stack.heading)
                                 .build(),
@@ -93,7 +93,7 @@ public class RedLeftAutoBetter extends AutoBase {
                         drive.actionBuilder(stack)
                                 .afterDisp(7, new SequentialAction(
                                         intake.intakeOff(),
-                                        outtake.latchClosed()
+                                        outtake.clawClosed()
                                 ))
                                 .strafeToLinearHeading(intermediate.position, intermediate.heading)
                                 .strafeToLinearHeading(new Vector2d(
@@ -137,7 +137,7 @@ public class RedLeftAutoBetter extends AutoBase {
                                 .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.redScoring[SPIKE].heading) // Strafe so the white doesn't block the yellow pixel.
                                 .build(),
                         new SleepAction(0.5),
-                        outtake.latchOpen(),
+                        outtake.clawOpen(),
                         new SleepAction(0.2),
                         outtake.extendOuttakeMidBlocking()
                 )
@@ -153,7 +153,7 @@ public class RedLeftAutoBetter extends AutoBase {
                                 outtake.wristStored(),
                                 new SleepAction(0.5),
                                 outtake.retractOuttake(),
-                                outtake.latchClosed(),
+                                outtake.clawClosed(),
                                 new SleepAction(0.5)
                         ))
 //                        .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, parking.position.y), parking.heading)

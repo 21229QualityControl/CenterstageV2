@@ -9,7 +9,6 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.opmode.auto.AutoBase;
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
@@ -118,7 +117,7 @@ public class BlueRightAuto extends AutoBase {
                                 outtake.wristStored(),
                                 new SleepAction(0.5),
                                 outtake.retractOuttake(),
-                                outtake.latchClosed(),
+                                outtake.clawClosed(),
                                 new SleepAction(0.5)
                         ))
                         .strafeToLinearHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x, parking.position.y), parking.heading)

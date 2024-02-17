@@ -105,7 +105,7 @@ public class RedRightAuto2_4 extends AutoBase {
         );
         sched.addAction(
                 new SequentialAction(
-                        outtake.latchOpen(),
+                        outtake.clawOpen(),
                         new SleepAction(0.3),
                         outtake.extendOuttakeMid(),
                         new SleepAction(0.1)
@@ -126,7 +126,7 @@ public class RedRightAuto2_4 extends AutoBase {
                                 outtake.wristStored(),
                                 new SleepAction(0.3),
                                 outtake.retractOuttake(),
-                                outtake.latchOpen()
+                                outtake.clawOpen()
                         ))
                         .splineToConstantHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y), stack.heading)
                         .afterDisp(0, new SequentialAction(
@@ -159,7 +159,7 @@ public class RedRightAuto2_4 extends AutoBase {
                         .splineToConstantHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x - 12, stack.position.y), stack.heading, drive.speedVelConstraint, drive.speedAccelConstraint)
                         .afterDisp(0, new SequentialAction(
                                 intake.intakeOff(),
-                                outtake.latchClosed()
+                                outtake.clawClosed()
                         ))
                         .afterDisp(10, new SequentialAction(
                                 firstCycle ? outtake.extendOuttakeTeleopBlocking() : outtake.extendOuttakeMidBlocking(),
@@ -182,7 +182,7 @@ public class RedRightAuto2_4 extends AutoBase {
                         .afterDisp(8, new SequentialAction(
                                 outtake.latchScoring(),
                                 new SleepAction(0.2),
-                                outtake.latchOpen(),
+                                outtake.clawOpen(),
                                 new SleepAction(0.1),
                                 outtake.extendOuttakeMid()
                         ))
@@ -196,7 +196,7 @@ public class RedRightAuto2_4 extends AutoBase {
                         .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(5, 0)), AutoConstants.redScoring[SPIKE].heading)
                         .afterDisp(0, new SequentialAction(
                                 outtake.wristStored(),
-                                outtake.latchClosed(),
+                                outtake.clawClosed(),
                                 outtake.retractOuttake()
                         ))
                         .build()
@@ -211,7 +211,7 @@ public class RedRightAuto2_4 extends AutoBase {
                                 outtake.wristStored(),
                                 new SleepAction(0.2),
                                 outtake.retractOuttake(),
-                                outtake.latchClosed()
+                                outtake.clawClosed()
                         ))
                         .splineToConstantHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, parking.position.y), parking.heading)
                         .splineToConstantHeading(parking.position, parking.heading)

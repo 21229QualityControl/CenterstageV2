@@ -97,7 +97,7 @@ public class RedRightAutoCringe extends AutoBase {
                               }))
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.redScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
-                      outtake.latchOpen(),
+                      outtake.clawOpen(),
                       new SleepAction(0.5),
                       outtake.extendOuttakeMidBlocking()
               )
@@ -112,7 +112,7 @@ public class RedRightAutoCringe extends AutoBase {
                                       outtake.wristStored(),
                                       new SleepAction(0.5),
                                       outtake.retractOuttake(),
-                                      outtake.latchOpen(),
+                                      outtake.clawOpen(),
                                       new SleepAction(0.5)
                               ))
                               .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, stack.position.y + 12), stack.heading)
@@ -131,7 +131,7 @@ public class RedRightAutoCringe extends AutoBase {
                       drive.actionBuilder(stack)
                               .afterTime(2, new SequentialAction(
                                       intake.intakeOff(),
-                                      outtake.latchClosed()
+                                      outtake.clawClosed()
                               ))
                               .strafeToLinearHeading(new Vector2d((AutoConstants.redScoring[SPIKE].position.x*5 + stack.position.x)/6, stack.position.y + 14), AutoConstants.redScoring[SPIKE].heading)
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
@@ -149,7 +149,7 @@ public class RedRightAutoCringe extends AutoBase {
                               outtake.wristStored(),
                               new SleepAction(0.5),
                               outtake.retractOuttake(),
-                              outtake.latchClosed(),
+                              outtake.clawClosed(),
                               new SleepAction(0.5)
                       ))
                       .strafeToLinearHeading(new Vector2d(AutoConstants.redScoring[SPIKE].position.x, parking.position.y), parking.heading)
