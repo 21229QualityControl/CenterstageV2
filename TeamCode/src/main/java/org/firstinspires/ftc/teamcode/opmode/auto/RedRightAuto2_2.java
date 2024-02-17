@@ -178,7 +178,7 @@ public class RedRightAuto2_2 extends AutoBase {
                             return false;
                         }))
                         .afterDisp(8, new SequentialAction(
-                                outtake.latchScoring(),
+                                outtake.clawOpen(),
                                 new SleepAction(0.2),
                                 outtake.clawOpen(),
                                 new SleepAction(0.1),

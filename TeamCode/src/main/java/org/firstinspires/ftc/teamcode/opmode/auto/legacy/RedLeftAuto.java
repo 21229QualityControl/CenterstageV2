@@ -94,7 +94,7 @@ public class RedLeftAuto extends AutoBase {
                               }))
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.redScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
-                      outtake.latchScoring(),
+                      outtake.clawOpen(),
                       new SleepAction(0.5),
                       outtake.extendOuttakeMidBlocking()
               )

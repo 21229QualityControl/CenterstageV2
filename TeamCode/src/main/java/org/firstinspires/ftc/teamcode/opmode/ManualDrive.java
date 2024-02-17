@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import static org.firstinspires.ftc.teamcode.subsystems.Outtake.CLAW_WRIST_DEFAULT;
-import static org.firstinspires.ftc.teamcode.subsystems.Outtake.clawWristPositions;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;

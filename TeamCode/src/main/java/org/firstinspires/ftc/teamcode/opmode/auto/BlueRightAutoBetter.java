@@ -135,7 +135,7 @@ public class BlueRightAutoBetter extends AutoBase {
                                         blueScoring[(SPIKE + 1) % 3].heading) // Correct for any turning that occured during the previous move
                                 .build(),
                         // score the white pixel
-                        outtake.latchScoring(),
+                        outtake.clawOpen(),
                         new SleepAction(0.4),
                         outtake.extendOuttakeMidLow(),
                         new SleepAction(0.7),

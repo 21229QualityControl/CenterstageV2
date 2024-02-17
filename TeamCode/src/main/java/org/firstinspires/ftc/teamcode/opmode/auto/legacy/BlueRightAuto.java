@@ -101,7 +101,7 @@ public class BlueRightAuto extends AutoBase {
                                 }))
                                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(9, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                                 .build(),
-                        outtake.latchScoring(),
+                        outtake.clawOpen(),
                         new SleepAction(0.5),
                         outtake.extendOuttakeMidBlocking()
                 )

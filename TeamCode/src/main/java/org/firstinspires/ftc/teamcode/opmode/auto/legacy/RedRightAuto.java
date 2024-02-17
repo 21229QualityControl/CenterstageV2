@@ -90,7 +90,7 @@ public class RedRightAuto extends AutoBase {
                               .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.redScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                               .build(),
                       // release pixels one at a time to prevent them from bouncing and fall off the backdrop
-                      outtake.latchScoring(),
+                      outtake.clawOpen(),
                       new SleepAction(0.4),
                       outtake.clawOpen(),
                       new SleepAction(0.2),
