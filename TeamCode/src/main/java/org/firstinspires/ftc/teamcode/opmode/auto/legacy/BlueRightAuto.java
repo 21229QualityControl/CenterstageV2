@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode.auto.legacy;
 
 import android.util.Log;
+import android.util.Size;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -10,9 +11,12 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.opmode.auto.AutoBase;
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 @Config
 //@Disabled
@@ -44,7 +48,7 @@ public class BlueRightAuto extends AutoBase {
 
     @Override
     protected void onRun() {
-        sched.addAction(new SleepAction(10));
+        //sched.addAction(new SleepAction(10));
         deliverSpike();
         driveToScoring();
         scorePreload();
@@ -82,6 +86,14 @@ public class BlueRightAuto extends AutoBase {
         );
         sched.addAction(
                 new SequentialAction(
+                        new ActionUtil.RunnableAction(() -> {
+                            this.preloadProcessor.updateTarget(SPIKE, false);
+                            this.preloadProcessor.detecting = false;
+                            this.portal.setProcessorEnabled(this.aprilTagProcessor, true);
+                            this.portal.setProcessorEnabled(this.preloadProcessor, true);
+                            this.portal.resumeStreaming();
+                            return false;
+                        }),
                         outtake.clawPreloadlosed(),
                         new SleepAction(0.6)
                 )
@@ -94,16 +106,15 @@ public class BlueRightAuto extends AutoBase {
                         outtake.wristScoring(),
                         outtake.extendOuttakeTeleopBlocking(),
                         new ActionUtil.RunnableAction(() -> {
-                            this.portal.setProcessorEnabled(this.aprilTagProcessor, true);
-                            this.portal.setProcessorEnabled(this.preloadProcessor, true);
-                            this.preloadProcessor.updateTarget(SPIKE, false);
-                            return false;
-                        }),
-                        new SleepAction(1),
-                        new ActionUtil.RunnableAction(() -> {
-                            outtake.clawSidewaysInstant(!preloadProcessor.preloadLeft);
-                            Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
-                            return false;
+                            this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_LAVA_PALETTE);
+                            if (preloadProcessor.detecting) {
+                                Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
+                                outtake.clawSidewaysInstant(!preloadProcessor.preloadLeft);
+                                this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+                                this.portal.stopStreaming();
+                                return false;
+                            }
+                            return true;
                         }),
                         new SleepAction(0.1),
                         drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
@@ -121,8 +132,7 @@ public class BlueRightAuto extends AutoBase {
                                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading) // Correct for any turning that occured during the previous move
                                 .build(),
                         outtake.clawOpen(),
-                        new SleepAction(0.5),
-                        outtake.extendOuttakeMidBlocking()
+                        new SleepAction(0.5)
                 )
         );
     }
@@ -134,9 +144,9 @@ public class BlueRightAuto extends AutoBase {
                         .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
                         .afterDisp(10, new SequentialAction(
                                 outtake.wristStored(),
+                                outtake.clawVertical(),
                                 new SleepAction(0.5),
                                 outtake.retractOuttake(),
-                                outtake.clawClosed(),
                                 new SleepAction(0.5)
                         ))
                         .strafeToLinearHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x, parking.position.y), parking.heading)

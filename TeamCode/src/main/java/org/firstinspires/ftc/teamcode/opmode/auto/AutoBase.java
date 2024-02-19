@@ -134,7 +134,6 @@ public abstract class AutoBase extends LinearOpMode {
         }
         portal.stopStreaming();
         portal.setProcessorEnabled(processor, false);
-        preloadProcessor.updateTarget(SPIKE, false); // TODO: Make this true on red side
 
         // Auto start
         resetRuntime(); // reset runtime timer

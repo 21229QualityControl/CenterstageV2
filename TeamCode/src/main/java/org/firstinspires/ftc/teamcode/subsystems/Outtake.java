@@ -22,7 +22,7 @@ public class Outtake {
    public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0.0015, 0.0004);
    public static int OUTTAKE_TELEOP = 0;
    public static int LAYER_HEIGHT = 100; // Height of a layer of pixels for the slide, used for teleop
-   public static int OUTTAKE_MIDLOW = 325;
+   public static int OUTTAKE_MIDLOW = 275;
    public static int OUTTAKE_MID = 600;
    public static int OUTTAKE_LOW = 250;
    public static double CLAW_OPEN = 0.74;
@@ -85,7 +85,6 @@ public class Outtake {
       this.mosaic.setPosition(MOSAIC_CLOSED);
       this.claw.setPosition(CLAW_OPEN);
       this.clawWrist.setPosition(CLAW_VERTICAL);
-      Log.d("BACKDROP_FINISHEDAUTO", String.valueOf(Memory.FINISHED_AUTO));
       if (!Memory.FINISHED_AUTO && teleop) {
          this.slide.setTargetPosition(OUTTAKE_MID);
          this.wrist.setPosition(WRIST_SCORING);

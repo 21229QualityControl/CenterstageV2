@@ -57,7 +57,6 @@ public class PartnerPreloadProcessor implements VisionProcessor {
             if (d.id != targetAprilTag) {
                 continue;
             }
-            detecting = true; // Found it!
 
             // General logic taken from kookybotz
             int leftX = Integer.MAX_VALUE;
@@ -100,6 +99,7 @@ public class PartnerPreloadProcessor implements VisionProcessor {
             rightZoneAverage = meanColor(frame, rightInclusionZone, rightExclusionZone);
 
             preloadLeft = leftZoneAverage > rightZoneAverage;
+            detecting = true; // Found it!
         }
         return null;
     }
