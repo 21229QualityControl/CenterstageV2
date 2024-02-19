@@ -24,9 +24,9 @@ public class Outtake {
    public static int LAYER_HEIGHT = 100; // Height of a layer of pixels for the slide, used for teleop
    public static int OUTTAKE_MIDLOW = 275;
    public static int OUTTAKE_MID = 600;
-   public static int OUTTAKE_LOW = 250;
+   public static int OUTTAKE_LOW = 200;
    public static double CLAW_OPEN = 0.74;
-   public static double CLAW_CLOSED = 0.525;
+   public static double CLAW_CLOSED = 0.5;
    public static double CLAW_PRELOAD_CLOSED = 0.3;
    public static double WRIST_STORED = 0.651;
    public static double WRIST_SCORING = 0.9;

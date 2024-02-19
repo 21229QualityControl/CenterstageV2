@@ -32,7 +32,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
     public static Pose2d parking = new Pose2d(58, 58, Math.toRadians(180));
     public static Pose2d stack = new Pose2d(-50.5, 10, Math.toRadians(180));
     public static double[] stackOffset = {6, 3.75, 3.75};
-    public static double[] backdropDistOffset = {9.3, 8.5, 9};
+    public static double[] backdropDistOffset = {7.3, 6.5, 7};
     private int startingSpike;
 
    @Override
@@ -76,6 +76,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
                          .build()
          );
       }
+       sched.addAction(outtake.clawPreloadlosed());
    }
 
    private void scorePreload() {
@@ -85,13 +86,14 @@ public class BlueLeftAuto2_4 extends AutoBase {
                          .splineToLinearHeading(AutoConstants.blueScoring[SPIKE], AutoConstants.blueScoring[SPIKE].heading)
                          .afterDisp(0, new SequentialAction(
                                  outtake.wristScoring(),
+                                 outtake.clawSideways(true),
                                  outtake.extendOuttakeLowBlocking()
                          ))
                          .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.blueScoring[SPIKE].heading)
                          .afterDisp(1, new ActionUtil.RunnableAction(() -> {
                              double dist = frontSensors.backdropDistance();
-                             if (dist > 15) {
-                                 dist = 9; // failed
+                             if (dist > 20) {
+                                 dist = 12; // failed
                                  led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
                              }
                              Log.d("BACKDROP_DIST", String.valueOf(dist));
@@ -105,24 +107,22 @@ public class BlueLeftAuto2_4 extends AutoBase {
          sched.addAction(
                  new SequentialAction(
                          outtake.clawOpen(),
-                         new SleepAction(0.3),
-                         outtake.extendOuttakeMid(),
-                         new SleepAction(0.1)
+                         new SleepAction(0.3)
                  )
          );
    }
 
    private void intakeStack(boolean firstCycle) {
       sched.addAction(
-              drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.blueScoring[SPIKE].heading))
+              drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading))
                       .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
                       .afterDisp(0, new ActionUtil.RunnableAction(() -> {
                           drive.pose = new Pose2d(drive.pose.position.plus(offsetPos), drive.pose.heading); // Fix stack pos reliability
                           return false;
                       }))
-                      .afterDisp(0, new SequentialAction(
-                              outtake.extendOuttakeMidBlocking(),
+                      .afterDisp(1, new SequentialAction(
                               outtake.wristStored(),
+                              outtake.clawVertical(),
                               new SleepAction(0.3),
                               outtake.retractOuttake(),
                               outtake.clawOpen()
@@ -155,35 +155,35 @@ public class BlueLeftAuto2_4 extends AutoBase {
       sched.addAction(
               drive.actionBuilder(stack)
                       .setReversed(true)
+                      .afterDisp(10, new SequentialAction(
+                              outtake.clawClosed(),
+                              new SleepAction(0.4),
+                              intake.intakeReverse()
+                      ))
+                      .afterDisp(60, new SequentialAction(
+                              firstCycle ? outtake.extendOuttakeTeleopBlocking() : outtake.extendOuttakeMidBlocking(),
+                              outtake.clawSideways(true)
+                      ))
                       .splineToConstantHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x - 12, stack.position.y), stack.heading, drive.speedVelConstraint, drive.speedAccelConstraint)
                       .afterDisp(0, new SequentialAction(
-                              intake.intakeOff(),
-                              outtake.clawClosed()
-                      ))
-                      .afterDisp(10, new SequentialAction(
-                              firstCycle ? outtake.extendOuttakeTeleopBlocking() : outtake.extendOuttakeMidBlocking(),
-                              new SleepAction(0.1),
-                              outtake.wristScoring()
+                              outtake.wristScoring(),
+                              intake.intakeOff()
                       ))
                       .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
-                      .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.blueScoring[SPIKE].heading)
+                      .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
                       .afterDisp(1, new ActionUtil.RunnableAction(() -> {
                           double dist = frontSensors.backdropDistance();
                           if (dist > 15) {
                               dist = 9; // failed
                           }
                           Log.d("BACKDROP_DIST", String.valueOf(dist));
-                          offsetPos = new Vector2d(-1 * (10 - dist), 0);
-                          drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(10 - dist, 0)), drive.pose.heading);
+                          offsetPos = new Vector2d(-1 * (8 - dist), 0);
+                          drive.pose = new Pose2d(drive.pose.position.plus(new Vector2d(8 - dist, 0)), drive.pose.heading);
                           drive.updatePoseEstimate();
                           return false;
                       }))
                       .afterDisp(8, new SequentialAction(
-                              outtake.clawOpen(),
-                              new SleepAction(0.2),
-                              outtake.clawOpen(),
-                              new SleepAction(0.1),
-                              outtake.extendOuttakeMid()
+                              outtake.clawOpen()
                       ))
                       .build()
       );
@@ -191,11 +191,11 @@ public class BlueLeftAuto2_4 extends AutoBase {
 
    private void parkBackdrop() {
       sched.addAction(
-           drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.blueScoring[SPIKE].heading))
+           drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading))
                    .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(5, 0)), AutoConstants.blueScoring[SPIKE].heading)
                    .afterDisp(0, new SequentialAction(
                            outtake.wristStored(),
-                           outtake.clawClosed(),
+                           outtake.clawVertical(),
                            outtake.retractOuttake()
                    ))
                    .build()
@@ -204,13 +204,13 @@ public class BlueLeftAuto2_4 extends AutoBase {
 
    private void park() {
        sched.addAction(
-               drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(10, 0)), AutoConstants.blueScoring[SPIKE].heading))
+               drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading))
                        .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
                        .afterDisp(0, new SequentialAction(
                                outtake.wristStored(),
+                               outtake.clawVertical(),
                                new SleepAction(0.2),
-                               outtake.retractOuttake(),
-                               outtake.clawClosed()
+                               outtake.retractOuttake()
                        ))
                        .splineToConstantHeading(new Vector2d(AutoConstants.blueScoring[SPIKE].position.x, parking.position.y), parking.heading)
                        .splineToConstantHeading(parking.position, parking.heading)

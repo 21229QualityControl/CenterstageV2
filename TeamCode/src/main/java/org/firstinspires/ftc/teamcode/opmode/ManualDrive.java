@@ -219,7 +219,10 @@ public class ManualDrive extends LinearOpMode {
       if (g2.yOnce()) {
          if (!outtake.isWristScoring()) {
             sched.queueAction(intake.intakeOff());
-            sched.queueAction(new SequentialAction(outtake.clawClosed(), new SleepAction(0.6)));
+            sched.queueAction(new SequentialAction(
+                    outtake.clawClosed(),
+                    new SleepAction(0.6)
+           ));
             sched.queueAction(new ParallelAction(
                     new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
                     outtake.extendOuttakeTeleopBlocking()
@@ -271,12 +274,13 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(outtake.lockPosition());
       }
       if (g2.bOnce()) {
-         sched.queueAction(outtake.wristStored());
-         outtake.clawVertical();
-         new SleepAction(1);
-         sched.queueAction(outtake.retractOuttake());
-         sched.queueAction(outtake.clawOpen());
-         sched.queueAction(outtake.clawVertical());
+         sched.queueAction(new SequentialAction(
+                 outtake.wristStored(),
+                 outtake.clawVertical(),
+                 outtake.retractOuttake(),
+                 new SleepAction(0.5),
+                 outtake.clawOpen()
+         ));
       }
       if (g2.dpadUpOnce()) {
          sched.queueAction(outtake.increaseSlideLayer(1));

@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 @Config
 public class Intake {
    public static int INTAKE_SPEED = 800; // Max speed is 2400
+   public static int INTAKE_REVERSE_SPEED = -1600;
 
    final MotorWithVelocityPID intakeMotor;
    final Servo leftStack;
@@ -96,7 +97,7 @@ public class Intake {
 
    public Action intakeReverse() {
       return new SequentialAction(
-              intakeMotor.setTargetVelocityAction(-INTAKE_SPEED),
+              intakeMotor.setTargetVelocityAction(INTAKE_REVERSE_SPEED),
               //new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), -INTAKE_SPEED / 1000.0),
               new IntakeStateAction(IntakeState.Reversing)
       );
