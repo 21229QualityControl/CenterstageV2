@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.subsystems.vision.CameraProcessor;
-import org.firstinspires.ftc.teamcode.subsystems.vision.FrontSensors;
 import org.firstinspires.ftc.teamcode.util.CameraUtil;
 import org.firstinspires.ftc.vision.VisionPortal;
 
@@ -26,9 +25,6 @@ public class CameraProcessorTest extends LinearOpMode {
         // Create an instance of the camera processor
         final CameraProcessor processor = new CameraProcessor();
         processor.setDebugMode(debugMode);
-
-        // Create one of the sensors too
-        final FrontSensors frontSensors = new FrontSensors(hardwareMap);
 
         int w = 1920;
         int h = 1080;
@@ -49,10 +45,8 @@ public class CameraProcessorTest extends LinearOpMode {
         while (opModeInInit()) {
             // the camera processor got result only when it is in active
             int cameraReading = processor.position;
-            int sensorReading = frontSensors.rawObjectPosition();
 
             telemetry.addData("Camera Position", cameraReading);
-            telemetry.addData("Sensor Position", sensorReading);
             telemetry.addData("Left Rectangle Saturation:", processor.getSatRectLeft());
             telemetry.addData("Center Rectangle Saturation:", processor.getSatRectCenter());
             telemetry.addData("Right Rectangle Saturation:", processor.getSatRectRight());

@@ -17,7 +17,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.vision.PartnerPreloadProcessor;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
-import org.firstinspires.ftc.teamcode.subsystems.vision.FrontSensors;
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoActionScheduler;
 import org.firstinspires.ftc.teamcode.util.LED;
@@ -29,7 +28,6 @@ public abstract class AutoBase extends LinearOpMode {
     protected MecanumDrive drive;
     protected Outtake outtake;
     protected Intake intake;
-    protected FrontSensors frontSensors;
     protected Plane plane;
     protected AutoActionScheduler sched;
     protected CameraProcessor processor;
@@ -60,7 +58,6 @@ public abstract class AutoBase extends LinearOpMode {
         this.drive = new MecanumDrive(hardwareMap, Memory.LAST_POSE);
         this.intake = new Intake(hardwareMap);
         this.outtake = new Outtake(hardwareMap);
-        this.frontSensors = new FrontSensors(hardwareMap);
         this.plane = new Plane(hardwareMap);
         this.sched = new AutoActionScheduler(this::update);
         this.processor = new CameraProcessor();
@@ -97,20 +94,11 @@ public abstract class AutoBase extends LinearOpMode {
             // Below is the code for the camera vision
 
             int cameraReading = processor.position;
-            int sensorReading = frontSensors.rawObjectPosition();
             if (cameraReading > -1) {
                 SPIKE = cameraReading;
                 telemetry.addData("Camera", "Working - " + cameraReading);
-                telemetry.addData("Sensor", "Unused - " + sensorReading);
             } else if (cameraReading == -1) {
                 telemetry.addData("Camera", "Not working - " + cameraReading);
-                if (sensorReading > -1) {
-                    SPIKE = sensorReading;
-                    telemetry.addData("Backup Sensor", "Working - " + sensorReading);
-                } else {
-                    SPIKE = -1;
-                    telemetry.addData("Backup Sensor", "Not working - " + sensorReading);
-                }
             }
 
             telemetry.addData("Position:", processor.position);
@@ -120,9 +108,6 @@ public abstract class AutoBase extends LinearOpMode {
             telemetry.update();
 
             led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE);
-
-//            vision.displayTelemetry(telemetry);
-//            printDescription();
 
             idle();
         }
