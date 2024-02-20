@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.subsystems.CameraProcessor;
-import org.firstinspires.ftc.teamcode.subsystems.FrontSensors;
+import org.firstinspires.ftc.teamcode.subsystems.vision.CameraProcessor;
+import org.firstinspires.ftc.teamcode.subsystems.vision.FrontSensors;
 import org.firstinspires.ftc.teamcode.util.CameraUtil;
 import org.firstinspires.ftc.vision.VisionPortal;
 

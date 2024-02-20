@@ -17,7 +17,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
-import org.firstinspires.ftc.teamcode.subsystems.FrontSensors;
 import org.firstinspires.ftc.teamcode.util.ActionScheduler;
 import org.firstinspires.ftc.teamcode.util.GamePadController;
 import org.firstinspires.ftc.teamcode.util.LED;
@@ -42,7 +41,6 @@ public class ManualDrive extends LinearOpMode {
    private Outtake outtake;
    private Hang hang;
    private Plane plane;
-   private FrontSensors frontSensors;
    private LED led;
 
    @Override
@@ -61,7 +59,6 @@ public class ManualDrive extends LinearOpMode {
       outtake = new Outtake(hardwareMap);
       hang = new Hang(hardwareMap);
       plane = new Plane(hardwareMap);
-      frontSensors = new FrontSensors(hardwareMap);
       led = new LED(hardwareMap);
 
       if (Memory.RAN_AUTO) {
@@ -112,8 +109,7 @@ public class ManualDrive extends LinearOpMode {
          hang.update();
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
-         telemetry.addData("Beam Broken", intake.isBeamBroken());
-         telemetry.addData("Touch Sensor Pressed", outtake.isTouchSensorPressed());
+         telemetry.addData("Pixel Count", intake.pixelCount());
          telemetry.update();
 
          telemetry.update();
@@ -131,25 +127,11 @@ public class ManualDrive extends LinearOpMode {
       }
 
       // Main driver controls
-      // Vision dist not possible due to camera not being able to focus when up against backdrop
-      /*double visionDist = vision.backdropDistance(50); // Refresh every 50 ticks unless something is within range, then 5
-      if (visionDist < VISION_CLOSE_DIST + VISION_RANGE) {
-         visionDist = vision.backdropDistance(5);
-      }
-      telemetry.addData("VISION DISTANCE", visionDist);*/
       double visionDist = 10000;
       double speed = Math.min(1, Math.max(0, ((visionDist - VISION_CLOSE_DIST) / VISION_RANGE))) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
-      // If the touching sensor on the outtake is triggered (meaning the robot's at the backdrop),
-      // then the gamepads will be unresponsive to any x values for 2 seconds
-      // After that, the driver will be allowed to drive away.
-      // Note that the driver can still strafe as the y value is still uninterfered.
-      // Actually the touch sensor code got removed
       double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
       double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
       Vector2d input = new Vector2d(input_x, input_y);
-      if (outtake.isTouchSensorPressed() && intake.pixelCount != 0) { // Outtake touch sensor
-         input = input.times(SLOW_DRIVE_SPEED);
-      }
       //input = drive.pose.heading.inverse().times(input); // Field centric
 
       double input_turn = Math.pow(g1.left_trigger - g1.right_trigger, 3) * TURN_SPEED;
@@ -164,108 +146,109 @@ public class ManualDrive extends LinearOpMode {
       drive.setDrivePowers(new PoseVelocity2d(input, input_turn));
    }
 
+   public int INTAKE_STACK_POSITION = 0;
    private void intakeControls() {
-      if (intake.hit2) {
-         intake.hit2 = false;
-         /*sched.queueAction(
-                 new SequentialAction(
-                         intake.intakeOff(),
-                         outtake.clawClosed()
-                 )
-         );*/
-         // TODO: Improve beam break reliability
+      if (intake.isIntaking() && intake.pixelCount() == 2) {
+         sched.queueAction(intake.intakeOn());
       }
 
       // Intake controls
       if (g1.aOnce()) {
-         if (intake.intakeState == Intake.IntakeState.On) {
+         if (intake.isIntaking()) {
             sched.queueAction(intake.intakeOff());
          } else {
             sched.queueAction(intake.intakeOn());
          }
       }
       if (g1.b()) {
-         if (intake.intakeState == Intake.IntakeState.On) {
-            sched.queueAction(outtake.clawClosed());
-         }
          sched.queueAction(intake.intakeReverse());
       }
-      if (!g1.b() && intake.intakeState == Intake.IntakeState.Reversing) {
+      if (!g1.b() && intake.isReversing()) {
          sched.queueAction(intake.intakeOff());
+      }
+      if (g1.dpadUpOnce()) {
+         INTAKE_STACK_POSITION--;
+         if (INTAKE_STACK_POSITION < 0) {
+            INTAKE_STACK_POSITION = 0;
+            sched.queueAction(intake.wristStored());
+         } else {
+            sched.queueAction(intake.wristStack(INTAKE_STACK_POSITION));
+         }
+      }
+      if (g1.dpadDownOnce()) {
+         INTAKE_STACK_POSITION++;
+         if (INTAKE_STACK_POSITION > 3) {
+            INTAKE_STACK_POSITION = 0;
+            sched.queueAction(intake.wristStored());
+         } else {
+            sched.queueAction(intake.wristStack(INTAKE_STACK_POSITION));
+         }
+      }
+      if (g1.dpadLeftOnce()) {
+         INTAKE_STACK_POSITION = 0;
+         sched.queueAction(intake.wristStored());
+      }
+      if (g1.dpadRightOnce()) {
+         sched.queueAction(intake.wristDown());
       }
 
       // Other susbsystems
-      if (g1.dpadUpOnce()) {
-         sched.queueAction(hang.extendHang());
-      }
-      if (g1.dpadDownOnce()) {
-         sched.queueAction(hang.retractHang());
-      }
       if (g1.backOnce()) {
          sched.queueAction(plane.scorePlane());
       }
       if (g1.startOnce()) {
-         sched.queueAction(new SequentialAction(
-                 intake.stackClosed(),
-                 new SleepAction(0.3),
-                 intake.stackOpen(),
-                 new SleepAction(0.3)
-         ));
+         if (hang.hangExtended()) {
+            sched.queueAction(hang.retractHang());
+         } else {
+            sched.queueAction(hang.extendHang());
+         }
       }
    }
 
    private void outtakeControls() {
       // Outtake controls
       if (g2.yOnce()) {
-         if (!outtake.isWristScoring()) {
+         if (!outtake.isArmScoring()) {
             sched.queueAction(intake.intakeOff());
             sched.queueAction(new SequentialAction(
                     outtake.clawClosed(),
-                    new SleepAction(0.6)
+                    new SleepAction(0.3)
            ));
             sched.queueAction(new ParallelAction(
-                    new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
+                    new SequentialAction(new SleepAction(0.4), outtake.armScoring()),
                     outtake.extendOuttakeTeleopBlocking()
             ));
          }
-         sched.queueAction(outtake.clawVertical());
-         intake.pixelCount = 2; // If the outtake slide's are extended and ready for deposit we probably have 2 pixels.
-         //Since the beam breaks aren't finalized yet I'm using this just to test whether the outtake can release one by one.
+         sched.queueAction(outtake.wristVertical());
       }
       if (g2.xOnce()) {
-         if (!outtake.isWristScoring()) {
+         if (!outtake.isArmScoring()) {
             sched.queueAction(intake.intakeOff());
-            sched.queueAction(new SequentialAction(outtake.clawClosed(), new SleepAction(0.6)));
+            sched.queueAction(new SequentialAction(outtake.clawClosed(), new SleepAction(0.3)));
             sched.queueAction(new ParallelAction(
-                    new SequentialAction(new SleepAction(0.4), outtake.wristScoring()),
+                    new SequentialAction(new SleepAction(0.4), outtake.armScoring()),
                     outtake.extendOuttakeTeleopBlocking()
             ));
          }
-         sched.queueAction(outtake.clawMosaic(true));
-         intake.pixelCount = 2; // If the outtake slide's are extended and ready for deposit we probably have 2 pixels.
-         //Since the beam breaks aren't finalized yet I'm using this just to test whether the outtake can release one by one.
+         sched.queueAction(outtake.wristMosaic(true));
       }
 
       if (g2.leftBumperOnce()) {
-         if (outtake.isClawMosaic()) {
-            sched.queueAction(outtake.clawMosaic(true));
+         if (outtake.isWristMosaic()) {
+            sched.queueAction(outtake.wristMosaic(true));
          } else {
-            sched.queueAction(outtake.clawSideways(true));
+            sched.queueAction(outtake.wristSideways(true));
          }
       }
 
       if (g2.rightBumperOnce()) {
-         if (outtake.isClawMosaic()) {
-            sched.queueAction(outtake.clawMosaic(false));
+         if (outtake.isWristMosaic()) {
+            sched.queueAction(outtake.wristMosaic(false));
          } else {
-            sched.queueAction(outtake.clawSideways(false));
+            sched.queueAction(outtake.wristSideways(false));
          }
       }
 
-      if (g2.aOnce()) {
-         sched.queueAction(outtake.clawOpen());
-         sched.queueAction(intake.setPixelCount(0));
-      }
       if (Math.abs(g2.right_stick_y) > 0.01) {
          outtake.slidePIDEnabled = false;
          outtake.setSlidePower(-g2.right_stick_y);
@@ -275,10 +258,9 @@ public class ManualDrive extends LinearOpMode {
       }
       if (g2.bOnce()) {
          sched.queueAction(new SequentialAction(
-                 outtake.wristStored(),
-                 outtake.clawVertical(),
-                 outtake.retractOuttake(),
-                 new SleepAction(0.5),
+                 outtake.armStored(),
+                 outtake.wristVertical(),
+                 outtake.retractOuttakeBlocking(),
                  outtake.clawOpen()
          ));
       }
@@ -290,19 +272,8 @@ public class ManualDrive extends LinearOpMode {
       }
 
       // Mosaic controls
-      if (g2.startOnce()) {
-         // The servo will rotate the beam so the driver can adjust pixels for mosaic creation.
-         sched.queueAction(outtake.mosaicAdjust());
-      }
-      if (g2.backOnce()) {
-         // The the servo will rotate the beam so it is safely inside the robot.
-         sched.queueAction(outtake.mosaicClosed());
-      }
-      if (g2.dpadLeft()) {
-         sched.queueAction(outtake.increaseMosaicPos());
-      }
-      if (g2.dpadRight()) {
-         sched.queueAction(outtake.decreaseMosaicPos());
+      if (g2.startOnce()) { // Press start to mosaic adjust with outtake
+         sched.queueAction(outtake.clawClosed());
       }
    }
 
@@ -317,15 +288,11 @@ public class ManualDrive extends LinearOpMode {
    boolean warning2 = false;
    boolean warning3 = false;
    private void ledUpdate() {
-      if (intake.pixelCount == 1) {
+      int pixelCount = intake.pixelCount();
+      if (pixelCount == 1) {
          led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-      } else if (intake.pixelCount == 2) {
+      } else if (pixelCount == 2) {
          led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-         if (outtake.isTouchSensorPressed()) {
-            led.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
-         }
-      } else if (intake.pixelCount > 2) {
-            led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_LAVA_PALETTE);
       } else if (isBetween(timeLeft(), 31, 35)) { // 35-31; prepare for endgame
          led.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
          if (!warning1) {

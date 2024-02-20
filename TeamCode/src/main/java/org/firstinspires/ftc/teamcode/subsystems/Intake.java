@@ -1,14 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.ftc.Actions;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -20,142 +13,82 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static int INTAKE_SPEED = 800; // Max speed is 2400
-   public static int INTAKE_REVERSE_SPEED = -1600;
+   public static int INTAKE_SPEED = 1600; // Max speed is 2400
+   public static int INTAKE_REVERSE_SPEED = -2400;
 
    final MotorWithVelocityPID intakeMotor;
-   final Servo leftStack;
-   final Servo rightStack;
-   final BeamBreakSensor beamBreak;
-   boolean beamBroken;
+   final Servo intakeWrist;
 
-   public int pixelCount = 0;
+   final BeamBreakSensor backBeam;
+   final BeamBreakSensor frontBeam;
 
-   public static double LEFT_STACK_OPEN = 0.55;
-   public static double LEFT_STACK_CLOSED = 0.08;
-   public static double RIGHT_STACK_OPEN = 0.45;
-   public static double RIGHT_STACK_CLOSED = 0.93;
-   public static double RIGHT_STACK_HALF = (RIGHT_STACK_OPEN + RIGHT_STACK_CLOSED) / 2;
-   public static double LEFT_STACK_HALF = (LEFT_STACK_OPEN + LEFT_STACK_CLOSED) / 2;
+   public static double WRIST_STORED = 0;
+   public static double WRIST_DOWN = 1;
+   public static double[] STACK_POSITIONS = {
+           0, // Getting 1
+           0, // Getting 2
+           0, // Getting 3
+           0, // Getting 4
+           // Use WRIST_DOWN to get 5
+   };
 
    public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00005, 0, 0);
 
    public Intake(HardwareMap hardwareMap) {
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
          this.intakeMotor.setMaxPower(1.0);
-         this.leftStack = HardwareCreator.createServo(hardwareMap, "leftStack");
-         this.rightStack = HardwareCreator.createServo(hardwareMap, "rightStack");
-         this.beamBreak = new BeamBreakSensor(hardwareMap, "intakeBeam");
+         this.intakeWrist = HardwareCreator.createServo(hardwareMap, "intakeWrist");
+         this.backBeam = new BeamBreakSensor(hardwareMap, "backBeam");
+         this.frontBeam = new BeamBreakSensor(hardwareMap, "frontBeam");
    }
 
    public void initialize() {
-      this.leftStack.setPosition(LEFT_STACK_OPEN);
-      this.rightStack.setPosition(RIGHT_STACK_OPEN);
-   }
-
-   public enum IntakeState {
-      Off,
-      Reversing,
-      On
-   }
-   public IntakeState intakeState;
-
-   public class IntakeStateAction implements Action {
-      IntakeState newState;
-
-      public IntakeStateAction(IntakeState newState) {
-         this.newState = newState;
-      }
-
-      @Override
-      public boolean run(TelemetryPacket packet) {
-         intakeState = newState;
-         return false;
-      }
-   }
-   public class IntakePixelCountAction implements Action {
-      int newPixelCount;
-
-      public IntakePixelCountAction(int newPixelCount) {
-         this.newPixelCount = newPixelCount;
-      }
-
-      @Override
-      public boolean run(TelemetryPacket packet) {
-         pixelCount = newPixelCount;
-         return false;
-      }
+      this.intakeWrist.setPosition(WRIST_STORED);
    }
 
    public Action intakeOn() {
-      return new SequentialAction(
-              intakeMotor.setTargetVelocityAction(INTAKE_SPEED),
-              //new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), INTAKE_SPEED / 1000.0),
-              new IntakeStateAction(IntakeState.On)
-      );
+      return intakeMotor.setTargetVelocityAction(INTAKE_SPEED);
    }
 
    public Action intakeReverse() {
-      return new SequentialAction(
-              intakeMotor.setTargetVelocityAction(INTAKE_REVERSE_SPEED),
-              //new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), -INTAKE_SPEED / 1000.0),
-              new IntakeStateAction(IntakeState.Reversing)
-      );
+      return intakeMotor.setTargetVelocityAction(INTAKE_REVERSE_SPEED);
+   }
+
+   public boolean isIntaking() {
+      return intakeMotor.getTargetVelocity() == INTAKE_SPEED;
+   }
+   public boolean isReversing() {
+      return intakeMotor.getTargetVelocity() == INTAKE_REVERSE_SPEED;
    }
 
    public Action intakeOff() {
       intakeMotor.resetIntegralGain();
-      return new SequentialAction(
-              intakeMotor.setTargetVelocityAction(0),
-              //new ActionUtil.DcMotorExPowerAction(intakeMotor.getMotor(), 0),
-              new IntakeStateAction(IntakeState.Off)
-      );
+      return intakeMotor.setTargetVelocityAction(0);
    }
-
-   private long lastPixel = 0;
-   public boolean hit2;
    public void update() {
       intakeMotor.update();
-      long currentTime = System.currentTimeMillis();
-      if (!beamBreak.isBeamBroken() && beamBroken && (currentTime - lastPixel) > 1) {
-         pixelCount++;
-//         Log.d("BEAMBREAK", "beam unbroken. Time: " + (currentTime - lastPixel) + " ms");
-         if (pixelCount >= 2 && intakeState == IntakeState.On) {
-            hit2 = true;
-         }
-         lastPixel = System.currentTimeMillis();
-      } else if (!beamBreak.isBeamBroken() && beamBroken) {
-//         Log.d("BEAMBREAK", "skipped beam unbroken. Time: " + (currentTime - lastPixel) + " ms");
+   }
+
+   public Action wristStored() {
+      return new ActionUtil.ServoPositionAction(intakeWrist, WRIST_STORED);
+   }
+
+   public Action wristDown() {
+      return new ActionUtil.ServoPositionAction(intakeWrist, WRIST_DOWN);
+   }
+
+   public Action wristStack(int numberIntaked) {
+      return new ActionUtil.ServoPositionAction(intakeWrist, STACK_POSITIONS[numberIntaked]);
+   }
+
+   public int pixelCount() {
+      int count = 0;
+      if (backBeam.isBeamBroken()) {
+         count++;
       }
-      beamBroken = beamBreak.isBeamBroken();
-   }
-
-   public Action stackOpen() {
-      return new SequentialAction(
-              new ActionUtil.ServoPositionAction(leftStack, LEFT_STACK_OPEN),
-              new ActionUtil.ServoPositionAction(rightStack, RIGHT_STACK_OPEN)
-      );
-   }
-
-   public Action stackHalf() {
-      return new SequentialAction(
-              new ActionUtil.ServoPositionAction(leftStack, LEFT_STACK_HALF),
-              new ActionUtil.ServoPositionAction(rightStack, RIGHT_STACK_HALF)
-      );
-   }
-
-   public Action stackClosed() {
-      return new SequentialAction(
-              new ActionUtil.ServoPositionAction(leftStack, LEFT_STACK_CLOSED),
-              new ActionUtil.ServoPositionAction(rightStack, RIGHT_STACK_CLOSED)
-      );
-   }
-
-   public Action setPixelCount(int newPixelCount) {
-      return new IntakePixelCountAction(newPixelCount);
-   }
-
-   public boolean isBeamBroken() {
-      return beamBreak.isBeamBroken();
+      if (frontBeam.isBeamBroken()) {
+         count++;
+      }
+      return count;
    }
 }

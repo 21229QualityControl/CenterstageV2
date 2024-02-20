@@ -27,6 +27,9 @@ public class Hang {
    public Action retractHang() {
       return this.hang.setTargetPositionAction(0);
    }
+   public boolean hangExtended() {
+      return this.hang.getTargetPosition() == HANG_EXTENDED;
+   }
    public void update() {
       this.hang.update();
    }
