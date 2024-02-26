@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.util.control.PIDFControllerKt.EPSIL
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -24,8 +25,14 @@ public class Outtake {
    public static double CLAW_OPEN = 0.74;
    public static double CLAW_CLOSED = 0.5;
    public static double CLAW_PRELOAD_CLOSED = 0.3;
-   public static double ARM_STORED = 0.651;
-   public static double ARM_SCORING = 0;
+
+
+   public static double ARM_LEFT_STORED = 1;
+   public static double ARM_LEFT_SCORING = 0;
+   public static double ARM_RIGHT_STORED = 1;
+   public static double ARM_RIGHT_SCORING = 0;
+
+
    public static double WRIST_VERTICAL = 0;
    public static double WRIST_MOSAIC_LEFT = 0;
    public static double WRIST_MOSAIC_RIGHT = 0;
@@ -37,7 +44,8 @@ public class Outtake {
    public boolean slidePIDEnabled = true;
    final Servo claw;
    final Servo wrist;
-   final Servo arm;
+   final Servo armLeft;
+   final Servo armRight;
 
    public Outtake(HardwareMap hardwareMap) {
       if (Memory.outtakeSlide != null) { // Preserve motor zero position
@@ -49,7 +57,8 @@ public class Outtake {
       this.slide.setMaxPower(1.0);
       this.claw = HardwareCreator.createServo(hardwareMap, "outtakeClaw");
       this.wrist = HardwareCreator.createServo(hardwareMap, "outtakeWrist");
-      this.arm = HardwareCreator.createServo(hardwareMap, "outtakeArm");
+      this.armLeft = HardwareCreator.createServo(hardwareMap, "outtakeArmLeft");
+      this.armRight = HardwareCreator.createServo(hardwareMap, "outtakeArmRight");
    }
 
    public void prepTeleop() {
@@ -67,12 +76,14 @@ public class Outtake {
       this.wrist.setPosition(WRIST_VERTICAL);
       if (!Memory.FINISHED_AUTO && teleop) {
          this.slide.setTargetPosition(OUTTAKE_PARTNER);
-         this.arm.setPosition(ARM_SCORING);
+         this.armLeft.setPosition(ARM_LEFT_SCORING);
+         this.armRight.setPosition(ARM_RIGHT_SCORING);
          this.claw.setPosition(CLAW_OPEN);
          Memory.FINISHED_AUTO = true;
       } else {
          this.slide.setTargetPosition(0);
-         this.arm.setPosition(ARM_STORED);
+         this.armLeft.setPosition(ARM_LEFT_STORED);
+         this.armRight.setPosition(ARM_RIGHT_STORED);
       }
    }
 
@@ -153,13 +164,19 @@ public class Outtake {
    }
 
    public Action armStored() {
-      return new ActionUtil.ServoPositionAction(arm, ARM_STORED);
+      return new ParallelAction(
+              new ActionUtil.ServoPositionAction(armLeft, ARM_LEFT_STORED),
+              new ActionUtil.ServoPositionAction(armRight, ARM_RIGHT_STORED)
+      );
    }
 
    public Action armScoring() {
-      return new ActionUtil.ServoPositionAction(arm, ARM_SCORING);
+      return new ParallelAction(
+              new ActionUtil.ServoPositionAction(armLeft, ARM_LEFT_SCORING),
+              new ActionUtil.ServoPositionAction(armRight, ARM_RIGHT_SCORING)
+      );
    }
    public boolean isArmScoring() {
-      return Math.abs(arm.getPosition() - ARM_SCORING) < EPSILON;
+      return Math.abs(armLeft.getPosition() - ARM_LEFT_SCORING) < EPSILON;
    }
 }

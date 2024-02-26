@@ -249,6 +249,14 @@ public class ManualDrive extends LinearOpMode {
          }
       }
 
+      if (g2.aOnce()) {
+         sched.queueAction(new SequentialAction(
+                 intake.feedOpen(),
+                 new SleepAction(0.5),
+                 intake.feedClosed()
+         ));
+      }
+
       if (Math.abs(g2.right_stick_y) > 0.01) {
          outtake.slidePIDEnabled = false;
          outtake.setSlidePower(-g2.right_stick_y);

@@ -18,6 +18,7 @@ public class Intake {
 
    final MotorWithVelocityPID intakeMotor;
    final Servo intakeWrist;
+   final Servo intakeFeed;
 
    final BeamBreakSensor backBeam;
    final BeamBreakSensor frontBeam;
@@ -32,18 +33,23 @@ public class Intake {
            // Use WRIST_DOWN to get 5
    };
 
+   public static double FEED_CLOSED = 0;
+   public static double FEED_OPEN = 1;
+
    public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00005, 0, 0);
 
    public Intake(HardwareMap hardwareMap) {
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
          this.intakeMotor.setMaxPower(1.0);
          this.intakeWrist = HardwareCreator.createServo(hardwareMap, "intakeWrist");
+         this.intakeFeed = HardwareCreator.createServo(hardwareMap, "intakeFeed");
          this.backBeam = new BeamBreakSensor(hardwareMap, "backBeam");
          this.frontBeam = new BeamBreakSensor(hardwareMap, "frontBeam");
    }
 
    public void initialize() {
       this.intakeWrist.setPosition(WRIST_STORED);
+      this.intakeFeed.setPosition(FEED_CLOSED);
    }
 
    public Action intakeOn() {
@@ -79,6 +85,14 @@ public class Intake {
 
    public Action wristStack(int numberIntaked) {
       return new ActionUtil.ServoPositionAction(intakeWrist, STACK_POSITIONS[numberIntaked]);
+   }
+
+   public Action feedClosed() {
+      return new ActionUtil.ServoPositionAction(intakeFeed, FEED_CLOSED);
+   }
+
+   public Action feedOpen() {
+      return new ActionUtil.ServoPositionAction(intakeWrist, FEED_OPEN);
    }
 
    public int pixelCount() {
