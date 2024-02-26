@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.RobotLog;
 
 /**
  * Class for our Blinkin LED strip
@@ -17,11 +18,19 @@ public class LED {
     BlinkinPattern pattern = null;
 
     public LED(HardwareMap hardwareMap) {
-        ledDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+        try {
+            ledDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+        } catch (IllegalArgumentException e) {
+            RobotLog.addGlobalWarningMessage("Failed to find Rev Blinkin Driver");
+            this.ledDriver = null;
+        }
         setPattern(BlinkinPattern.BLACK);
     }
 
     public void setPattern(BlinkinPattern pattern) {
+        if (this.ledDriver == null) {
+            return;
+        }
         if (pattern != this.pattern) ledDriver.setPattern(pattern);
         this.pattern = pattern;
     }

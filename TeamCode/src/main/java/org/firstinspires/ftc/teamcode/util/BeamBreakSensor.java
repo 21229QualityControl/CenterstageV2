@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class BeamBreakSensor {
     private DigitalChannel sensor;
 
-    public BeamBreakSensor(HardwareMap hardwareMap, String deviceName) {
-        sensor = hardwareMap.digitalChannel.get(deviceName);
+    public BeamBreakSensor(DigitalChannel channel) {
+        sensor = channel;
     }
 
     public boolean isBeamBroken() {

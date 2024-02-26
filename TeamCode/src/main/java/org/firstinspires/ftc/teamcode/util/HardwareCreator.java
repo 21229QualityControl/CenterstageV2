@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -11,6 +12,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.util.fakes.CRServoFake;
 import org.firstinspires.ftc.teamcode.util.fakes.DcMotorFake;
+import org.firstinspires.ftc.teamcode.util.fakes.DigitalChannelFake;
 import org.firstinspires.ftc.teamcode.util.fakes.ServoFake;
 
 
@@ -43,6 +45,16 @@ public class HardwareCreator {
         } catch (IllegalArgumentException e) { // Could not find device
             RobotLog.addGlobalWarningMessage("Failed to find DcMotorEx '%s'", deviceName);
             return new DcMotorFake();
+        }
+    }
+
+    public static DigitalChannel createDigitalChannel(HardwareMap hardwareMap, String deviceName) {
+        if (SIMULATE_HARDWARE) return new DigitalChannelFake();
+        try {
+            return hardwareMap.digitalChannel.get(deviceName);
+        } catch (IllegalArgumentException e) { // Could not find device
+            RobotLog.addGlobalWarningMessage("Failed to find DigitalChannel '%s'", deviceName);
+            return new DigitalChannelFake();
         }
     }
 

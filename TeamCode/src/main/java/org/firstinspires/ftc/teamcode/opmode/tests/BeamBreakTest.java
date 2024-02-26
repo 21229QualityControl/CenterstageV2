@@ -26,7 +26,7 @@ public class BeamBreakTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         waitForStart();
-        sensor = new BeamBreakSensor(hardwareMap, NAME);
+        sensor = new BeamBreakSensor(HardwareCreator.createDigitalChannel(hardwareMap, NAME));
         // Game loop
         while (!isStopRequested()) {
             telemetry.addData("Sensor", NAME);

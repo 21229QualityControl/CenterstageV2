@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.util.control.PIDFControllerKt.EPSILON;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -13,7 +16,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static int INTAKE_SPEED = 1600; // Max speed is 2400
+   public static int INTAKE_SPEED = 800; // Max speed is 2400
    public static int INTAKE_REVERSE_SPEED = -2400;
 
    final MotorWithVelocityPID intakeMotor;
@@ -23,28 +26,29 @@ public class Intake {
    final BeamBreakSensor backBeam;
    final BeamBreakSensor frontBeam;
 
-   public static double WRIST_STORED = 0;
-   public static double WRIST_DOWN = 1;
+   public static double WRIST_STORED = 0.34;
+   public static double WRIST_DOWN = 0.08;
    public static double[] STACK_POSITIONS = {
-           0, // Getting 1
-           0, // Getting 2
-           0, // Getting 3
-           0, // Getting 4
+           0.18, // Getting 1
+           0.16, // Getting 2
+           0.14, // Getting 3
+           0.1, // Getting 4
            // Use WRIST_DOWN to get 5
    };
 
-   public static double FEED_CLOSED = 0;
-   public static double FEED_OPEN = 1;
+   public static double FEED_CLOSED = 0.14;
+   public static double FEED_OPEN = 0.4;
 
    public static PIDCoefficients intakeMotorPid = new PIDCoefficients(0.00005, 0, 0);
 
    public Intake(HardwareMap hardwareMap) {
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
          this.intakeMotor.setMaxPower(1.0);
+         this.intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
          this.intakeWrist = HardwareCreator.createServo(hardwareMap, "intakeWrist");
          this.intakeFeed = HardwareCreator.createServo(hardwareMap, "intakeFeed");
-         this.backBeam = new BeamBreakSensor(hardwareMap, "backBeam");
-         this.frontBeam = new BeamBreakSensor(hardwareMap, "frontBeam");
+         this.backBeam = new BeamBreakSensor(HardwareCreator.createDigitalChannel(hardwareMap, "backBeam"));
+         this.frontBeam =new BeamBreakSensor(HardwareCreator.createDigitalChannel(hardwareMap, "frontBeam"));
    }
 
    public void initialize() {
@@ -78,6 +82,9 @@ public class Intake {
    public Action wristStored() {
       return new ActionUtil.ServoPositionAction(intakeWrist, WRIST_STORED);
    }
+   public boolean wristIsStored() {
+      return Math.abs(intakeWrist.getPosition() - WRIST_STORED) < EPSILON;
+   }
 
    public Action wristDown() {
       return new ActionUtil.ServoPositionAction(intakeWrist, WRIST_DOWN);
@@ -92,7 +99,7 @@ public class Intake {
    }
 
    public Action feedOpen() {
-      return new ActionUtil.ServoPositionAction(intakeWrist, FEED_OPEN);
+      return new ActionUtil.ServoPositionAction(intakeFeed, FEED_OPEN);
    }
 
    public int pixelCount() {

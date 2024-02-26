@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -12,7 +14,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystems.Hang;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
@@ -39,7 +40,6 @@ public class ManualDrive extends LinearOpMode {
    private ActionScheduler sched;
    private Intake intake;
    private Outtake outtake;
-   private Hang hang;
    private Plane plane;
    private LED led;
 
@@ -57,7 +57,6 @@ public class ManualDrive extends LinearOpMode {
       drive = new MecanumDrive(hardwareMap, Memory.LAST_POSE);
       intake = new Intake(hardwareMap);
       outtake = new Outtake(hardwareMap);
-      hang = new Hang(hardwareMap);
       plane = new Plane(hardwareMap);
       led = new LED(hardwareMap);
 
@@ -106,7 +105,6 @@ public class ManualDrive extends LinearOpMode {
          sched.update();
          outtake.update();
          intake.update();
-         hang.update();
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
          telemetry.addData("Pixel Count", intake.pixelCount());
@@ -148,16 +146,18 @@ public class ManualDrive extends LinearOpMode {
 
    public int INTAKE_STACK_POSITION = 0;
    private void intakeControls() {
-      if (intake.isIntaking() && intake.pixelCount() == 2) {
-         sched.queueAction(intake.intakeOn());
-      }
+      /*if (intake.isIntaking() && intake.pixelCount() == 2) {
+          sched.queueAction(intake.intakeOff()); TODO: Enable this
+      }*/
 
       // Intake controls
       if (g1.aOnce()) {
          if (intake.isIntaking()) {
             sched.queueAction(intake.intakeOff());
+            sched.queueAction(intake.wristStored());
          } else {
             sched.queueAction(intake.intakeOn());
+            sched.queueAction(intake.wristDown());
          }
       }
       if (g1.b()) {
@@ -171,18 +171,26 @@ public class ManualDrive extends LinearOpMode {
          if (INTAKE_STACK_POSITION < 0) {
             INTAKE_STACK_POSITION = 0;
             sched.queueAction(intake.wristStored());
+            sched.queueAction(intake.intakeOff());
          } else {
             sched.queueAction(intake.wristStack(INTAKE_STACK_POSITION));
          }
+         Log.d("STACKPOSITION", String.valueOf(INTAKE_STACK_POSITION));
       }
       if (g1.dpadDownOnce()) {
-         INTAKE_STACK_POSITION++;
+         if (intake.wristIsStored()) {
+            INTAKE_STACK_POSITION = 0; // Reset
+            sched.queueAction(intake.intakeOn());
+         } else {
+            INTAKE_STACK_POSITION++;
+         }
          if (INTAKE_STACK_POSITION > 3) {
             INTAKE_STACK_POSITION = 0;
-            sched.queueAction(intake.wristStored());
+            sched.queueAction(intake.wristDown());
          } else {
             sched.queueAction(intake.wristStack(INTAKE_STACK_POSITION));
          }
+         Log.d("STACKPOSITION", String.valueOf(INTAKE_STACK_POSITION));
       }
       if (g1.dpadLeftOnce()) {
          INTAKE_STACK_POSITION = 0;
@@ -197,10 +205,10 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(plane.scorePlane());
       }
       if (g1.startOnce()) {
-         if (hang.hangExtended()) {
-            sched.queueAction(hang.retractHang());
+         if (outtake.isSlideRetracted()) {
+            sched.queueAction(outtake.extendOuttakeHangBlocking());
          } else {
-            sched.queueAction(hang.extendHang());
+            sched.queueAction(outtake.retractOuttake());
          }
       }
    }

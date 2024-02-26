@@ -15,12 +15,13 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Outtake {
-   public static PIDCoefficients outtakePID = new PIDCoefficients(0.01, 0.0015, 0.0004);
+   public static PIDCoefficients outtakePID = new PIDCoefficients(0.007, 0.0015, 0.0002);
    public static int OUTTAKE_TELEOP = 0; // Changes throughout teleop
    public static int LAYER_HEIGHT = 100; // Height of a layer of pixels for the slide, used for teleop
    public static int OUTTAKE_CLOSE = 200; // For close side auto
    public static int OUTTAKE_PARTNER = 275; // For far side auto, start of TeleOp
    public static int OUTTAKE_CYCLE = 375; // For cycling during auto
+   public static int OUTTAKE_HANG = 500;
 
    public static double CLAW_OPEN = 0.74;
    public static double CLAW_CLOSED = 0.5;
@@ -51,7 +52,7 @@ public class Outtake {
       if (Memory.outtakeSlide != null) { // Preserve motor zero position
          this.slide = Memory.outtakeSlide;
       } else {
-         this.slide = new DualMotorWithPID(HardwareCreator.createMotor(hardwareMap, "outtakeSlideWithEncoder"), HardwareCreator.createMotor(hardwareMap, "secondOuttakeSlide"), outtakePID);
+         this.slide = new DualMotorWithPID(HardwareCreator.createMotor(hardwareMap, "outtakeSlideWithEncoder"), HardwareCreator.createMotor(hardwareMap, "secondaryOuttakeSlide"), outtakePID);
          Memory.outtakeSlide = this.slide;
       }
       this.slide.setMaxPower(1.0);
@@ -124,9 +125,18 @@ public class Outtake {
    public Action extendOuttakeTeleopBlocking() {
       return this.slide.setTargetPositionActionBlocking(OUTTAKE_TELEOP);
    }
+   public Action extendOuttakeHangBlocking() {
+      return this.slide.setTargetPositionActionBlocking(OUTTAKE_HANG);
+   }
+   public boolean isSlideRetracted() {
+      return this.slide.getTargetPosition() == 0;
+   }
 
    public Action retractOuttakeBlocking() {
       return this.slide.setTargetPositionActionBlocking(0);
+   }
+   public Action retractOuttake() {
+      return this.slide.setTargetPositionAction(0);
    }
 
    public Action clawOpen() { return new ActionUtil.ServoPositionAction(claw, CLAW_OPEN); }
