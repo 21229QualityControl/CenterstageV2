@@ -24,21 +24,21 @@ public class Outtake {
    public static int OUTTAKE_HANG = 575;
 
    public static double CLAW_OPEN = 0.74;
-   public static double CLAW_CLOSED = 0.5;
-   public static double CLAW_PRELOAD_CLOSED = 0.3;
+   public static double CLAW_CLOSED = 0.54;
+   public static double CLAW_PRELOAD_CLOSED = 0.47;
 
 
-   public static double ARM_LEFT_STORED = 1;
-   public static double ARM_LEFT_SCORING = 0;
-   public static double ARM_RIGHT_STORED = 1;
-   public static double ARM_RIGHT_SCORING = 0;
+   public static double ARM_LEFT_STORED = 0.47;
+   public static double ARM_LEFT_SCORING = 0.725;
+   public static double ARM_RIGHT_STORED; // the arm right servo is weird so I'm not using it for now
+   public static double ARM_RIGHT_SCORING;
 
 
-   public static double WRIST_VERTICAL = 0;
+   public static double WRIST_VERTICAL = 0.545;
    public static double WRIST_MOSAIC_LEFT = 0;
-   public static double WRIST_MOSAIC_RIGHT = 0;
-   public static double WRIST_LEFT = 0;
-   public static double WRIST_RIGHT = 0;
+   public static double WRIST_MOSAIC_RIGHT = 0.42;
+   public static double WRIST_LEFT = 0.88;
+   public static double WRIST_RIGHT = 0.2;
 
    public double mosaicPosition;
    final DualMotorWithPID slide;
