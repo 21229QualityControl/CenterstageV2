@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static int INTAKE_SPEED = 800; // Max speed is 2400
-   public static int INTAKE_REVERSE_SPEED = -2400;
+   public static int INTAKE_SPEED = -800; // Max speed is 2400
+   public static int INTAKE_REVERSE_SPEED = 2400;
 
    final MotorWithVelocityPID intakeMotor;
    final Servo intakeWrist;

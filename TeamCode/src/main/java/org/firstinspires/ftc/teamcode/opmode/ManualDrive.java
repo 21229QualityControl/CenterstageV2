@@ -274,10 +274,12 @@ public class ManualDrive extends LinearOpMode {
       }
       if (g2.bOnce()) {
          sched.queueAction(new SequentialAction(
+                 outtake.clawOpen(),
+                 new SleepAction(0.5),
                  outtake.armStored(),
+                 new SleepAction(0.5),
                  outtake.wristVertical(),
-                 outtake.retractOuttakeBlocking(),
-                 outtake.clawOpen()
+                 outtake.retractOuttakeBlocking()
          ));
       }
       if (g2.dpadUpOnce()) {

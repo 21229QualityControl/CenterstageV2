@@ -28,14 +28,14 @@ public class Outtake {
    public static double CLAW_PRELOAD_CLOSED = 0.47;
 
 
-   public static double ARM_LEFT_STORED = 0.47;
+   public static double ARM_LEFT_STORED = 0.46;
    public static double ARM_LEFT_SCORING = 0.725;
    public static double ARM_RIGHT_STORED; // the arm right servo is weird so I'm not using it for now
    public static double ARM_RIGHT_SCORING;
 
 
-   public static double WRIST_VERTICAL = 0.545;
-   public static double WRIST_MOSAIC_LEFT = 0;
+   public static double WRIST_VERTICAL = 0.56;
+   public static double WRIST_MOSAIC_LEFT = 0.64;
    public static double WRIST_MOSAIC_RIGHT = 0.42;
    public static double WRIST_LEFT = 0.88;
    public static double WRIST_RIGHT = 0.2;
@@ -78,13 +78,13 @@ public class Outtake {
       if (!Memory.FINISHED_AUTO && teleop) {
          this.slide.setTargetPosition(OUTTAKE_PARTNER);
          this.armLeft.setPosition(ARM_LEFT_SCORING);
-         this.armRight.setPosition(ARM_RIGHT_SCORING);
+//         this.armRight.setPosition(ARM_RIGHT_SCORING);
          this.claw.setPosition(CLAW_OPEN);
          Memory.FINISHED_AUTO = true;
       } else {
          this.slide.setTargetPosition(0);
          this.armLeft.setPosition(ARM_LEFT_STORED);
-         this.armRight.setPosition(ARM_RIGHT_STORED);
+//         this.armRight.setPosition(ARM_RIGHT_STORED);
       }
    }
 
@@ -175,15 +175,15 @@ public class Outtake {
 
    public Action armStored() {
       return new ParallelAction(
-              new ActionUtil.ServoPositionAction(armLeft, ARM_LEFT_STORED),
-              new ActionUtil.ServoPositionAction(armRight, ARM_RIGHT_STORED)
+              new ActionUtil.ServoPositionAction(armLeft, ARM_LEFT_STORED)
+//              new ActionUtil.ServoPositionAction(armRight, ARM_RIGHT_STORED)
       );
    }
 
    public Action armScoring() {
       return new ParallelAction(
-              new ActionUtil.ServoPositionAction(armLeft, ARM_LEFT_SCORING),
-              new ActionUtil.ServoPositionAction(armRight, ARM_RIGHT_SCORING)
+              new ActionUtil.ServoPositionAction(armLeft, ARM_LEFT_SCORING)
+//              new ActionUtil.ServoPositionAction(armRight, ARM_RIGHT_SCORING)
       );
    }
    public boolean isArmScoring() {
