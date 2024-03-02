@@ -64,7 +64,11 @@ public class ManualDrive extends LinearOpMode {
          smartGameTimer = new SmartGameTimer(true);
       } else { // No auto memory, pull in slides
          smartGameTimer = new SmartGameTimer(false);
-         outtake.prepTeleop();
+         outtake.prepInitializeSlides();
+         telemetry.addLine("Initializing slides...");
+         telemetry.update();
+         sleep(200);
+         while (opModeInInit() && outtake.initializeSlides()) {}
       }
       led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE);
 
@@ -78,11 +82,6 @@ public class ManualDrive extends LinearOpMode {
          resetRuntime();
          g1.reset();
          g2.reset();
-
-         // Finish pulling in slides
-         if (!smartGameTimer.isNominal()) {
-            outtake.finishPrepTeleop();
-         }
 
          // Init opmodes
          outtake.initialize(true);
@@ -165,6 +164,13 @@ public class ManualDrive extends LinearOpMode {
       }
       if (!g1.b() && intake.isReversing()) {
          sched.queueAction(intake.intakeOff());
+      }
+      if (g1.xOnce()) {
+         sched.queueAction(new SequentialAction(
+                 intake.feedOpen(),
+                 new SleepAction(0.5),
+                 intake.feedClosed()
+         ));
       }
       if (g1.dpadUpOnce()) {
          INTAKE_STACK_POSITION--;
@@ -257,14 +263,6 @@ public class ManualDrive extends LinearOpMode {
          }
       }
 
-      if (g2.aOnce()) {
-         sched.queueAction(new SequentialAction(
-                 intake.feedOpen(),
-                 new SleepAction(0.5),
-                 intake.feedClosed()
-         ));
-      }
-
       if (Math.abs(g2.right_stick_y) > 0.01) {
          outtake.slidePIDEnabled = false;
          outtake.setSlidePower(-g2.right_stick_y);
@@ -272,7 +270,7 @@ public class ManualDrive extends LinearOpMode {
          outtake.slidePIDEnabled = true;
          sched.queueAction(outtake.lockPosition());
       }
-      if (g2.bOnce()) {
+      if (g2.aOnce()) {
          sched.queueAction(new SequentialAction(
                  outtake.clawOpen(),
                  new SleepAction(0.5),
@@ -280,6 +278,16 @@ public class ManualDrive extends LinearOpMode {
                  new SleepAction(0.5),
                  outtake.wristVertical(),
                  outtake.retractOuttakeBlocking()
+         ));
+      }
+      if (g2.bOnce()) {
+         sched.queueAction(new SequentialAction(
+                 outtake.armStored(),
+                 outtake.wristVertical(),
+                 new SleepAction(0.3),
+                 outtake.retractOuttakeBlocking(),
+                 new SleepAction(0.1),
+                 outtake.clawOpen()
          ));
       }
       if (g2.dpadUpOnce()) {

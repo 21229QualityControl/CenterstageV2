@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.util.control.PIDFControllerKt.EPSILON;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -15,7 +17,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Outtake {
-   public static PIDCoefficients outtakePID = new PIDCoefficients(0.007, 0.0015, 0.0002);
+   public static PIDCoefficients outtakePID = new PIDCoefficients(0.007, 0.002, 0.0002);
    public static int OUTTAKE_TELEOP = 0; // Changes throughout teleop
    public static int LAYER_HEIGHT = 100; // Height of a layer of pixels for the slide, used for teleop
    public static int OUTTAKE_CLOSE = 200; // For close side auto
@@ -62,14 +64,6 @@ public class Outtake {
       this.armRight = HardwareCreator.createServo(hardwareMap, "outtakeArmRight");
    }
 
-   public void prepTeleop() {
-      this.slide.setPower(-0.3);
-   }
-
-   public void finishPrepTeleop() {
-      this.slide.setPower(0);
-   }
-
    public void initialize(boolean teleop) {
       this.slide.resetIntegralGain();
       OUTTAKE_TELEOP = OUTTAKE_PARTNER;
@@ -88,8 +82,18 @@ public class Outtake {
       }
    }
 
-   public void resetMotors() {
-      this.slide.setCurrentPosition(0);
+   public void prepInitializeSlides() {
+      this.slide.setPower(-0.3);
+   }
+
+   public boolean initializeSlides() {
+      if (Math.abs(this.slide.getVelocity()) < 5) {
+         this.slide.setPower(0);
+         this.slide.setCurrentPosition(-5);
+         this.slide.setTargetPosition(0);
+         return false;
+      }
+      return true;
    }
 
    public void update() {

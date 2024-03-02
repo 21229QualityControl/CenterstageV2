@@ -79,11 +79,15 @@ public abstract class AutoBase extends LinearOpMode {
         portal.setProcessorEnabled(aprilTagProcessor, false);
         portal.setProcessorEnabled(preloadProcessor, false);
 
-        outtake.resetMotors();
-
         outtake.initialize(false);
         plane.initialize();
         intake.initialize();
+
+        telemetry.addLine("Initializing outtake slides");
+        telemetry.update();
+        outtake.prepInitializeSlides();
+        sleep(200);
+        while (opModeInInit() && outtake.initializeSlides()) {}
 
         onInit();
 
