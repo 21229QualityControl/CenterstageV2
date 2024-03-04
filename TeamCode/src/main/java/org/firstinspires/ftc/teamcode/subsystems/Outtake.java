@@ -87,9 +87,10 @@ public class Outtake {
    }
 
    public boolean initializeSlides() {
-      if (Math.abs(this.slide.getVelocity()) < 5) {
+      Log.d("SLIDEVEL", String.valueOf(this.slide.getVelocity()));
+      if ((int)this.slide.getVelocity() == 0) {
          this.slide.setPower(0);
-         this.slide.setCurrentPosition(-5);
+         this.slide.setCurrentPosition(0);
          this.slide.setTargetPosition(0);
          return false;
       }

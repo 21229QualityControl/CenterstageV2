@@ -37,6 +37,7 @@ public class DualMotorWithPID {
 
         motorWithEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         secondMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        secondMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void setPower(double power) {

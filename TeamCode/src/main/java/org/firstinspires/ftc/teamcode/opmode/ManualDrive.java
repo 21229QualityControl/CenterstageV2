@@ -118,11 +118,6 @@ public class ManualDrive extends LinearOpMode {
    }
 
    private void move() {
-      if (g1.backOnce()) { // Reset field centric
-         drive.pose = new Pose2d(0, 0, Math.toRadians(180));
-         drive.imu.resetYaw();
-      }
-
       // Main driver controls
       double visionDist = 10000;
       double speed = Math.min(1, Math.max(0, ((visionDist - VISION_CLOSE_DIST) / VISION_RANGE))) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
@@ -274,16 +269,16 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(new SequentialAction(
                  outtake.clawOpen(),
                  new SleepAction(0.5),
+                 outtake.wristVertical(),
                  outtake.armStored(),
                  new SleepAction(0.5),
-                 outtake.wristVertical(),
                  outtake.retractOuttakeBlocking()
          ));
       }
       if (g2.bOnce()) {
          sched.queueAction(new SequentialAction(
-                 outtake.armStored(),
                  outtake.wristVertical(),
+                 outtake.armStored(),
                  new SleepAction(0.3),
                  outtake.retractOuttakeBlocking(),
                  new SleepAction(0.1),
