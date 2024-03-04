@@ -54,13 +54,13 @@ import java.util.List;
 public final class MecanumDrive {
     public static class Params {
         // drive model parameters
-        public double inPerTick = 24.0 / 44593.0;
-        public double lateralInPerTick = 0.0003894187147584737;
-        public double trackWidthTicks = 20418.477702556804;
+        public double inPerTick = 24.0 / 8033.0;
+        public double lateralInPerTick = 0.001872601954423625;
+        public double trackWidthTicks = 4555.32477379268;
 
         // feedforward parameters (in tick units)
-        public double kS = 0.1;
-        public double kV = 0.00007;
+        public double kS = 1.4569770152533916;
+        public double kV = 0.0004015312166964385;
         public double kA = 0.00003;
 
         // path profile parameters (in inches)
@@ -140,7 +140,7 @@ public final class MecanumDrive {
 
         imu = new LazyImu(hardwareMap, "imu", new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.DOWN));
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 //        imu = hardwareMap.get(BNO055IMU.class, "imuExpansionHub");
 //        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 //        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
