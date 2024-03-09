@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.util.control.PIDFControllerKt.EPSIL
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -17,34 +19,33 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static int INTAKE_SPEED = -800; // Max speed is 2400
-   public static int INTAKE_REVERSE_SPEED = 2400;
+   public static int INTAKE_SPEED = 800; // Max speed is 2400
+   public static int INTAKE_REVERSE_SPEED = -2400;
 
    final MotorWithVelocityPID intakeMotor;
    final Servo intakeWristLeft;
    final Servo intakeWristRight;
    final Servo intakeFeed;
 
-   final BeamBreakSensor backBeam;
-   final BeamBreakSensor frontBeam;
+   final BeamBreakSensor beamBreak;
 
    public static double WRIST_LEFT_STORED = 0.17;
-   public static double WRIST_LEFT_DOWN = 0.44;
+   public static double WRIST_LEFT_DOWN = 0.43;
    public static double[] WRIST_LEFT_STACK_POSITIONS = {
-           0.33, // Getting 1
-           0.36, // Getting 2
-           0.39, // Getting 3
-           0.42, // Getting 4
+           0.32, // Getting 1
+           0.35, // Getting 2
+           0.38, // Getting 3
+           0.41, // Getting 4
            // Use WRIST_DOWN to get 5
    };
 
    public static double WRIST_RIGHT_STORED = 0.34;
-   public static double WRIST_RIGHT_DOWN = 0.08;
+   public static double WRIST_RIGHT_DOWN = 0.09;
    public static double[] WRIST_RIGHT_STACK_POSITIONS = {
-           0.18, // Getting 1
-           0.16, // Getting 2
-           0.14, // Getting 3
-           0.1, // Getting 4
+           0.19, // Getting 1
+           0.17, // Getting 2
+           0.15, // Getting 3
+           0.11, // Getting 4
            // Use WRIST_DOWN to get 5
    };
 
@@ -56,12 +57,10 @@ public class Intake {
    public Intake(HardwareMap hardwareMap) {
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
          this.intakeMotor.setMaxPower(1.0);
-         this.intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
          this.intakeWristLeft = HardwareCreator.createServo(hardwareMap, "intakeWristLeft");
          this.intakeWristRight = HardwareCreator.createServo(hardwareMap, "intakeWristRight");
          this.intakeFeed = HardwareCreator.createServo(hardwareMap, "intakeFeed");
-         this.backBeam = new BeamBreakSensor(HardwareCreator.createDigitalChannel(hardwareMap, "backBeam"));
-         this.frontBeam =new BeamBreakSensor(HardwareCreator.createDigitalChannel(hardwareMap, "frontBeam"));
+         this.beamBreak = new BeamBreakSensor(HardwareCreator.createDigitalChannel(hardwareMap, "intakeBeam"));
    }
 
    public void initialize() {
@@ -78,6 +77,14 @@ public class Intake {
       return intakeMotor.setTargetVelocityAction(INTAKE_REVERSE_SPEED);
    }
 
+   public Action dropPreload() {
+      return new SequentialAction(
+              intakeMotor.setTargetVelocityAction(-200),
+              new SleepAction(0.5),
+              intakeMotor.setTargetVelocityAction(0)
+      );
+   }
+
    public boolean isIntaking() {
       return intakeMotor.getTargetVelocity() == INTAKE_SPEED;
    }
@@ -89,8 +96,18 @@ public class Intake {
       intakeMotor.resetIntegralGain();
       return intakeMotor.setTargetVelocityAction(0);
    }
+
+   boolean beamBreakPrev = false;
+   public int pixelCount = 0;
    public void update() {
       intakeMotor.update();
+      if (beamBreak.isBeamBroken() && !beamBreakPrev) {
+         beamBreakPrev = true;
+         pixelCount++;
+      }
+      if (beamBreakPrev && !beamBreak.isBeamBroken()) {
+         beamBreakPrev = false;
+      }
    }
 
    public Action wristStored() {
@@ -114,16 +131,5 @@ public class Intake {
 
    public Action feedOpen() {
       return new ActionUtil.ServoPositionAction(intakeFeed, FEED_OPEN);
-   }
-
-   public int pixelCount() {
-      int count = 0;
-      if (backBeam.isBeamBroken()) {
-         count++;
-      }
-      if (frontBeam.isBeamBroken()) {
-         count++;
-      }
-      return count;
    }
 }

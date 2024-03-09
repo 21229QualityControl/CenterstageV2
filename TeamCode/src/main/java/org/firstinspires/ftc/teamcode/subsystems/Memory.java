@@ -22,7 +22,6 @@ public class Memory {
     public static boolean RAN_AUTO = false;
     public static boolean FINISHED_AUTO = true;
     public static Pose2d LAST_POSE = new Pose2d(0, 0, 0);
-    public static DualMotorWithPID outtakeSlide;
 
     // For time persistence
     public static String SAVED_TIME_FILE_NAME = "AutoStartTime";

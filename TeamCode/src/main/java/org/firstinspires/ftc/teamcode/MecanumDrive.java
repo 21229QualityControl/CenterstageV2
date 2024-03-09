@@ -23,26 +23,17 @@ import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Twist2dDual;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
-import com.acmerobotics.roadrunner.ftc.Encoder;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.LynxFirmware;
-import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
-import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
-import com.acmerobotics.roadrunner.ftc.RawEncoder;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.acmerobotics.roadrunner.ftc.LazyImu;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.util.AxisDirection;
-import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 
 import java.lang.Math;
@@ -61,10 +52,10 @@ public final class MecanumDrive {
         // feedforward parameters (in tick units)
         public double kS = 1.4569770152533916;
         public double kV = 0.0004015312166964385;
-        public double kA = 0.00003;
+        public double kA = 0.0001;
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 50;
+        public double defaultWheelVel = 80;
         public double minProfileAccel = -30;
         public double maxProfileAccel = 50;
 
@@ -90,20 +81,10 @@ public final class MecanumDrive {
     public final TurnConstraints defaultTurnConstraints = new TurnConstraints(
             PARAMS.maxAngVel, -PARAMS.maxAngAccel, PARAMS.maxAngAccel);
     public final VelConstraint defaultVelConstraint = new MinVelConstraint(Arrays.asList(
-            kinematics.new WheelVelConstraint(PARAMS.maxWheelVel),
-            new AngularVelConstraint(PARAMS.maxAngVel)));
-    public final VelConstraint speedVelConstraint = new MinVelConstraint(Arrays.asList(
-            kinematics.new WheelVelConstraint(PARAMS.maxWheelVel * 2),
+            kinematics.new WheelVelConstraint(PARAMS.defaultWheelVel),
             new AngularVelConstraint(PARAMS.maxAngVel)));
     public final AccelConstraint defaultAccelConstraint = new ProfileAccelConstraint(PARAMS.minProfileAccel,
             PARAMS.maxProfileAccel);
-    public final VelConstraint slowVelConstraint = new MinVelConstraint(Arrays.asList(
-            kinematics.new WheelVelConstraint(PARAMS.maxWheelVel/3),
-            new AngularVelConstraint(PARAMS.maxAngVel)));
-    public final AccelConstraint slowAccelConstraint = new ProfileAccelConstraint(PARAMS.minProfileAccel/2,
-            PARAMS.maxProfileAccel/2);
-    public final AccelConstraint speedAccelConstraint = new ProfileAccelConstraint(PARAMS.minProfileAccel,
-            PARAMS.maxProfileAccel*1.5);
 
     public final DcMotorEx leftFront, leftBack, rightBack, rightFront;
 
@@ -149,7 +130,7 @@ public final class MecanumDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick);
+        localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick, imu.get());
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }

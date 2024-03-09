@@ -50,13 +50,15 @@ public class Outtake {
    final Servo armLeft;
    final Servo armRight;
 
-   public Outtake(HardwareMap hardwareMap) {
-      if (Memory.outtakeSlide != null) { // Preserve motor zero position
-         this.slide = Memory.outtakeSlide;
-      } else {
-         this.slide = new DualMotorWithPID(HardwareCreator.createMotor(hardwareMap, "outtakeSlideWithEncoder"), HardwareCreator.createMotor(hardwareMap, "secondaryOuttakeSlide"), outtakePID);
-         Memory.outtakeSlide = this.slide;
+   public double outtakeFF(double target, double measured, double vel) {
+      if ((target + slide.internalOffset) == 0 && (measured + slide.internalOffset) > 5 && Math.abs(this.slide.getVelocity()) < 5) {
+         return -0.5;
       }
+      return 0;
+   }
+
+   public Outtake(HardwareMap hardwareMap) {
+      this.slide = new DualMotorWithPID(HardwareCreator.createMotor(hardwareMap, "outtakeSlideWithEncoder"), HardwareCreator.createMotor(hardwareMap, "secondaryOuttakeSlide"), outtakePID, this::outtakeFF);
       this.slide.setMaxPower(1.0);
       this.claw = HardwareCreator.createServo(hardwareMap, "outtakeClaw");
       this.wrist = HardwareCreator.createServo(hardwareMap, "outtakeWrist");
@@ -87,7 +89,6 @@ public class Outtake {
    }
 
    public boolean initializeSlides() {
-      Log.d("SLIDEVEL", String.valueOf(this.slide.getVelocity()));
       if ((int)this.slide.getVelocity() == 0) {
          this.slide.setPower(0);
          this.slide.setCurrentPosition(0);

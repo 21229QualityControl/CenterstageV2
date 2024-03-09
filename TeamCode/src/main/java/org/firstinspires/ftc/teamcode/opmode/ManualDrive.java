@@ -106,7 +106,7 @@ public class ManualDrive extends LinearOpMode {
          intake.update();
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
-         telemetry.addData("Pixel Count", intake.pixelCount());
+         telemetry.addData("Pixel Count", intake.pixelCount);
          telemetry.update();
 
          telemetry.update();
@@ -309,7 +309,7 @@ public class ManualDrive extends LinearOpMode {
    boolean warning2 = false;
    boolean warning3 = false;
    private void ledUpdate() {
-      int pixelCount = intake.pixelCount();
+      int pixelCount = intake.pixelCount;
       if (pixelCount == 1) {
          led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
       } else if (pixelCount == 2) {
