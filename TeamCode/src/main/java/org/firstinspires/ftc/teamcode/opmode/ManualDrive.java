@@ -220,7 +220,7 @@ public class ManualDrive extends LinearOpMode {
          if (!outtake.isArmScoring()) {
             sched.queueAction(intake.intakeOff());
             sched.queueAction(new SequentialAction(
-                    outtake.clawClosed(),
+                    intake.pixelCount == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
                     new SleepAction(0.3)
            ));
             sched.queueAction(new ParallelAction(
@@ -233,7 +233,10 @@ public class ManualDrive extends LinearOpMode {
       if (g2.xOnce()) {
          if (!outtake.isArmScoring()) {
             sched.queueAction(intake.intakeOff());
-            sched.queueAction(new SequentialAction(outtake.clawClosed(), new SleepAction(0.3)));
+            sched.queueAction(new SequentialAction(
+                    intake.pixelCount == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
+                    new SleepAction(0.3)
+            ));
             sched.queueAction(new ParallelAction(
                     new SequentialAction(new SleepAction(0.4), outtake.armScoring()),
                     outtake.extendOuttakeTeleopBlocking()

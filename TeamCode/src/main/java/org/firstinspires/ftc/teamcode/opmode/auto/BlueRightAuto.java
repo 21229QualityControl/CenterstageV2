@@ -50,7 +50,7 @@ public class BlueRightAuto extends AutoBase {
         sched.addAction(new SleepAction(0.5));
         sched.addAction(
                 drive.actionBuilder(getStartPose())
-                        .strafeTo(spike[SPIKE].position)
+                        .strafeToLinearHeading(spike[SPIKE].position, spike[SPIKE].heading)
                         .build()
         );
         sched.addAction(intake.wristStored());
@@ -72,7 +72,7 @@ public class BlueRightAuto extends AutoBase {
         sched.addAction(
                 drive.actionBuilder(stack)
                         .splineToConstantHeading(intermediate.position, intermediate.heading)
-                        .afterDisp(0, outtake.clawSingleClosed())
+                        .afterDisp(0, outtake.clawClosed())
                         .splineToConstantHeading(pastTruss.position, pastTruss.heading)
                         .afterDisp(0, new SequentialAction(
                                 outtake.extendOuttakePartnerBlocking(),
