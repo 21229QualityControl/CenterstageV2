@@ -2,7 +2,10 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.util.control.PIDFControllerKt.EPSILON;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -77,14 +80,6 @@ public class Intake {
       return intakeMotor.setTargetVelocityAction(INTAKE_REVERSE_SPEED);
    }
 
-   public Action dropPreload() {
-      return new SequentialAction(
-              intakeMotor.setTargetVelocityAction(-200),
-              new SleepAction(0.5),
-              intakeMotor.setTargetVelocityAction(0)
-      );
-   }
-
    public boolean isIntaking() {
       return intakeMotor.getTargetVelocity() == INTAKE_SPEED;
    }
@@ -125,11 +120,40 @@ public class Intake {
       return new ParallelAction(new ActionUtil.ServoPositionAction(intakeWristLeft, WRIST_LEFT_STACK_POSITIONS[numberIntaked]), new ActionUtil.ServoPositionAction(intakeWristRight, WRIST_RIGHT_STACK_POSITIONS[numberIntaked]));
    }
 
+   private void wristStackInstant(int numberIntaked) {
+      intakeWristLeft.setPosition(WRIST_LEFT_STACK_POSITIONS[numberIntaked]);
+      intakeWristRight.setPosition(WRIST_RIGHT_STACK_POSITIONS[numberIntaked]);
+   }
+
    public Action feedClosed() {
       return new ActionUtil.ServoPositionAction(intakeFeed, FEED_CLOSED);
    }
 
    public Action feedOpen() {
       return new ActionUtil.ServoPositionAction(intakeFeed, FEED_OPEN);
+   }
+
+   int numIntaked = 0;
+   public Action intakeCount(boolean start) {
+      if (start) {
+         numIntaked = 0;
+      }
+      return new SequentialAction(
+              intakeOn(),
+              new IntakeCountAction(),
+              intakeOff()
+      );
+   }
+   private class IntakeCountAction implements Action {
+      private long waitUntil;
+      @Override
+      public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+         if (pixelCount < 2 && System.currentTimeMillis() >= waitUntil) {
+            wristStackInstant(numIntaked);
+            numIntaked++;
+            this.waitUntil = System.currentTimeMillis() + 500;
+         }
+         return pixelCount != 2;
+      }
    }
 }

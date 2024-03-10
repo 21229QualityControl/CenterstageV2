@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.util.control.PIDFControllerKt.EPSILON;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -27,7 +25,7 @@ public class Outtake {
 
    public static double CLAW_OPEN = 0.74;
    public static double CLAW_CLOSED = 0.54;
-   public static double CLAW_PRELOAD_CLOSED = 0.47;
+   public static double CLAW_SINGLE_CLOSED = 0.47;
 
 
    public static double ARM_LEFT_STORED = 0.46;
@@ -152,7 +150,7 @@ public class Outtake {
    }
 
    public Action clawSingleClosed() {
-      return new ActionUtil.ServoPositionAction(claw, CLAW_PRELOAD_CLOSED);
+      return new ActionUtil.ServoPositionAction(claw, CLAW_SINGLE_CLOSED);
    }
 
    public Action wristMosaic(boolean left) {

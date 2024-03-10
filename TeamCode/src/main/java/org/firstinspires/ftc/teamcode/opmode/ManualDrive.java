@@ -266,6 +266,7 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(outtake.lockPosition());
       }
       if (g2.aOnce()) {
+         intake.pixelCount = 0;
          sched.queueAction(new SequentialAction(
                  outtake.clawOpen(),
                  new SleepAction(0.5),
