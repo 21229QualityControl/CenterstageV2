@@ -23,8 +23,8 @@ public class Outtake {
    public static int OUTTAKE_CYCLE = 375; // For cycling during auto
    public static int OUTTAKE_HANG = 575;
 
-   public static double CLAW_OPEN = 0.74;
-   public static double CLAW_CLOSED = 0.54;
+   public static double CLAW_OPEN = 0.77;
+   public static double CLAW_CLOSED = 0.53;
    public static double CLAW_SINGLE_CLOSED = 0.47;
 
 
