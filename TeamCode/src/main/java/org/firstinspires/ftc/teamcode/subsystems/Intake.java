@@ -11,9 +11,12 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.BeamBreakSensor;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
@@ -31,6 +34,8 @@ public class Intake {
    final Servo intakeFeed;
 
    final BeamBreakSensor beamBreak;
+   private DistanceSensor distanceSensor1;
+   private DistanceSensor distanceSensor2;
 
    public static double WRIST_LEFT_STORED = 0.17;
    public static double WRIST_LEFT_DOWN = 0.43;
@@ -64,12 +69,25 @@ public class Intake {
          this.intakeWristRight = HardwareCreator.createServo(hardwareMap, "intakeWristRight");
          this.intakeFeed = HardwareCreator.createServo(hardwareMap, "intakeFeed");
          this.beamBreak = new BeamBreakSensor(HardwareCreator.createDigitalChannel(hardwareMap, "intakeBeam"));
+         this.distanceSensor1 = hardwareMap.get(DistanceSensor.class, "distanceSensor");
    }
 
    public void initialize() {
       this.intakeWristLeft.setPosition(WRIST_LEFT_STORED);
       this.intakeWristRight.setPosition(WRIST_RIGHT_STORED);
       this.intakeFeed.setPosition(FEED_CLOSED);
+   }
+
+   public boolean isIntakeNearWall() {
+      return distanceSensor1.getDistance(DistanceUnit.INCH) < 36;
+   }
+
+   public boolean willIntakeHitWall() {
+      return distanceSensor1.getDistance(DistanceUnit.MM) < 150;
+   }
+
+   public double getDistance() {
+      return distanceSensor1.getDistance(DistanceUnit.MM);
    }
 
    public Action intakeOn() {

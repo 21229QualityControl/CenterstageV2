@@ -12,6 +12,8 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
@@ -121,8 +123,38 @@ public class ManualDrive extends LinearOpMode {
       // Main driver controls
       double visionDist = 10000;
       double speed = Math.min(1, Math.max(0, ((visionDist - VISION_CLOSE_DIST) / VISION_RANGE))) * (DRIVE_SPEED - SLOW_DRIVE_SPEED) + SLOW_DRIVE_SPEED;
-      double input_x = Math.pow(-g1.left_stick_y, 3) * speed;
-      double input_y = Math.pow(-g1.left_stick_x, 3) * speed;
+
+      //ATTEMPT 1
+      //      double input_x = Math.pow(-g1.left_stick_y * (intake.isIntakeNearWall() ? SLOW_DRIVE_SPEED: 1),
+//              3) * speed;
+//      double input_y = Math.pow(-g1.left_stick_x * (intake.isIntakeNearWall() ? SLOW_DRIVE_SPEED: 1),
+//              3) * speed;
+
+      //ATTEMPT 2
+//      double input_x = Math.pow(-g1.left_stick_y * (intake.isIntakeNearWall() ? Range.clip((intake.getDistance()-200)/500, 0.15, 0.5) : 1), 3) * speed;
+//      input_x = (input_x >= 0) ? Range.clip(input_x,(input_x/Math.abs(input_x))*0.15,(input_x/Math.abs(input_x))*0.5): input_x;
+//      double input_y = Math.pow(-g1.left_stick_x * (intake.isIntakeNearWall() ? Range.clip((intake.getDistance()-200)/500, 0.15, 0.5) : 1), 3) * speed;
+//      input_y = (input_y >= 0) ? Range.clip(input_y,(input_y/Math.abs(input_y))*0.15,(input_y/Math.abs(input_y))*0.5): input_y;
+
+      double input_x;
+      double input_y;
+      if (-g1.left_stick_y > 0) {
+         input_x = Math.pow(-g1.left_stick_y * (intake.isIntakeNearWall() ? Range.clip((intake.getDistance()-200)/800, 0.4, 0.8) : 1), 3) * speed;
+         input_x = Range.clip(input_x, 0.15, 1);
+         if (intake.willIntakeHitWall()) {
+            input_x = 0;
+         }
+      }
+      else {
+         input_x = Math.pow(-g1.left_stick_y, 3) * speed;
+      }
+
+      input_y = Math.pow(-g1.left_stick_x, 3) * speed;
+
+      telemetry.addData("Distance From Wall:", intake.getDistance());
+      telemetry.addData("Speed X:", input_x);
+      telemetry.addData("Speed Y:", input_y);
+      telemetry.addData("Speed Variable:", speed);
       Vector2d input = new Vector2d(input_x, input_y);
       //input = drive.pose.heading.inverse().times(input); // Field centric
 
