@@ -17,11 +17,12 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 public class Outtake {
    public static PIDCoefficients outtakePID = new PIDCoefficients(0.007, 0.002, 0.0002);
    public static int OUTTAKE_TELEOP = 0; // Changes throughout teleop
-   public static int LAYER_HEIGHT = 100; // Height of a layer of pixels for the slide, used for teleop
-   public static int OUTTAKE_CLOSE = 200; // For close side auto
-   public static int OUTTAKE_PARTNER = 275; // For far side auto, start of TeleOp
-   public static int OUTTAKE_CYCLE = 375; // For cycling during auto
-   public static int OUTTAKE_HANG = 575;
+   public static int LAYER_HEIGHT = 200; // Height of a layer of pixels for the slide, used for teleop
+   public static int OUTTAKE_CLOSE = 400; // For close side auto
+   public static int OUTTAKE_PARTNER = 550; // For far side auto, start of TeleOp
+   public static int OUTTAKE_CYCLE = 750; // For cycling during auto
+   public static int OUTTAKE_HANG = 1500;
+   public static int OUTTAKE_HANG_VELOCITY = 100;
 
    public static double CLAW_OPEN = 0.77;
    public static double CLAW_CLOSED = 0.53;

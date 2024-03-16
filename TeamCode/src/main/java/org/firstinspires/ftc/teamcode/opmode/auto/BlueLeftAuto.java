@@ -7,16 +7,18 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
+@Autonomous(name = "Blue Left Auto", group = "Auto")
 public class BlueLeftAuto extends AutoBase {
     public static Pose2d start = new Pose2d(12, 63, Math.toRadians(-90));
     public static Pose2d[] spike = {
-            new Pose2d(7, 36, Math.toRadians(180)),
-            new Pose2d(16, 32, Math.toRadians(180)),
-            new Pose2d(24, 42, Math.toRadians(180))
+            new Pose2d(7, 46, Math.toRadians(180)),
+            new Pose2d(16, 42, Math.toRadians(180)),
+            new Pose2d(24, 52, Math.toRadians(180))
     };
     public static Pose2d intermediate = new Pose2d(36, 10, Math.toRadians(180));
     public static Pose2d pastTruss = new Pose2d(-36, 10, Math.toRadians(180));

@@ -138,23 +138,18 @@ public class ManualDrive extends LinearOpMode {
 
       double input_x;
       double input_y;
-      if (-g1.left_stick_y > 0) {
+      if (-g1.left_stick_y > 0 && intake.isIntaking()) {
          input_x = Math.pow(-g1.left_stick_y * (intake.isIntakeNearWall() ? Range.clip((intake.getDistance()-200)/800, 0.4, 0.8) : 1), 3) * speed;
          input_x = Range.clip(input_x, 0.15, 1);
          if (intake.willIntakeHitWall()) {
             input_x = 0;
          }
-      }
-      else {
+      } else {
          input_x = Math.pow(-g1.left_stick_y, 3) * speed;
       }
 
       input_y = Math.pow(-g1.left_stick_x, 3) * speed;
 
-      telemetry.addData("Distance From Wall:", intake.getDistance());
-      telemetry.addData("Speed X:", input_x);
-      telemetry.addData("Speed Y:", input_y);
-      telemetry.addData("Speed Variable:", speed);
       Vector2d input = new Vector2d(input_x, input_y);
       //input = drive.pose.heading.inverse().times(input); // Field centric
 

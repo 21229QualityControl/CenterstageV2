@@ -98,7 +98,7 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
                 int perpPosDelta = perpPosVel.position - lastPerpPos;
                 double headingDelta = heading.minus(lastHeading);
                 lastHeading = heading;
-                if (Math.abs(headingVel) < Math.toRadians(5)) { // Use dead wheels when heading change low low
+                if (Math.abs(headingVel) < Math.toRadians(0)) { // Use dead wheels when heading change low low
                         headingDelta = (par0PosDelta - par1PosDelta) / (PARAMS.par0YTicks - PARAMS.par1YTicks);
                         headingVel =  (par0PosVel.velocity - par1PosVel.velocity) / (PARAMS.par0YTicks - PARAMS.par1YTicks);
                 }

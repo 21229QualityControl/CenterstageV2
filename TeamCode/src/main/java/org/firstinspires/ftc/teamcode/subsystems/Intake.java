@@ -114,13 +114,28 @@ public class Intake {
    public int pixelCount = 0;
    public void update() {
       intakeMotor.update();
+      if (pixelCount == 1 && beamBreak.isBeamBroken()) {
+         pixelCount = 2;
+         return;
+      }
+      if (pixelCount == 2) {
+         return;
+      }
+
       if (beamBreak.isBeamBroken() && !beamBreakPrev) {
          beamBreakPrev = true;
-         pixelCount++;
       }
       if (beamBreakPrev && !beamBreak.isBeamBroken()) {
          beamBreakPrev = false;
+         pixelCount++;
       }
+   }
+
+   public Action setPixelCount(int count) {
+      return new ActionUtil.RunnableAction(() -> {
+         pixelCount = count;
+         return false;
+      });
    }
 
    public Action wristStored() {
@@ -156,10 +171,15 @@ public class Intake {
       if (start) {
          numIntaked = 0;
       }
+      if (numIntaked >= WRIST_LEFT_STACK_POSITIONS.length) {
+         numIntaked = 0;
+      }
       return new SequentialAction(
               intakeOn(),
+              wristStack(numIntaked),
               new IntakeCountAction(),
-              intakeOff()
+              intakeOff(),
+              wristStored()
       );
    }
    private class IntakeCountAction implements Action {
@@ -169,6 +189,9 @@ public class Intake {
          if (pixelCount < 2 && System.currentTimeMillis() >= waitUntil) {
             wristStackInstant(numIntaked);
             numIntaked++;
+            if (numIntaked >= (WRIST_LEFT_STACK_POSITIONS.length-1)) {
+               return false;
+            }
             this.waitUntil = System.currentTimeMillis() + 500;
          }
          return pixelCount != 2;
