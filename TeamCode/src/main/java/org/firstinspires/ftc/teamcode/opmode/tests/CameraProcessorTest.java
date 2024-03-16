@@ -16,7 +16,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 @Autonomous(name = "CameraProcessorTest", group = "Test")
 // This uses the CameraProcessor
 public class CameraProcessorTest extends LinearOpMode {
-    public CameraUtil.DebugMode debugMode = CameraUtil.DebugMode.DriverStation;
+    public CameraUtil.DebugMode debugMode = CameraUtil.DebugMode.Dashboard;
     public void runOpMode() throws InterruptedException {
         if (debugMode == CameraUtil.DebugMode.Dashboard) {
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
