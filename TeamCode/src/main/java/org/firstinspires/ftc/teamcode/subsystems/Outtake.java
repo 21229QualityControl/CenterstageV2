@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 public class Outtake {
    public static PIDCoefficients outtakePID = new PIDCoefficients(0.007, 0.002, 0.0002);
    public static int OUTTAKE_TELEOP = 0; // Changes throughout teleop
+   public static int OUTTAKE_BARELY_RAISED = 7; // Raises just enough to grab 1 pixel
    public static int LAYER_HEIGHT = 200; // Height of a layer of pixels for the slide, used for teleop
    public static int OUTTAKE_CLOSE = 400; // For close side auto
    public static int OUTTAKE_PARTNER = 550; // For far side auto, start of TeleOp
@@ -113,6 +114,10 @@ public class Outtake {
    public Action increaseSlideLayer(int cnt) {
       OUTTAKE_TELEOP += LAYER_HEIGHT * cnt;
       return this.slide.setTargetPositionAction(OUTTAKE_TELEOP);
+   }
+
+   public Action extendOuttakeBarelyOut() {
+      return this.slide.setTargetPositionActionBlocking(OUTTAKE_BARELY_RAISED);
    }
 
    public Action extendOuttakeCloseBlocking() {

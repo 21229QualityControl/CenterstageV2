@@ -26,16 +26,16 @@ import java.util.concurrent.atomic.AtomicReference;
 @Config
 public class CameraProcessor implements VisionProcessor, CameraStreamSource {
     // State the dimensions of the rectangles for the 3 locations of the team prop.
-    public static Rect leftRect = new Rect(1150, 250, 300 , 250);
-    public static Rect centerRect = new Rect(800, 350, 300, 210);
-    public static Rect rightRect = new Rect(400, 250, 350, 280);
+    public static Rect leftRect = new Rect(400, 800, 350 , 280);
+    public static Rect centerRect = new Rect(800, 700, 300, 210);
+    public static Rect rightRect = new Rect(1150, 800, 300, 250);
     public int position = -1;
     private double satRectLeft;
     private double satRectCenter;
     private double satRectRight;
     Mat hsvMat = new Mat();
 
-    private CameraUtil.DebugMode debugMode = CameraUtil.DebugMode.None;
+    private CameraUtil.DebugMode debugMode = CameraUtil.DebugMode.Dashboard;
 
     /* Create an AtomicReference that holds a Bitmap that is called "lastFrame" and give it some random dimensions.
      * The "AtomicReference" means that it is thread safe.
@@ -55,7 +55,7 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
     };
 
     public Object processFrame(Mat frame, long captureTimeNanos) {
-        if (debugMode == CameraUtil.DebugMode.DriverStation) {
+        if (debugMode == CameraUtil.DebugMode.Dashboard) {
             saveDebugMat(frame);
         }
 
@@ -140,7 +140,6 @@ public class CameraProcessor implements VisionProcessor, CameraStreamSource {
         Utils.matToBitmap(frame, b);
         // Set the "lastFrame" to the Bitmap "b." So that AtomicReference container ACTUALLY holds the Bitmap.
         lastFrame.set(b);
-
         // Make a color "green."
         Scalar green = new Scalar(0, 255, 0);
         // Clone the Matrix. The original matrix is for the processing purposes and the cloned matrix is for the display purposes.

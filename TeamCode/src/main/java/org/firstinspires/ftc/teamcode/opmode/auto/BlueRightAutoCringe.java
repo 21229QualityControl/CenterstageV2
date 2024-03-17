@@ -96,6 +96,8 @@ public class BlueRightAutoCringe extends AutoBase {
                             this.portal.resumeStreaming();
                             return false;
                         }),
+                        outtake.extendOuttakeBarelyOut(),
+                        new SleepAction(0.5),
                         outtake.clawSingleClosed(),
                         new SleepAction(0.6)
                 )
