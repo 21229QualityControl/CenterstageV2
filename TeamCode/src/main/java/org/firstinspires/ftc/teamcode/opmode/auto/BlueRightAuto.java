@@ -18,13 +18,13 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 public class BlueRightAuto extends AutoBase {
     public static Pose2d start = new Pose2d(-36, 64, Math.toRadians(-90));
     public static Pose2d[] spike = {
-            new Pose2d(-48, 38, Math.toRadians(-90)),
-            new Pose2d(-36, 38, Math.toRadians(-90)),
-            new Pose2d(-31, 48, Math.toRadians(0))};
-    public static Pose2d intermediate = new Pose2d(-36, 56, Math.toRadians(180));
-    public static Pose2d pastTruss = new Pose2d(24, 56, Math.toRadians(180));
+            new Pose2d(-48, 40, Math.toRadians(-90)),
+            new Pose2d(-36, 40, Math.toRadians(-90)),
+            new Pose2d(-35, 40, Math.toRadians(0))};
+    public static Pose2d intermediate = new Pose2d(-36, 58, Math.toRadians(180));
+    public static Pose2d pastTruss = new Pose2d(24, 58, Math.toRadians(180));
     public static Pose2d stack = new Pose2d(-58, 36, Math.toRadians(180));
-    public static Pose2d corner = new Pose2d(50, 56, Math.toRadians(180));
+    public static Pose2d corner = new Pose2d(50, 58, Math.toRadians(180));
 
     @Override
     protected Pose2d getStartPose() {
@@ -38,7 +38,7 @@ public class BlueRightAuto extends AutoBase {
 
     @Override
     protected void onRun() {
-        SPIKE = 1;
+        SPIKE = 2;
 
         firstCycle();
 
@@ -52,11 +52,11 @@ public class BlueRightAuto extends AutoBase {
     private void firstCycle() {
         // Deliver spike
         sched.addAction(intake.setPixelCount(1));
-        sched.addAction(intake.wristDown());
+        sched.addAction(intake.wristPreload());
         sched.addAction(new SleepAction(0.5));
         sched.addAction(
                 drive.actionBuilder(getStartPose())
-                        .strafeToLinearHeading(spike[SPIKE].position, spike[SPIKE].heading)
+                        .strafeToLinearHeading(spike[SPIKE].position.plus(new Vector2d(0, -4)), spike[SPIKE].heading) // It doesn't go far enough? Perhaps roadrunner needs to be tuned better
                         .build()
         );
         sched.addAction(intake.wristStored());
@@ -67,21 +67,21 @@ public class BlueRightAuto extends AutoBase {
         sched.addAction(
                 drive.actionBuilder(spike[SPIKE])
                         .splineToLinearHeading(new Pose2d(-36, 48, Math.toRadians(180)), intermediate.heading)
-                        .afterDisp(0, intake.intakeOn())
-                        .splineToConstantHeading(stack.position, stack.heading)
+                        .afterDisp(0, intake.prepIntakeCount(true))
+                        .splineToSplineHeading(stack, stack.heading)
                         .build()
         );
-        sched.addAction(intake.intakeCount(true));
+        sched.addAction(intake.intakeCount());
         sched.run();
 
         // Drive to preload
         sched.addAction(
                 drive.actionBuilder(stack)
-                        .splineToConstantHeading(intermediate.position, intermediate.heading)
+                        .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI)
                         .afterDisp(0, outtake.clawClosed())
-                        .setTangent(pastTruss.heading)
-                        .splineToConstantHeading(pastTruss.position, pastTruss.heading)
-                        .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
+                        .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
+                        .afterDisp(0, intake.intakeOff())
+                        .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading.toDouble() - Math.PI)
                         .afterDisp(0, new SequentialAction(
                                 outtake.extendOuttakePartnerBlocking(),
                                 outtake.armScoring(),
@@ -96,9 +96,9 @@ public class BlueRightAuto extends AutoBase {
             this.preloadProcessor.updateTarget(SPIKE, false);
             this.preloadProcessor.detecting = false;
             // TODO: Use back camera
-            this.portal.setProcessorEnabled(this.aprilTagProcessor, true);
-            this.portal.setProcessorEnabled(this.preloadProcessor, true);
-            this.portal.resumeStreaming();
+            this.preloadPortal.setProcessorEnabled(this.aprilTagProcessor, true);
+            this.preloadPortal.setProcessorEnabled(this.preloadProcessor, true);
+            this.preloadPortal.resumeStreaming();
             this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_LAVA_PALETTE);
             return false;
         }));
@@ -146,11 +146,11 @@ public class BlueRightAuto extends AutoBase {
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading)
                 .afterDisp(0, intake.feedClosed())
                 .splineToConstantHeading(intermediate.position, intermediate.heading)
-                .afterDisp(0, intake.intakeOn())
+                .afterDisp(0, intake.prepIntakeCount(false))
                 .splineToConstantHeading(stack.position, stack.heading)
                 .build()
         );
-        sched.addAction(intake.intakeCount(false));
+        sched.addAction(intake.intakeCount());
         sched.run();
 
         // Update for future cycles
@@ -160,12 +160,13 @@ public class BlueRightAuto extends AutoBase {
     }
 
     private void cycle() {
+        sched.addAction(intake.intakeOff());
         // Drive to corner & open feed
         sched.addAction(drive.actionBuilder(stack)
                 .setReversed(true)
-                .splineToConstantHeading(intermediate.position, intermediate.heading)
-                .splineToConstantHeading(pastTruss.position, pastTruss.heading)
-                .splineToConstantHeading(corner.position, corner.heading)
+                .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI)
+                .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
+                .splineToConstantHeading(corner.position, corner.heading.toDouble() - Math.PI)
                 .build()
         );
         sched.addAction(new SequentialAction(

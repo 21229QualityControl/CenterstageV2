@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.util.control.PIDFControllerKt.EPSILON;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -10,6 +12,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -25,7 +28,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 
 @Config
 public class Intake {
-   public static int INTAKE_SPEED = 800; // Max speed is 2400
+   public static int INTAKE_SPEED = 600; // Max speed is 2400
    public static int INTAKE_REVERSE_SPEED = -2400;
 
    final MotorWithVelocityPID intakeMotor;
@@ -39,22 +42,24 @@ public class Intake {
 
    public static double WRIST_LEFT_STORED = 0.17;
    public static double WRIST_LEFT_DOWN = 0.43;
+   public static double WRIST_LEFT_PRELOAD = 0.45;
    public static double[] WRIST_LEFT_STACK_POSITIONS = {
-           0.32, // Getting 1
-           0.35, // Getting 2
-           0.38, // Getting 3
+           0.35, // Getting 1
+           0.37, // Getting 2
+           0.39, // Getting 3
            0.41, // Getting 4
-           // Use WRIST_DOWN to get 5
+           WRIST_LEFT_DOWN,
    };
 
    public static double WRIST_RIGHT_STORED = 0.34;
    public static double WRIST_RIGHT_DOWN = 0.09;
+   public static double WRIST_RIGHT_PRELOAD = 0.07;
    public static double[] WRIST_RIGHT_STACK_POSITIONS = {
-           0.19, // Getting 1
-           0.17, // Getting 2
-           0.15, // Getting 3
+           0.17, // Getting 1
+           0.15, // Getting 2
+           0.13, // Getting 3
            0.11, // Getting 4
-           // Use WRIST_DOWN to get 5
+           WRIST_RIGHT_DOWN,
    };
 
    public static double FEED_CLOSED = 0.69; // Nice
@@ -95,6 +100,7 @@ public class Intake {
    }
 
    public Action intakeReverse() {
+      Log.d("SETPOWER", "REVERSE");
       return intakeMotor.setTargetVelocityAction(INTAKE_REVERSE_SPEED);
    }
 
@@ -118,7 +124,7 @@ public class Intake {
          pixelCount = 2;
          return;
       }
-      if (pixelCount == 2) {
+      if (pixelCount > 0) {
          return;
       }
 
@@ -148,6 +154,9 @@ public class Intake {
    public Action wristDown() {
       return new ParallelAction(new ActionUtil.ServoPositionAction(intakeWristLeft, WRIST_LEFT_DOWN), new ActionUtil.ServoPositionAction(intakeWristRight, WRIST_RIGHT_DOWN));
    }
+   public Action wristPreload() {
+      return new ParallelAction(new ActionUtil.ServoPositionAction(intakeWristLeft, WRIST_LEFT_PRELOAD), new ActionUtil.ServoPositionAction(intakeWristRight, WRIST_RIGHT_PRELOAD));
+   }
 
    public Action wristStack(int numberIntaked) {
       return new ParallelAction(new ActionUtil.ServoPositionAction(intakeWristLeft, WRIST_LEFT_STACK_POSITIONS[numberIntaked]), new ActionUtil.ServoPositionAction(intakeWristRight, WRIST_RIGHT_STACK_POSITIONS[numberIntaked]));
@@ -166,33 +175,43 @@ public class Intake {
       return new ActionUtil.ServoPositionAction(intakeFeed, FEED_OPEN);
    }
 
-   int numIntaked = 0;
-   public Action intakeCount(boolean start) {
+   public int numIntaked = 0;
+   public Action prepIntakeCount(boolean start) {
       if (start) {
          numIntaked = 0;
       }
+      numIntaked++; // Intake 2 at once
       if (numIntaked >= WRIST_LEFT_STACK_POSITIONS.length) {
-         numIntaked = 0;
+         numIntaked = WRIST_LEFT_STACK_POSITIONS.length-1;
       }
       return new SequentialAction(
               intakeOn(),
-              wristStack(numIntaked),
+              wristStack(numIntaked)
+      );
+   }
+   public Action intakeCount() {
+      return new SequentialAction(
               new IntakeCountAction(),
-              intakeOff(),
+              intakeReverse(),
               wristStored()
       );
    }
    private class IntakeCountAction implements Action {
       private long waitUntil;
+
+      public IntakeCountAction() {
+         this.waitUntil = System.currentTimeMillis() + 1500;
+      }
+
       @Override
       public boolean run(@NonNull TelemetryPacket telemetryPacket) {
          if (pixelCount < 2 && System.currentTimeMillis() >= waitUntil) {
             wristStackInstant(numIntaked);
             numIntaked++;
-            if (numIntaked >= (WRIST_LEFT_STACK_POSITIONS.length-1)) {
-               return false;
+            if (numIntaked >= WRIST_LEFT_STACK_POSITIONS.length) {
+               numIntaked = WRIST_LEFT_STACK_POSITIONS.length-1;
             }
-            this.waitUntil = System.currentTimeMillis() + 500;
+            this.waitUntil = System.currentTimeMillis() + 1500;
          }
          return pixelCount != 2;
       }

@@ -34,6 +34,7 @@ public abstract class AutoBase extends LinearOpMode {
     protected AprilTagProcessor aprilTagProcessor;
     protected PartnerPreloadProcessor preloadProcessor;
     protected VisionPortal portal;
+    protected VisionPortal preloadPortal;
     protected LED led;
 
     protected int w = 1920;
@@ -43,8 +44,12 @@ public abstract class AutoBase extends LinearOpMode {
 
     final public void update() {
         telemetry.addData("Time left", 30 - getRuntime());
+        telemetry.addData("Pixel Count", intake.pixelCount);
+        telemetry.addData("Number Intaked", intake.numIntaked);
+        telemetry.addData("Intake Reversing", intake.isReversing());
         outtake.update();
         intake.update();
+        telemetry.update();
     }
 
     final public void runOpMode() throws InterruptedException {
@@ -69,6 +74,14 @@ public abstract class AutoBase extends LinearOpMode {
                 .setCamera(hardwareMap.get(WebcamName.class, "webcam"))
                 .setCameraResolution(new Size(w, h))
                 .addProcessor(processor)
+                .setCamera(BuiltinCameraDirection.BACK)
+                .enableLiveView(true)
+                .setAutoStopLiveView(true)
+                .build();
+        this.preloadPortal = new VisionPortal.Builder()
+                // Get the actual camera on the robot, add the processor, state the orientation of the camera.
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(1280, 720))
                 .addProcessor(aprilTagProcessor)
                 .addProcessor(preloadProcessor)
                 .setCamera(BuiltinCameraDirection.BACK)
@@ -77,8 +90,8 @@ public abstract class AutoBase extends LinearOpMode {
                 .build();
 
 
-        portal.setProcessorEnabled(aprilTagProcessor, false);
-        portal.setProcessorEnabled(preloadProcessor, false);
+        preloadPortal.setProcessorEnabled(aprilTagProcessor, false);
+        preloadPortal.setProcessorEnabled(preloadProcessor, false);
 
         outtake.initialize(false);
         plane.initialize();
@@ -123,6 +136,7 @@ public abstract class AutoBase extends LinearOpMode {
             SPIKE = 0;
         }
         portal.stopStreaming();
+        //preloadPortal.stopStreaming();
         portal.setProcessorEnabled(processor, false);
 
         // Auto start

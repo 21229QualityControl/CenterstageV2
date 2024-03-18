@@ -46,6 +46,7 @@ public class MotorWithVelocityPID {
     public void update() {
         double change = Range.clip(this.pidfController.update(motor.getVelocity()), -maxPower, maxPower);
         power += change;
+        power = Range.clip(power, -1, 1);
         motor.setPower(power);
     }
 
@@ -74,6 +75,7 @@ public class MotorWithVelocityPID {
 
         @Override
         public boolean run(TelemetryPacket packet) {
+            power = ((double)velocity)/2400;
             setTargetVelocity(velocity);
             return false;
         }

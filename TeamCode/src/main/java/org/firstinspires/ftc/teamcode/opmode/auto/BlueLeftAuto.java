@@ -5,6 +5,7 @@ import android.util.Log;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -16,14 +17,14 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 public class BlueLeftAuto extends AutoBase {
     public static Pose2d start = new Pose2d(12, 63, Math.toRadians(-90));
     public static Pose2d[] spike = {
-            new Pose2d(7, 46, Math.toRadians(180)),
-            new Pose2d(16, 42, Math.toRadians(180)),
-            new Pose2d(24, 52, Math.toRadians(180))
+            new Pose2d(7, 29, Math.toRadians(180)),
+            new Pose2d(26, 22, Math.toRadians(180)),
+            new Pose2d(36, 26, Math.toRadians(180))
     };
-    public static Pose2d intermediate = new Pose2d(36, 10, Math.toRadians(180));
-    public static Pose2d pastTruss = new Pose2d(-36, 10, Math.toRadians(180));
-    public static Pose2d stack = new Pose2d(-57, 12, Math.toRadians(180));
-    public static Pose2d secondStack = new Pose2d(-50, 24, Math.toRadians(135));
+    public static Pose2d intermediate = new Pose2d(24, 8, Math.toRadians(180));
+    public static Pose2d pastTruss = new Pose2d(-36, 8, Math.toRadians(180));
+    public static Pose2d stack = new Pose2d(-57, 8, Math.toRadians(180));
+    public static Pose2d secondStack = new Pose2d(-60, 14, Math.toRadians(135));
 
     @Override
     protected Pose2d getStartPose() {
@@ -37,84 +38,100 @@ public class BlueLeftAuto extends AutoBase {
 
     @Override
     protected void onRun() {
+        SPIKE = 1;
+
         scorePreload();
 
         // First stack
         intakeStack(true, false);
-        cycle();
+        cycle(false);
 
         intakeStack(false, false);
-        cycle();
+        cycle(false);
 
         // Second stack
         intakeStack(true, true);
-        cycle();
+        cycle(true);
 
         intakeStack(false, true);
-        cycle();
+        cycle(true);
     }
 
     private void scorePreload() {
         // Deliver spike
-        sched.addAction(intake.wristDown());
+        sched.addAction(outtake.extendOuttakeBarelyOut());
+        sched.addAction(intake.wristPreload());
         sched.addAction(outtake.clawSingleClosed());
-        sched.addAction(new SleepAction(0.5));
+        //sched.addAction(new SleepAction(0.3));
         sched.addAction(
                 drive.actionBuilder(getStartPose())
                         .strafeToLinearHeading(spike[SPIKE].position, spike[SPIKE].heading)
                         .build()
         );
         sched.addAction(intake.wristStored());
-        sched.addAction(new SleepAction(0.5));
+        //sched.addAction(new SleepAction(0.2));
         sched.run();
 
         // Score preload
-        sched.addAction(outtake.extendOuttakeCloseBlocking());
-        sched.addAction(outtake.armScoring());
-        sched.addAction(outtake.wristSideways(false));
         sched.addAction(drive.actionBuilder(spike[SPIKE])
+                .afterDisp(0, new SequentialAction(
+                        outtake.extendOuttakeCloseBlocking(),
+                        outtake.armScoring(),
+                        outtake.wristSideways(false)
+                ))
                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
                         .build()
         );
         sched.addAction(outtake.clawOpen());
+        sched.addAction(intake.setPixelCount(0));
         sched.run();
     }
 
     private void intakeStack(boolean first, boolean nextStack) {
-        sched.addAction(drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading))
+        TrajectoryActionBuilder bld = drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading))
                 .afterDisp(1, new SequentialAction(
                         outtake.wristVertical(),
                         outtake.armStored(),
                         outtake.retractOuttakeBlocking()
                 ))
                 .splineToConstantHeading(intermediate.position, intermediate.heading)
-                .splineToConstantHeading(pastTruss.position, pastTruss.heading)
-                .afterDisp(0, intake.intakeOn())
-                .splineToConstantHeading((nextStack ? secondStack : stack).position, (nextStack ? secondStack : stack).heading)
-                .build()
-        );
+                .afterDisp(0, intake.prepIntakeCount(first))
+                .splineToConstantHeading(pastTruss.position, pastTruss.heading);
+        if (nextStack) {
+            bld = bld.splineToSplineHeading(secondStack, secondStack.heading, drive.slowVelConstraint);
+        } else {
+            bld = bld.splineToConstantHeading(stack.position, stack.heading, drive.slowVelConstraint);
+        }
+        sched.addAction(bld.build());
         if (first) {
             SPIKE = (SPIKE + 1) % 3;
         }
-        sched.addAction(intake.intakeCount(first));
+        sched.addAction(intake.intakeCount());
         sched.run();
     }
 
-    private void cycle() {
-        sched.addAction(drive.actionBuilder(stack)
-                .splineToConstantHeading(pastTruss.position, pastTruss.heading)
+    private void cycle(boolean second) {
+        sched.addAction(intake.intakeOff());
+        TrajectoryActionBuilder bld = drive.actionBuilder(second ? secondStack : stack).setReversed(true);
+        if (second) {
+            bld = bld.splineToSplineHeading(pastTruss, pastTruss.heading.toDouble() - Math.PI);
+        } else {
+            bld = bld.splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI);
+        }
+        sched.addAction(bld
                 .afterDisp(0, outtake.clawClosed())
-                .splineToConstantHeading(intermediate.position, intermediate.heading)
+                .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI)
                         .afterDisp(0, new SequentialAction(
                                 outtake.extendOuttakeCycleBlocking(),
                                 outtake.armScoring(),
                                 outtake.wristSideways(false)
                         ))
-                .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading)
+                .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading.toDouble() - Math.PI)
                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
                 .build()
         );
         sched.addAction(outtake.clawOpen());
+        sched.addAction(intake.setPixelCount(0));
         sched.run();
     }
 }
