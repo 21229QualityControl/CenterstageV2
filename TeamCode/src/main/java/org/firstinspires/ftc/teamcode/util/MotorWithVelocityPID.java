@@ -63,7 +63,8 @@ public class MotorWithVelocityPID {
 
     public void setTargetVelocity(int velocity) {
         this.targetVelocity = velocity;
-        this.pidfController.setTargetPosition(velocity - internalOffset); // TODO: Verify sign
+        this.power = ((double)velocity)/2400;
+        this.pidfController.setTargetPosition(velocity - internalOffset);
     }
 
     private class TargetVelocityAction implements Action {
@@ -75,7 +76,6 @@ public class MotorWithVelocityPID {
 
         @Override
         public boolean run(TelemetryPacket packet) {
-            power = ((double)velocity)/2400;
             setTargetVelocity(velocity);
             return false;
         }

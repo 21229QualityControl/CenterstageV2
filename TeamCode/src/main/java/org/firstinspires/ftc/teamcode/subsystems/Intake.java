@@ -100,7 +100,6 @@ public class Intake {
    }
 
    public Action intakeReverse() {
-      Log.d("SETPOWER", "REVERSE");
       return intakeMotor.setTargetVelocityAction(INTAKE_REVERSE_SPEED);
    }
 
