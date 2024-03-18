@@ -26,9 +26,9 @@ import java.util.concurrent.atomic.AtomicReference;
 @Config
 public class CameraProcessor implements VisionProcessor, CameraStreamSource {
     // State the dimensions of the rectangles for the 3 locations of the team prop.
-    public static Rect leftRect = new Rect(400, 800, 350 , 280);
-    public static Rect centerRect = new Rect(800, 700, 300, 210);
-    public static Rect rightRect = new Rect(1150, 800, 300, 250);
+    public static Rect leftRect = new Rect(100, 350, 116, 93);
+    public static Rect centerRect = new Rect(245, 330, 180, 70);
+    public static Rect rightRect = new Rect(450, 350, 116, 93);
     public int position = -1;
     private double satRectLeft;
     private double satRectCenter;

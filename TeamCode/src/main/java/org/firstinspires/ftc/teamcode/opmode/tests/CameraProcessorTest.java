@@ -26,8 +26,8 @@ public class CameraProcessorTest extends LinearOpMode {
         final CameraProcessor processor = new CameraProcessor();
         processor.setDebugMode(debugMode);
 
-        int w = 1920;
-        int h = 1080;
+        int w = 640;
+        int h = 480;
 
         VisionPortal portal = new VisionPortal.Builder()
                 // Get the actual camera on the robot, add the processor, state the orientation of the camera.
