@@ -29,12 +29,10 @@ public class Outtake {
    public static double CLAW_CLOSED = 0.53;
    public static double CLAW_SINGLE_CLOSED = 0.47;
 
-
-   public static double ARM_LEFT_STORED = 0.46;
-   public static double ARM_LEFT_SCORING = 0.725;
-   public static double ARM_RIGHT_STORED; // the arm right servo is weird so I'm not using it for now
-   public static double ARM_RIGHT_SCORING;
-
+   public static double ARM_LEFT_STORED = 0.52;
+   public static double ARM_LEFT_SCORING = 0.77;
+   public static double ARM_RIGHT_STORED = 0.67;
+   public static double ARM_RIGHT_SCORING = 0.42;
 
    public static double WRIST_VERTICAL = 0.56;
    public static double WRIST_MOSAIC_LEFT = 0.64;
