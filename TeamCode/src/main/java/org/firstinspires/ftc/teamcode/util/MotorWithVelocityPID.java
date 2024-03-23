@@ -76,6 +76,7 @@ public class MotorWithVelocityPID {
 
         @Override
         public boolean run(TelemetryPacket packet) {
+            Log.d("VELOCITY", String.valueOf(velocity));
             setTargetVelocity(velocity);
             return false;
         }

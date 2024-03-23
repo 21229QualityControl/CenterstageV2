@@ -80,7 +80,7 @@ public abstract class AutoBase extends LinearOpMode {
                 .build();
         this.preloadPortal = new VisionPortal.Builder()
                 // Get the actual camera on the robot, add the processor, state the orientation of the camera.
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCamera(hardwareMap.get(WebcamName.class, "WebcamOuttake"))
                 .setCameraResolution(new Size(1280, 720))
                 .addProcessor(aprilTagProcessor)
                 .addProcessor(preloadProcessor)

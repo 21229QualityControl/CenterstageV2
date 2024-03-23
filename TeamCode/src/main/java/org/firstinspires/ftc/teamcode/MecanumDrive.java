@@ -88,6 +88,8 @@ public final class MecanumDrive {
             new AngularVelConstraint(PARAMS.maxAngVel)));
     public final AccelConstraint defaultAccelConstraint = new ProfileAccelConstraint(PARAMS.minProfileAccel,
             PARAMS.maxProfileAccel);
+    public final AccelConstraint slowAccelConstraint = new ProfileAccelConstraint(PARAMS.minProfileAccel,
+            50);
 
     public final DcMotorEx leftFront, leftBack, rightBack, rightFront;
 

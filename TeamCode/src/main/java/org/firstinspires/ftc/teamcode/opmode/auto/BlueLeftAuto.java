@@ -95,7 +95,10 @@ public class BlueLeftAuto extends AutoBase {
                         outtake.retractOuttakeBlocking()
                 ))
                 .splineToConstantHeading(intermediate.position, intermediate.heading)
-                .afterDisp(0, intake.prepIntakeCount(first))
+                .afterDisp(0, new SequentialAction(
+                        intake.prepIntakeCount(first, false),
+                        outtake.extendOuttakeBarelyOut()
+                ))
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading);
         if (nextStack) {
             bld = bld.splineToSplineHeading(secondStack, secondStack.heading, drive.slowVelConstraint);
@@ -103,10 +106,17 @@ public class BlueLeftAuto extends AutoBase {
             bld = bld.splineToConstantHeading(stack.position, stack.heading, drive.slowVelConstraint);
         }
         sched.addAction(bld.build());
-        if (first) {
-            SPIKE = (SPIKE + 1) % 3;
+        if (first) { // Score out of the way
+            if (SPIKE == 0) {
+                SPIKE = 1;
+            } else {
+                SPIKE = 0;
+            }
         }
-        sched.addAction(intake.intakeCount());
+        sched.addAction(new SequentialAction(
+                intake.intakeCount(),
+                outtake.retractOuttake()
+        ));
         sched.run();
     }
 
@@ -124,13 +134,15 @@ public class BlueLeftAuto extends AutoBase {
                         .afterDisp(0, new SequentialAction(
                                 outtake.extendOuttakeCycleBlocking(),
                                 outtake.armScoring(),
-                                outtake.wristSideways(false)
+                                outtake.wristSideways(false),
+                                intake.feedOpen()
                         ))
                 .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading.toDouble() - Math.PI)
                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
                 .build()
         );
         sched.addAction(outtake.clawOpen());
+        sched.addAction(intake.feedClosed()); // Open & close feed in case outtake doesn't grab
         sched.addAction(intake.setPixelCount(0));
         sched.run();
     }

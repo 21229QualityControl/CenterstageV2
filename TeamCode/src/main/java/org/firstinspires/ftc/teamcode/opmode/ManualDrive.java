@@ -173,9 +173,11 @@ public class ManualDrive extends LinearOpMode {
 
       if (Math.abs(g2.left_stick_x) != 0 && Math.abs(prevInputX) < EPSILON) {
          headingPid.setTargetPosition(drive.pose.heading.toDouble());
-         Log.d("TARGET", "target");
       }
       prevInputX = g2.left_stick_x;
+      if (Math.abs(input_turn) > EPSILON) {
+         prevInputX = 0;
+      }
       if (Math.abs(g1.left_stick_x + g1.left_stick_y + input_turn) < EPSILON && Math.abs(g2.left_stick_x) > 0) { // Do heading lock
          input_turn = headingPid.update(drive.pose.heading.toDouble());
          if (g2.left_stick_x > 0) { // Account for heading turn overpowering strafe
@@ -183,7 +185,6 @@ public class ManualDrive extends LinearOpMode {
          } else {
             input = input.plus(new Vector2d(0, -Math.abs(input_turn)));
          }
-         Log.d("TARGET", String.valueOf(input_turn));
       }
 
       drive.setDrivePowers(new PoseVelocity2d(input, input_turn));
@@ -191,10 +192,6 @@ public class ManualDrive extends LinearOpMode {
 
    public int INTAKE_STACK_POSITION = 0;
    private void intakeControls() {
-      /*if (intake.isIntaking() && intake.pixelCount() == 2) {
-          sched.queueAction(intake.intakeOff()); TODO: Enable this
-      }*/
-
       // Intake controls
       if (g1.aOnce()) {
          if (intake.isIntaking()) {
@@ -260,7 +257,7 @@ public class ManualDrive extends LinearOpMode {
          if (outtake.isSlideRetracted()) {
             sched.queueAction(outtake.extendOuttakeHangBlocking());
          } else {
-            sched.queueAction(outtake.retractOuttake());
+            sched.queueAction(outtake.retractOuttakeHang());
          }
       }
    }

@@ -26,7 +26,7 @@ public class PartnerPreloadTest extends LinearOpMode {
         PartnerPreloadProcessor processor = new PartnerPreloadProcessor(aprilTag);
         VisionPortal portal = new VisionPortal.Builder()
                 // Get the actual camera on the robot, add the processor, state the orientation of the camera.
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCamera(hardwareMap.get(WebcamName.class, "WebcamOuttake"))
                 .setCameraResolution(new Size(1280, 720)) // THIS CRASHES AT 1920x1080, GL ERROR: Out of memory!
                 .addProcessor(aprilTag)
                 .addProcessor(processor)

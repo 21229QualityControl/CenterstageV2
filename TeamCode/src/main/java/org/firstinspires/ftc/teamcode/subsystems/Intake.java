@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 @Config
 public class Intake {
    public static int INTAKE_SPEED = 600; // Max speed is 2400
+   public static int INTAKE_SPEED_FAST = 1000; // Used to fling the top pixel off of the stack when intaking one
    public static int INTAKE_REVERSE_SPEED = -2400;
 
    final MotorWithVelocityPID intakeMotor;
@@ -97,6 +98,10 @@ public class Intake {
 
    public Action intakeOn() {
       return intakeMotor.setTargetVelocityAction(INTAKE_SPEED);
+   }
+
+   public Action intakeOnFast() {
+      return intakeMotor.setTargetVelocityAction(INTAKE_SPEED_FAST);
    }
 
    public Action intakeReverse() {
@@ -175,16 +180,18 @@ public class Intake {
    }
 
    public int numIntaked = 0;
-   public Action prepIntakeCount(boolean start) {
+   public Action prepIntakeCount(boolean start, boolean one) {
       if (start) {
          numIntaked = 0;
       }
-      numIntaked++; // Intake 2 at once
+      if (!one) {
+         numIntaked++; // Intake 2 at once
+      }
       if (numIntaked >= WRIST_LEFT_STACK_POSITIONS.length) {
          numIntaked = WRIST_LEFT_STACK_POSITIONS.length-1;
       }
       return new SequentialAction(
-              intakeOn(),
+              one ? intakeOnFast() : intakeOn(),
               wristStack(numIntaked)
       );
    }
