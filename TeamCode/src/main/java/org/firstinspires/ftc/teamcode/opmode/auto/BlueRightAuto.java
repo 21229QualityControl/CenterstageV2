@@ -143,7 +143,8 @@ public class BlueRightAuto extends AutoBase {
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading, first ? drive.slowVelConstraint : drive.defaultVelConstraint, first ? drive.slowAccelConstraint : drive.defaultAccelConstraint)
                 .afterDisp(0, intake.feedClosed())
                 .splineToConstantHeading(intermediate.position, intermediate.heading)
-                .afterDisp(0, intake.prepIntakeCount(false, false))
+                .afterDisp(0, intake.prepIntakeCount(false, true))
+                .afterDisp(0.3, intake.prepIntakeCount(first, true))
                 .splineToConstantHeading(stack.position, stack.heading, drive.slowVelConstraint)
                 .build()
         );

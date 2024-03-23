@@ -25,7 +25,7 @@ public class Outtake {
    public static int OUTTAKE_HANG_EXTEND = 1500;
    public static int OUTTAKE_HANG_RETRACT = 900;
 
-   public static double CLAW_OPEN = 0.77;
+   public static double CLAW_OPEN = 0.85;
    public static double CLAW_CLOSED = 0.53;
    public static double CLAW_SINGLE_CLOSED = 0.47;
 
