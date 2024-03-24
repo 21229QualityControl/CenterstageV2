@@ -145,6 +145,13 @@ public class ManualDrive extends LinearOpMode {
 //      double input_y = Math.pow(-g1.left_stick_x * (intake.isIntakeNearWall() ? Range.clip((intake.getDistance()-200)/500, 0.15, 0.5) : 1), 3) * speed;
 //      input_y = (input_y >= 0) ? Range.clip(input_y,(input_y/Math.abs(input_y))*0.15,(input_y/Math.abs(input_y))*0.5): input_y;
 
+      if (!outtake.isSlideRetracted()) {
+         g2.left_stick_x -= g1.left_stick_x;
+         g2.left_stick_y -= g1.left_stick_y;
+         g1.left_stick_x = 0;
+         g1.left_stick_y = 0;
+      }
+
       double input_x;
       double input_y;
       /*if (-g1.left_stick_y > 0 && intake.isIntaking()) {

@@ -198,15 +198,17 @@ public class Intake {
    public Action intakeCount() {
       return new SequentialAction(
               new IntakeCountAction(),
-              intakeReverse(),
-              wristStored()
+              wristStored(),
+              intakeReverse()
       );
    }
    private class IntakeCountAction implements Action {
       private long waitUntil;
+      private long finalTime;
 
       public IntakeCountAction() {
-         this.waitUntil = System.currentTimeMillis() + 1500;
+         this.waitUntil = System.currentTimeMillis() + 1000;
+         this.finalTime = System.currentTimeMillis() + 6000;
       }
 
       @Override
@@ -217,9 +219,9 @@ public class Intake {
             if (numIntaked >= WRIST_LEFT_STACK_POSITIONS.length) {
                numIntaked = WRIST_LEFT_STACK_POSITIONS.length-1;
             }
-            this.waitUntil = System.currentTimeMillis() + 1500;
+            this.waitUntil = System.currentTimeMillis() + 1000;
          }
-         return pixelCount != 2;
+         return pixelCount != 2 && System.currentTimeMillis() < finalTime;
       }
    }
 }

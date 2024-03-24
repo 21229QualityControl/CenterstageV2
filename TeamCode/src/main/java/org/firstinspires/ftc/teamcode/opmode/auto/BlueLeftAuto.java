@@ -24,7 +24,7 @@ public class BlueLeftAuto extends AutoBase {
     public static Pose2d intermediate = new Pose2d(24, 8, Math.toRadians(180));
     public static Pose2d pastTruss = new Pose2d(-36, 8, Math.toRadians(180));
     public static Pose2d stack = new Pose2d(-57, 8, Math.toRadians(180));
-    public static Pose2d secondStack = new Pose2d(-60, 14, Math.toRadians(135));
+    public static Pose2d secondStack = new Pose2d(-60, 14, Math.toRadians(150));
 
     @Override
     protected Pose2d getStartPose() {
@@ -53,8 +53,8 @@ public class BlueLeftAuto extends AutoBase {
         intakeStack(true, true);
         cycle(true);
 
-        intakeStack(false, true);
-        cycle(true);
+        /*intakeStack(false, true);
+        cycle(true);*/
     }
 
     private void scorePreload() {

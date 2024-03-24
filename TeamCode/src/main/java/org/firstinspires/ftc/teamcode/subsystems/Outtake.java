@@ -23,7 +23,7 @@ public class Outtake {
    public static int OUTTAKE_PARTNER = 550; // For far side auto, start of TeleOp
    public static int OUTTAKE_CYCLE = 750; // For cycling during auto
    public static int OUTTAKE_HANG_EXTEND = 1500;
-   public static int OUTTAKE_HANG_RETRACT = 900;
+   public static int OUTTAKE_HANG_RETRACT = 800;
 
    public static double CLAW_OPEN = 0.85;
    public static double CLAW_CLOSED = 0.53;
