@@ -142,9 +142,9 @@ public class BlueRightAuto extends AutoBase {
                 .afterDisp(10, outtake.retractOuttake())
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading, first ? drive.slowVelConstraint : drive.defaultVelConstraint, first ? drive.slowAccelConstraint : drive.defaultAccelConstraint)
                 .afterDisp(0, intake.feedClosed())
+                .afterDisp(0, intake.setPixelCount(0))
                 .splineToConstantHeading(intermediate.position, intermediate.heading)
-                .afterDisp(0, intake.prepIntakeCount(false, true))
-                .afterDisp(0.3, intake.prepIntakeCount(first, true))
+                .afterDisp(0, intake.prepIntakeCount(false, false))
                 .splineToConstantHeading(stack.position, stack.heading, drive.slowVelConstraint)
                 .build()
         );
@@ -164,12 +164,12 @@ public class BlueRightAuto extends AutoBase {
                 .setReversed(true)
                 .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
-                .afterDisp(0, outtake.extendOuttakeCloseBlocking())
-                .splineToConstantHeading(corner.position, corner.heading.toDouble() - Math.PI)
-                .afterDisp(0, new SequentialAction(
+//                .afterDisp(0, outtake.extendOuttakeCloseBlocking())
+                .afterDisp(10, new SequentialAction(
                         intake.feedOpen(),
                         intake.setPixelCount(0)
                 ))
+                .splineToConstantHeading(corner.position, corner.heading.toDouble() - Math.PI)
                 .build()
         );
         sched.run();

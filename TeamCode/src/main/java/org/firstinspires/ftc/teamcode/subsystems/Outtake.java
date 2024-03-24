@@ -27,9 +27,9 @@ public class Outtake {
 
    public static double CLAW_OPEN = 0.85;
    public static double CLAW_CLOSED = 0.53;
-   public static double CLAW_SINGLE_CLOSED = 0.47;
+   public static double CLAW_SINGLE_CLOSED = 0.46;
 
-   public static double ARM_LEFT_STORED = 0.51;
+   public static double ARM_LEFT_STORED = 0.5;
    public static double ARM_LEFT_SCORING = 0.77;
    public static double ARM_RIGHT_STORED = 0.68;
    public static double ARM_RIGHT_SCORING = 0.42;
