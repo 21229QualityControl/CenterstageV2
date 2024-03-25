@@ -30,7 +30,7 @@ public class PartnerPreloadTest extends LinearOpMode {
                 .setCameraResolution(new Size(1280, 720)) // THIS CRASHES AT 1920x1080, GL ERROR: Out of memory!
                 .addProcessor(aprilTag)
                 .addProcessor(processor)
-                .setCamera(BuiltinCameraDirection.BACK)
+                .setCamera(BuiltinCameraDirection.FRONT)
                 .enableLiveView(true)
                 .setAutoStopLiveView(true)
                 .build();

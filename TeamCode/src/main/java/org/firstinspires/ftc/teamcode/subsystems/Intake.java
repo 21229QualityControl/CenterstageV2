@@ -151,6 +151,10 @@ public class Intake {
    public Action wristStored() {
       return new ParallelAction(new ActionUtil.ServoPositionAction(intakeWristLeft, WRIST_LEFT_STORED), new ActionUtil.ServoPositionAction(intakeWristRight, WRIST_RIGHT_STORED));
    }
+   public void wristStoredInstant() {
+      intakeWristLeft.setPosition(WRIST_LEFT_STORED);
+      intakeWristRight.setPosition(WRIST_RIGHT_STORED);
+   }
    public boolean wristIsStored() {
       return Math.abs(intakeWristLeft.getPosition() - WRIST_LEFT_STORED) < EPSILON;
    }
@@ -198,13 +202,13 @@ public class Intake {
    public Action intakeCount() {
       return new SequentialAction(
               new IntakeCountAction(),
-              wristStored(),
               intakeReverse()
       );
    }
    private class IntakeCountAction implements Action {
       private long waitUntil;
       private long finalTime;
+      private boolean done;
 
       public IntakeCountAction() {
          this.waitUntil = System.currentTimeMillis() + 1000;
@@ -213,6 +217,9 @@ public class Intake {
 
       @Override
       public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+         if (done) { // Make it wait 0.2s after it has intaked 2
+            return System.currentTimeMillis() < waitUntil;
+         }
          if (pixelCount < 2 && System.currentTimeMillis() >= waitUntil) {
             wristStackInstant(numIntaked);
             numIntaked++;
@@ -221,7 +228,13 @@ public class Intake {
             }
             this.waitUntil = System.currentTimeMillis() + 1000;
          }
-         return pixelCount != 2 && System.currentTimeMillis() < finalTime;
+         if (pixelCount >= 2) {
+            done = true;
+            this.waitUntil = System.currentTimeMillis() + 200;
+            wristStoredInstant();
+            return true;
+         }
+         return System.currentTimeMillis() < finalTime;
       }
    }
 }

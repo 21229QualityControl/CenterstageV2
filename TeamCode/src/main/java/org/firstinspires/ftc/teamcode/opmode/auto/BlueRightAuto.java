@@ -38,8 +38,6 @@ public class BlueRightAuto extends AutoBase {
 
     @Override
     protected void onRun() {
-        SPIKE = 1;
-
         firstCycle();
 
         intakeStack(true);
@@ -97,7 +95,6 @@ public class BlueRightAuto extends AutoBase {
         sched.addAction(new ActionUtil.RunnableAction(() -> {
             this.preloadProcessor.updateTarget(SPIKE, false);
             this.preloadProcessor.detecting = false;
-            // TODO: Use back camera
             this.preloadPortal.setProcessorEnabled(this.aprilTagProcessor, true);
             this.preloadPortal.setProcessorEnabled(this.preloadProcessor, true);
             this.preloadPortal.resumeStreaming();
@@ -105,14 +102,13 @@ public class BlueRightAuto extends AutoBase {
             return false;
         }));
         sched.addAction(new ActionUtil.RunnableAction(() -> {
-            /*if (preloadProcessor.detecting) {
+            if (preloadProcessor.detecting) {
                 Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
                 this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
                 this.portal.stopStreaming();
                 return false;
             }
-            return true;*/
-            return false;
+            return true;
         }));
         sched.addAction(outtake.wristSideways(!preloadProcessor.preloadLeft));
         sched.run();
@@ -141,8 +137,10 @@ public class BlueRightAuto extends AutoBase {
                 ) : new SequentialAction())
                 .afterDisp(10, outtake.retractOuttake())
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading, first ? drive.slowVelConstraint : drive.defaultVelConstraint, first ? drive.slowAccelConstraint : drive.defaultAccelConstraint)
-                .afterDisp(0, intake.feedClosed())
-                .afterDisp(0, intake.setPixelCount(0))
+                .afterDisp(0, new SequentialAction(
+                        intake.feedClosed(),
+                        intake.setPixelCount(0)
+                ))
                 .splineToConstantHeading(intermediate.position, intermediate.heading)
                 .afterDisp(0, intake.prepIntakeCount(false, false))
                 .splineToConstantHeading(stack.position, stack.heading, drive.slowVelConstraint)
@@ -158,13 +156,12 @@ public class BlueRightAuto extends AutoBase {
     }
 
     private void cycle() {
-        sched.addAction(intake.intakeOff());
         // Drive to corner & open feed
         sched.addAction(drive.actionBuilder(stack)
                 .setReversed(true)
                 .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
-//                .afterDisp(0, outtake.extendOuttakeCloseBlocking())
+                .afterDisp(1, intake.intakeOff())
                 .afterDisp(10, new SequentialAction(
                         intake.feedOpen(),
                         intake.setPixelCount(0)

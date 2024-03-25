@@ -84,9 +84,9 @@ public abstract class AutoBase extends LinearOpMode {
                 .setCameraResolution(new Size(1280, 720))
                 .addProcessor(aprilTagProcessor)
                 .addProcessor(preloadProcessor)
-                .setCamera(BuiltinCameraDirection.BACK)
-                .enableLiveView(true)
-                .setAutoStopLiveView(true)
+                .setCamera(BuiltinCameraDirection.FRONT)
+                .enableLiveView(false)
+                .setAutoStopLiveView(false)
                 .build();
 
 
@@ -127,6 +127,11 @@ public abstract class AutoBase extends LinearOpMode {
 
             led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE);
 
+            telemetry.addData("Portal State", preloadPortal.getCameraState());
+            if (preloadPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
+                preloadPortal.stopStreaming();
+            }
+
             idle();
         }
 
@@ -136,7 +141,6 @@ public abstract class AutoBase extends LinearOpMode {
             SPIKE = 0;
         }
         portal.stopStreaming();
-        //preloadPortal.stopStreaming();
         portal.setProcessorEnabled(processor, false);
 
         // Auto start

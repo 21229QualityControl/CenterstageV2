@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.pathing.Pose;
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
@@ -17,14 +18,16 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 public class BlueLeftAuto extends AutoBase {
     public static Pose2d start = new Pose2d(12, 63, Math.toRadians(-90));
     public static Pose2d[] spike = {
-            new Pose2d(7, 29, Math.toRadians(180)),
+            new Pose2d(9, 34, Math.toRadians(-135)),
             new Pose2d(26, 22, Math.toRadians(180)),
-            new Pose2d(36, 26, Math.toRadians(180))
+            new Pose2d(33, 29, Math.toRadians(180))
     };
-    public static Pose2d intermediate = new Pose2d(24, 8, Math.toRadians(180));
-    public static Pose2d pastTruss = new Pose2d(-36, 8, Math.toRadians(180));
+    public static Pose2d intermediate = new Pose2d(24,  10, Math.toRadians(180));
+    public static Pose2d pastTruss = new Pose2d(-36, 10, Math.toRadians(180));
     public static Pose2d stack = new Pose2d(-57, 8, Math.toRadians(180));
-    public static Pose2d secondStack = new Pose2d(-60, 14, Math.toRadians(150));
+    public static Pose2d secondStack = new Pose2d(-58, 16, Math.toRadians(150));
+    public static Pose2d scoring = new Pose2d(56, 22, Math.toRadians(200));
+    public static Pose2d park = new Pose2d(53, 22, Math.toRadians(180));
 
     @Override
     protected Pose2d getStartPose() {
@@ -34,6 +37,12 @@ public class BlueLeftAuto extends AutoBase {
     @Override
     protected void printDescription() {
         telemetry.addData("Description", "Blue Left Auto");
+    }
+
+    @Override
+    protected void onInit() {
+        sched.addAction(outtake.clawSingleClosed());
+        sched.run();
     }
 
     @Override
@@ -50,26 +59,25 @@ public class BlueLeftAuto extends AutoBase {
         cycle(false);
 
         // Second stack
-        intakeStack(true, true);
+        intakeStack(false, true);
         cycle(true);
 
         /*intakeStack(false, true);
         cycle(true);*/
+
+        park();
     }
 
     private void scorePreload() {
         // Deliver spike
         sched.addAction(outtake.extendOuttakeBarelyOut());
         sched.addAction(intake.wristPreload());
-        sched.addAction(outtake.clawSingleClosed());
-        //sched.addAction(new SleepAction(0.3));
         sched.addAction(
                 drive.actionBuilder(getStartPose())
-                        .strafeToLinearHeading(spike[SPIKE].position, spike[SPIKE].heading)
+                        .strafeToSplineHeading(spike[SPIKE].position, spike[SPIKE].heading)
                         .build()
         );
         sched.addAction(intake.wristStored());
-        //sched.addAction(new SleepAction(0.2));
         sched.run();
 
         // Score preload
@@ -88,18 +96,23 @@ public class BlueLeftAuto extends AutoBase {
     }
 
     private void intakeStack(boolean first, boolean nextStack) {
-        TrajectoryActionBuilder bld = drive.actionBuilder(new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading))
+        TrajectoryActionBuilder bld = drive.actionBuilder(first ? new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading) : scoring)
                 .afterDisp(1, new SequentialAction(
                         outtake.wristVertical(),
                         outtake.armStored(),
                         outtake.retractOuttakeBlocking()
-                ))
-                .splineToConstantHeading(intermediate.position, intermediate.heading)
-                .afterDisp(0, new SequentialAction(
-                        intake.prepIntakeCount(first, false),
-                        outtake.extendOuttakeBarelyOut()
-                ))
-                .splineToConstantHeading(pastTruss.position, pastTruss.heading);
+                ));
+        if (first) {
+            bld = bld.splineToConstantHeading(intermediate.position, intermediate.heading);
+        } else {
+            bld = bld.splineToSplineHeading(intermediate, intermediate.heading);
+        }
+        bld = bld.afterDisp(0, new SequentialAction(
+                    intake.prepIntakeCount(first || nextStack, false),
+                    nextStack ? intake.intakeOnFast() : intake.intakeOn(),
+                    outtake.extendOuttakeBarelyOut()
+            ))
+            .splineToConstantHeading(pastTruss.position, pastTruss.heading);
         if (nextStack) {
             bld = bld.splineToSplineHeading(secondStack, secondStack.heading, drive.slowVelConstraint);
         } else {
@@ -121,7 +134,6 @@ public class BlueLeftAuto extends AutoBase {
     }
 
     private void cycle(boolean second) {
-        sched.addAction(intake.intakeOff());
         TrajectoryActionBuilder bld = drive.actionBuilder(second ? secondStack : stack).setReversed(true);
         if (second) {
             bld = bld.splineToSplineHeading(pastTruss, pastTruss.heading.toDouble() - Math.PI);
@@ -129,21 +141,33 @@ public class BlueLeftAuto extends AutoBase {
             bld = bld.splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI);
         }
         sched.addAction(bld
-                .afterDisp(0, outtake.clawClosed())
+                .afterDisp(0, new SequentialAction(
+                        outtake.clawClosed(),
+                        intake.intakeOff()
+                ))
                 .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI)
                         .afterDisp(0, new SequentialAction(
                                 outtake.extendOuttakeCycleBlocking(),
                                 outtake.armScoring(),
-                                outtake.wristSideways(false),
                                 intake.feedOpen()
                         ))
-                .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading.toDouble() - Math.PI)
-                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
+                .splineToSplineHeading(scoring, scoring.heading.toDouble() - Math.PI)
                 .build()
         );
         sched.addAction(outtake.clawOpen());
         sched.addAction(intake.feedClosed()); // Open & close feed in case outtake doesn't grab
         sched.addAction(intake.setPixelCount(0));
+        sched.run();
+    }
+
+    private void park() {
+        sched.addAction(drive.actionBuilder(scoring)
+                .strafeToLinearHeading(park.position, park.heading)
+                .afterDisp(1, new SequentialAction(
+                        outtake.armStored(),
+                        outtake.retractOuttakeBlocking()
+                ))
+                .build());
         sched.run();
     }
 }

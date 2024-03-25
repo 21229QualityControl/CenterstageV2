@@ -21,7 +21,7 @@ public class Outtake {
    public static int LAYER_HEIGHT = 200; // Height of a layer of pixels for the slide, used for teleop
    public static int OUTTAKE_CLOSE = 400; // For close side auto
    public static int OUTTAKE_PARTNER = 550; // For far side auto, start of TeleOp
-   public static int OUTTAKE_CYCLE = 750; // For cycling during auto
+   public static int OUTTAKE_CYCLE = 1100; // For cycling during auto
    public static int OUTTAKE_HANG_EXTEND = 1500;
    public static int OUTTAKE_HANG_RETRACT = 800;
 
