@@ -37,8 +37,8 @@ public abstract class AutoBase extends LinearOpMode {
     protected VisionPortal preloadPortal;
     protected LED led;
 
-    protected int w = 1920;
-    protected int h = 1080;
+    protected int w = 640;
+    protected int h = 480;
 
     public static int SPIKE = -1;
 
