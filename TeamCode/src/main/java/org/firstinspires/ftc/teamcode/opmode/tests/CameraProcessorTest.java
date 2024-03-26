@@ -57,6 +57,8 @@ public class CameraProcessorTest extends LinearOpMode {
 
         waitForStart();
 
+        portal.stopStreaming();
+
         while (opModeIsActive()) {
             // the camera processor got result only when it is in active
             telemetry.addData("loop:", "loop");

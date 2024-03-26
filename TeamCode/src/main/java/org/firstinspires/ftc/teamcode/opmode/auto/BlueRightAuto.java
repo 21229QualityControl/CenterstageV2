@@ -23,7 +23,7 @@ public class BlueRightAuto extends AutoBase {
             new Pose2d(-35, 40, Math.toRadians(0))};
     public static Pose2d intermediate = new Pose2d(-36, 60, Math.toRadians(180));
     public static Pose2d pastTruss = new Pose2d(24, 60, Math.toRadians(180));
-    public static Pose2d stack = new Pose2d(-58, 34, Math.toRadians(180));
+    public static Pose2d stack = new Pose2d(-56, 38, Math.toRadians(225));
     public static Pose2d corner = new Pose2d(50, 60, Math.toRadians(180));
 
     @Override
@@ -64,10 +64,11 @@ public class BlueRightAuto extends AutoBase {
         // Intake stack
         sched.addAction(
                 drive.actionBuilder(spike[SPIKE])
-                        .afterDisp(0, outtake.extendOuttakeBarelyOut())
-                        .splineToLinearHeading(new Pose2d(-36, 45, Math.toRadians(180)), intermediate.heading)
-                        .afterDisp(0, intake.prepIntakeCount(true, true))
-                        .splineToLinearHeading(stack, stack.heading, drive.slowVelConstraint)
+                        .afterDisp(0, new SequentialAction(
+                                outtake.extendOuttakeBarelyOut(),
+                                intake.prepIntakeCount(true, true)
+                        ))
+                        .strafeToLinearHeading(stack.position, stack.heading)
                         .build()
         );
         sched.addAction(intake.intakeCount());
@@ -143,7 +144,7 @@ public class BlueRightAuto extends AutoBase {
                 ))
                 .splineToConstantHeading(intermediate.position, intermediate.heading)
                 .afterDisp(0, intake.prepIntakeCount(false, false))
-                .splineToConstantHeading(stack.position, stack.heading, drive.slowVelConstraint)
+                .splineToSplineHeading(stack, stack.heading, drive.slowVelConstraint)
                 .build()
         );
         sched.addAction(intake.intakeCount());
@@ -159,7 +160,7 @@ public class BlueRightAuto extends AutoBase {
         // Drive to corner & open feed
         sched.addAction(drive.actionBuilder(stack)
                 .setReversed(true)
-                .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
                 .afterDisp(1, intake.intakeOff())
                 .afterDisp(10, new SequentialAction(

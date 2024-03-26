@@ -36,12 +36,12 @@ public class Outtake {
 
    public static double WRIST_VERTICAL = 0.43;
    public static double WRIST_VERTICAL_FLIPPED = 0.98;
-   public static double WRIST_MOSAIC_LEFT = 0.34;
-   public static double WRIST_MOSAIC_LEFT_FLIP = 0;
-   public static double WRIST_MOSAIC_RIGHT = 0.51;
-   public static double WRIST_MOSIAC_RIGHT_FLIP = 0.71;
-   public static double WRIST_LEFT = 0.145;
-   public static double WRIST_RIGHT = 0.71;
+   public static double WRIST_MOSAIC_LEFT = 0.51;
+   public static double WRIST_MOSAIC_LEFT_FLIP = 1;
+   public static double WRIST_MOSAIC_RIGHT = 0.34;
+   public static double WRIST_MOSAIC_RIGHT_FLIP = 0.89;
+   public static double WRIST_LEFT = 0.71;
+   public static double WRIST_RIGHT = 0.145;
 
    public double mosaicPosition;
    final DualMotorWithPID slide;
@@ -171,8 +171,24 @@ public class Outtake {
       }
    }
 
-   public boolean isWristMosaic() {
-      return Math.abs(wrist.getPosition() - WRIST_MOSAIC_LEFT) < EPSILON || Math.abs(wrist.getPosition() - WRIST_MOSAIC_RIGHT) < EPSILON;
+   public Action wristMosaicFlip(boolean left) {
+      if (left) {
+         return new ActionUtil.ServoPositionAction(wrist, WRIST_MOSAIC_LEFT_FLIP);
+      } else {
+         return new ActionUtil.ServoPositionAction(wrist, WRIST_MOSAIC_RIGHT_FLIP);
+      }
+   }
+
+   public boolean isWristMosaic(boolean left) {
+      return (Math.abs(wrist.getPosition() - (left ? WRIST_MOSAIC_LEFT : WRIST_MOSAIC_RIGHT)) < EPSILON) || (Math.abs(wrist.getPosition() - (left ? WRIST_MOSAIC_RIGHT_FLIP : WRIST_MOSAIC_LEFT_FLIP)) < EPSILON);
+   }
+
+   public boolean isWristVertical() {
+      return (Math.abs(wrist.getPosition() - WRIST_VERTICAL) < EPSILON) || (Math.abs(wrist.getPosition() - WRIST_VERTICAL_FLIPPED) < EPSILON);
+   }
+
+   public boolean isWristSideways() {
+      return (Math.abs(wrist.getPosition() - WRIST_LEFT) < EPSILON) || (Math.abs(wrist.getPosition() - WRIST_RIGHT) < EPSILON);
    }
 
    public Action wristSideways(boolean left) {
@@ -184,12 +200,11 @@ public class Outtake {
    }
 
    public Action wristVertical() {
-//      if (flipped) {
-//         return new ActionUtil.ServoPositionAction(wrist, WRIST_VERTICAL_FLIPPED);
-//      }
-//      else {
-   return new ActionUtil.ServoPositionAction(wrist, WRIST_VERTICAL);
-//      }
+      return new ActionUtil.ServoPositionAction(wrist, WRIST_VERTICAL);
+   }
+
+   public Action wristVerticalFlip() {
+      return new ActionUtil.ServoPositionAction(wrist, WRIST_VERTICAL_FLIPPED);
    }
 
    public Action armStored() {
