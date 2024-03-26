@@ -34,11 +34,14 @@ public class Outtake {
    public static double ARM_RIGHT_STORED = 0.68;
    public static double ARM_RIGHT_SCORING = 0.42;
 
-   public static double WRIST_VERTICAL = 0.56;
-   public static double WRIST_MOSAIC_LEFT = 0.64;
-   public static double WRIST_MOSAIC_RIGHT = 0.42;
-   public static double WRIST_LEFT = 0.88;
-   public static double WRIST_RIGHT = 0.2;
+   public static double WRIST_VERTICAL = 0.43;
+   public static double WRIST_VERTICAL_FLIPPED = 0.98;
+   public static double WRIST_MOSAIC_LEFT = 0.34;
+   public static double WRIST_MOSAIC_LEFT_FLIP = 0;
+   public static double WRIST_MOSAIC_RIGHT = 0.51;
+   public static double WRIST_MOSIAC_RIGHT_FLIP = 0.71;
+   public static double WRIST_LEFT = 0.145;
+   public static double WRIST_RIGHT = 0.71;
 
    public double mosaicPosition;
    final DualMotorWithPID slide;
@@ -181,7 +184,12 @@ public class Outtake {
    }
 
    public Action wristVertical() {
-      return new ActionUtil.ServoPositionAction(wrist, WRIST_VERTICAL);
+//      if (flipped) {
+//         return new ActionUtil.ServoPositionAction(wrist, WRIST_VERTICAL_FLIPPED);
+//      }
+//      else {
+   return new ActionUtil.ServoPositionAction(wrist, WRIST_VERTICAL);
+//      }
    }
 
    public Action armStored() {
