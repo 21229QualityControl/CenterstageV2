@@ -47,7 +47,7 @@ public class BlueLeftAuto extends AutoBase {
 
     @Override
     protected void onRun() {
-        SPIKE = 1;
+        SPIKE = 2;
 
         scorePreload();
 
@@ -85,7 +85,7 @@ public class BlueLeftAuto extends AutoBase {
                 .afterDisp(0, new SequentialAction(
                         outtake.extendOuttakeCloseBlocking(),
                         outtake.armScoring(),
-                        outtake.wristSideways(false)
+                        outtake.wristSideways(SPIKE == 2)
                 ))
                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
                         .build()

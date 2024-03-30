@@ -262,7 +262,7 @@ public class ManualDrive extends LinearOpMode {
       if (g1.backOnce()) {
          sched.queueAction(plane.scorePlane());
       }
-      if (g1.startOnce()) {
+      if (g2.startOnce()) {
          if (outtake.isSlideRetracted()) {
             sched.queueAction(outtake.extendOuttakeHangBlocking());
          } else {
@@ -347,10 +347,11 @@ public class ManualDrive extends LinearOpMode {
       if (g2.aOnce()) {
          intake.pixelCount = 0;
          sched.queueAction(new SequentialAction(
-                 outtake.clawOpen(),
+                 outtake.clawHalfOpen(),
                  new SleepAction(0.5),
                  outtake.wristVertical(),
                  outtake.armStored(),
+                 outtake.clawOpen(),
                  new SleepAction(0.5),
                  outtake.retractOuttakeBlocking()
          ));

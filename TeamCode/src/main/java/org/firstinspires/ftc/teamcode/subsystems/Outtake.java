@@ -27,6 +27,7 @@ public class Outtake {
 
    public static double CLAW_OPEN = 0.85;
    public static double CLAW_CLOSED = 0.53;
+   public static double CLAW_HALF_OPEN = 0.67;
    public static double CLAW_SINGLE_CLOSED = 0.46;
 
    public static double ARM_LEFT_STORED = 0.5;
@@ -154,6 +155,7 @@ public class Outtake {
    }
 
    public Action clawOpen() { return new ActionUtil.ServoPositionAction(claw, CLAW_OPEN); }
+   public Action clawHalfOpen() { return new ActionUtil.ServoPositionAction(claw, CLAW_HALF_OPEN); }
 
    public Action clawClosed() {
       return new ActionUtil.ServoPositionAction(claw, CLAW_CLOSED);
