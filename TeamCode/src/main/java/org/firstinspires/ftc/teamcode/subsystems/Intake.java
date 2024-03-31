@@ -37,9 +37,13 @@ public class Intake {
    final Servo intakeWristRight;
    final Servo intakeFeed;
 
-   final BeamBreakSensor beamBreak;
+   final BeamBreakSensor beamBreakFront;
+   final BeamBreakSensor beamBreakBack;
+
    private DistanceSensor distanceSensor1;
    private DistanceSensor distanceSensor2;
+   private DistanceSensor distanceLeft;
+   private DistanceSensor distanceRight;
 
    public static double WRIST_LEFT_STORED = 0.17;
    public static double WRIST_LEFT_DOWN = 0.43;
@@ -74,8 +78,12 @@ public class Intake {
          this.intakeWristLeft = HardwareCreator.createServo(hardwareMap, "intakeWristLeft");
          this.intakeWristRight = HardwareCreator.createServo(hardwareMap, "intakeWristRight");
          this.intakeFeed = HardwareCreator.createServo(hardwareMap, "intakeFeed");
-         this.beamBreak = new BeamBreakSensor(HardwareCreator.createDigitalChannel(hardwareMap, "intakeBeam"));
+         this.beamBreakFront = new BeamBreakSensor(HardwareCreator.createDigitalChannel(hardwareMap, "intakeBeamFront"));
+         this.beamBreakBack = new BeamBreakSensor(HardwareCreator.createDigitalChannel(hardwareMap, "intakeBeamBack"));
+
          this.distanceSensor1 = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+         this.distanceRight = hardwareMap.get(DistanceSensor.class, "distanceRight");
+         this.distanceLeft = hardwareMap.get(DistanceSensor.class, "distanceLeft");
    }
 
    public void initialize() {
@@ -118,33 +126,18 @@ public class Intake {
       intakeMotor.resetIntegralGain();
       return intakeMotor.setTargetVelocityAction(0);
    }
-
-   boolean beamBreakPrev = false;
-   public int pixelCount = 0;
    public void update() {
       intakeMotor.update();
-      if (pixelCount == 1 && beamBreak.isBeamBroken()) {
-         pixelCount = 2;
-         return;
-      }
-      if (pixelCount > 0) {
-         return;
-      }
-
-      if (beamBreak.isBeamBroken() && !beamBreakPrev) {
-         beamBreakPrev = true;
-      }
-      if (beamBreakPrev && !beamBreak.isBeamBroken()) {
-         beamBreakPrev = false;
-         pixelCount++;
-      }
    }
 
-   public Action setPixelCount(int count) {
-      return new ActionUtil.RunnableAction(() -> {
-         pixelCount = count;
-         return false;
-      });
+   public int pixelCount() {
+      if (beamBreakBack.isBeamBroken()) {
+         if (beamBreakFront.isBeamBroken()) {
+            return 2;
+         }
+         return 1;
+      }
+      return 0;
    }
 
    public Action wristStored() {
@@ -219,7 +212,7 @@ public class Intake {
          if (done) { // Make it wait 0.2s after it has intaked 2
             return System.currentTimeMillis() < waitUntil;
          }
-         if (pixelCount < 2 && System.currentTimeMillis() >= waitUntil) {
+         if (pixelCount() < 2 && System.currentTimeMillis() >= waitUntil) {
             wristStackInstant(numIntaked);
             numIntaked++;
             if (numIntaked >= WRIST_LEFT_STACK_POSITIONS.length) {
@@ -227,7 +220,7 @@ public class Intake {
             }
             this.waitUntil = System.currentTimeMillis() + 1000;
          }
-         if (pixelCount >= 2) {
+         if (pixelCount() >= 2) {
             done = true;
             this.waitUntil = System.currentTimeMillis() + 200;
             wristStoredInstant();

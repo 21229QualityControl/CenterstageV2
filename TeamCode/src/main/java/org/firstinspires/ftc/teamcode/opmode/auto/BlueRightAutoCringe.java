@@ -56,7 +56,6 @@ public class BlueRightAutoCringe extends AutoBase {
     }
 
     private void deliverSpike() {
-        sched.addAction(intake.setPixelCount(1));
         sched.addAction(intake.wristDown());
         sched.addAction(new SleepAction(0.5));
         if (SPIKE != 2) {

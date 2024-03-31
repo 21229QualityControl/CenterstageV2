@@ -116,7 +116,7 @@ public class ManualDrive extends LinearOpMode {
          intake.update();
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
-         telemetry.addData("Pixel Count", intake.pixelCount);
+         telemetry.addData("Pixel Count", intake.pixelCount());
          telemetry.update();
 
          telemetry.update();
@@ -275,12 +275,12 @@ public class ManualDrive extends LinearOpMode {
       // Outtake controls
       if (g2.yOnce()) {
          if (!outtake.isArmScoring()) {
-            if (intake.pixelCount == 1) {
+            if (intake.pixelCount() == 1) {
                sched.queueAction(new SequentialAction(outtake.extendOuttakeBarelyOut(), new SleepAction(0.3)));
             }
             sched.queueAction(intake.intakeOff());
             sched.queueAction(new SequentialAction(
-                    intake.pixelCount == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
+                    intake.pixelCount() == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
                     new SleepAction(0.3)
            ));
             sched.queueAction(new ParallelAction(
@@ -292,12 +292,12 @@ public class ManualDrive extends LinearOpMode {
       }
       if (g2.xOnce()) {
          if (!outtake.isArmScoring()) {
-            if (intake.pixelCount == 1) {
+            if (intake.pixelCount() == 1) {
                sched.queueAction(new SequentialAction(outtake.extendOuttakeBarelyOut(), new SleepAction(0.3)));
             }
             sched.queueAction(intake.intakeOff());
             sched.queueAction(new SequentialAction(
-                    intake.pixelCount == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
+                    intake.pixelCount() == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
                     new SleepAction(0.3)
             ));
             sched.queueAction(new ParallelAction(
@@ -345,7 +345,6 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(outtake.lockPosition());
       }
       if (g2.aOnce()) {
-         intake.pixelCount = 0;
          sched.queueAction(new SequentialAction(
                  outtake.clawHalfOpen(),
                  new SleepAction(0.5),
@@ -390,7 +389,7 @@ public class ManualDrive extends LinearOpMode {
    boolean warning2 = false;
    boolean warning3 = false;
    private void ledUpdate() {
-      int pixelCount = intake.pixelCount;
+      int pixelCount = intake.pixelCount();
       if (pixelCount == 1) {
          led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
       } else if (pixelCount == 2) {

@@ -91,7 +91,6 @@ public class BlueLeftAuto extends AutoBase {
                         .build()
         );
         sched.addAction(outtake.clawOpen());
-        sched.addAction(intake.setPixelCount(0));
         sched.run();
     }
 
@@ -156,7 +155,6 @@ public class BlueLeftAuto extends AutoBase {
         );
         sched.addAction(outtake.clawOpen());
         sched.addAction(intake.feedClosed()); // Open & close feed in case outtake doesn't grab
-        sched.addAction(intake.setPixelCount(0));
         sched.run();
     }
 

@@ -49,7 +49,6 @@ public class BlueRightAuto extends AutoBase {
 
     private void firstCycle() {
         // Deliver spike
-        sched.addAction(intake.setPixelCount(1));
         sched.addAction(intake.wristPreload());
         sched.addAction(new SleepAction(0.5));
         sched.addAction(
@@ -118,8 +117,7 @@ public class BlueRightAuto extends AutoBase {
         sched.addAction(drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
                 .afterDisp(12, new SequentialAction(
-                        outtake.clawOpen(),
-                        intake.setPixelCount(0)
+                        outtake.clawOpen()
                 ))
                 .build()
         );
@@ -139,8 +137,7 @@ public class BlueRightAuto extends AutoBase {
                 .afterDisp(10, outtake.retractOuttake())
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading, first ? drive.slowVelConstraint : drive.defaultVelConstraint, first ? drive.slowAccelConstraint : drive.defaultAccelConstraint)
                 .afterDisp(0, new SequentialAction(
-                        intake.feedClosed(),
-                        intake.setPixelCount(0)
+                        intake.feedClosed()
                 ))
                 .splineToConstantHeading(intermediate.position, intermediate.heading)
                 .afterDisp(0, intake.prepIntakeCount(false, false))
@@ -164,8 +161,7 @@ public class BlueRightAuto extends AutoBase {
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
                 .afterDisp(1, intake.intakeOff())
                 .afterDisp(10, new SequentialAction(
-                        intake.feedOpen(),
-                        intake.setPixelCount(0)
+                        intake.feedOpen()
                 ))
                 .splineToConstantHeading(corner.position, corner.heading.toDouble() - Math.PI)
                 .build()

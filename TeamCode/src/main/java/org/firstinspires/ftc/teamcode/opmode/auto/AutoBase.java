@@ -44,7 +44,7 @@ public abstract class AutoBase extends LinearOpMode {
 
     final public void update() {
         telemetry.addData("Time left", 30 - getRuntime());
-        telemetry.addData("Pixel Count", intake.pixelCount);
+        telemetry.addData("Pixel Count", intake.pixelCount());
         telemetry.addData("Number Intaked", intake.numIntaked);
         telemetry.addData("Intake Reversing", intake.isReversing());
         outtake.update();
