@@ -20,13 +20,13 @@ public class BlueLeftAuto extends AutoBase {
     public static Pose2d[] spike = {
             new Pose2d(9, 34, Math.toRadians(-135)),
             new Pose2d(26, 22, Math.toRadians(180)),
-            new Pose2d(33, 29, Math.toRadians(180))
+            new Pose2d(35, 33, Math.toRadians(180))
     };
     public static Pose2d intermediate = new Pose2d(24,  10, Math.toRadians(180));
     public static Pose2d pastTruss = new Pose2d(-36, 10, Math.toRadians(180));
     public static Pose2d stack = new Pose2d(-57, 8, Math.toRadians(180));
-    public static Pose2d secondStack = new Pose2d(-58, 16, Math.toRadians(150));
-    public static Pose2d scoring = new Pose2d(56, 22, Math.toRadians(200));
+    public static Pose2d secondStack = new Pose2d(-58, 15, Math.toRadians(150));
+    public static Pose2d scoring = new Pose2d(56, 21, Math.toRadians(200));
     public static Pose2d park = new Pose2d(53, 22, Math.toRadians(180));
 
     @Override
@@ -109,7 +109,7 @@ public class BlueLeftAuto extends AutoBase {
         }
         bld = bld.afterDisp(0, new SequentialAction(
                     intake.prepIntakeCount(first || nextStack, false),
-                    nextStack ? intake.intakeOnFast() : intake.intakeOn(),
+                    nextStack ? intake.intakeOn() : intake.intakeSlow(),
                     outtake.extendOuttakeBarelyOut()
             ))
             .splineToConstantHeading(pastTruss.position, pastTruss.heading);

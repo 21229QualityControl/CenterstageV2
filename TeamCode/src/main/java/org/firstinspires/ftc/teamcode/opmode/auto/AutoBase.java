@@ -78,7 +78,7 @@ public abstract class AutoBase extends LinearOpMode {
                 .enableLiveView(true)
                 .setAutoStopLiveView(true)
                 .build();
-        this.preloadPortal = new VisionPortal.Builder()
+        /*this.preloadPortal = new VisionPortal.Builder()
                 // Get the actual camera on the robot, add the processor, state the orientation of the camera.
                 .setCamera(hardwareMap.get(WebcamName.class, "WebcamOuttake"))
                 .setCameraResolution(new Size(1280, 720))
@@ -91,7 +91,7 @@ public abstract class AutoBase extends LinearOpMode {
 
 
         preloadPortal.setProcessorEnabled(aprilTagProcessor, false);
-        preloadPortal.setProcessorEnabled(preloadProcessor, false);
+        preloadPortal.setProcessorEnabled(preloadProcessor, false);*/
 
         outtake.initialize(false);
         plane.initialize();
@@ -127,10 +127,13 @@ public abstract class AutoBase extends LinearOpMode {
 
             led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE);
 
-            telemetry.addData("Portal State", preloadPortal.getCameraState());
+            /*telemetry.addData("Portal State", preloadPortal.getCameraState());
             if (preloadPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
                 preloadPortal.stopStreaming();
-            }
+            }*/
+
+            outtake.update();
+            intake.update();
 
             idle();
         }
