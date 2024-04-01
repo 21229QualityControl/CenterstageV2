@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.pathing.Pose;
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
@@ -18,13 +19,16 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 public class BlueRightAuto extends AutoBase {
     public static Pose2d start = new Pose2d(-36, 64, Math.toRadians(-90));
     public static Pose2d[] spike = {
-            new Pose2d(-48, 40, Math.toRadians(-90)),
+            new Pose2d(-46, 40, Math.toRadians(-90)),
             new Pose2d(-36, 40, Math.toRadians(-90)),
-            new Pose2d(-35, 40, Math.toRadians(0))};
+            new Pose2d(-33, 41, Math.toRadians(-45))};
     public static Pose2d intermediate = new Pose2d(-36, 60, Math.toRadians(180));
     public static Pose2d pastTruss = new Pose2d(24, 60, Math.toRadians(180));
-    public static Pose2d stack = new Pose2d(-56, 38, Math.toRadians(225));
-    public static Pose2d corner = new Pose2d(50, 60, Math.toRadians(180));
+    public static Pose2d stackAfterPreload = new Pose2d(-59, 44, Math.toRadians(210));
+    public static Pose2d stack = new Pose2d(-59, 39, Math.toRadians(205));
+    public static Pose2d stackLastCycle = new Pose2d(-59, 35, Math.toRadians(205));
+    public static Pose2d corner = new Pose2d(55, 60, Math.toRadians(180));
+    public static Pose2d park = new Pose2d(50, 60, Math.toRadians(180));
 
     @Override
     protected Pose2d getStartPose() {
@@ -41,10 +45,12 @@ public class BlueRightAuto extends AutoBase {
         firstCycle();
 
         intakeStack(true);
-        cycle();
+        cycle(true);
 
         intakeStack(false);
-        cycle();
+        cycle(false);
+
+        park();
     }
 
     private void firstCycle() {
@@ -53,7 +59,7 @@ public class BlueRightAuto extends AutoBase {
         sched.addAction(new SleepAction(0.5));
         sched.addAction(
                 drive.actionBuilder(getStartPose())
-                        .strafeToLinearHeading(spike[SPIKE].position.plus(new Vector2d(0, -4)), spike[SPIKE].heading) // It doesn't go far enough? Perhaps roadrunner needs to be tuned better
+                        .strafeToSplineHeading(spike[SPIKE].position.plus(new Vector2d(0, -4)), spike[SPIKE].heading) // It doesn't go far enough? Perhaps roadrunner needs to be tuned better
                         .build()
         );
         sched.addAction(intake.wristStored());
@@ -67,7 +73,7 @@ public class BlueRightAuto extends AutoBase {
                                 outtake.extendOuttakeBarelyOut(),
                                 intake.prepIntakeCount(true, true)
                         ))
-                        .strafeToLinearHeading(stack.position, stack.heading)
+                        .strafeToLinearHeading(stackAfterPreload.position, stackAfterPreload.heading)
                         .build()
         );
         sched.addAction(intake.intakeCount());
@@ -75,16 +81,26 @@ public class BlueRightAuto extends AutoBase {
 
         // Drive to preload
         sched.addAction(
-                drive.actionBuilder(stack)
+                drive.actionBuilder(stackAfterPreload)
                         .setReversed(true)
                         .afterDisp(0, outtake.retractOuttakeBlocking())
-                        .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
-                        .afterDisp(0, outtake.clawClosed())
+                        .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
+                        .afterDisp(0, intake.pixelCount() == 2 ? outtake.clawClosed() : outtake.clawSingleClosed())
                         .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
+                        .afterDisp(0, new ActionUtil.RunnableAction(() -> {
+                            this.preloadProcessor.updateTarget(SPIKE, false);
+                            this.preloadProcessor.detecting = false;
+                            this.preloadPortal.setProcessorEnabled(this.aprilTagProcessor, true);
+                            this.preloadPortal.setProcessorEnabled(this.preloadProcessor, true);
+                            this.preloadPortal.resumeStreaming();
+                            this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_LAVA_PALETTE);
+                            return false;
+                        }))
                         .afterDisp(1, new SequentialAction(
                                 intake.intakeOff(),
                                 outtake.extendOuttakePartnerBlocking(),
-                                outtake.armScoring()
+                                outtake.armScoring(),
+                                outtake.wristVerticalFlip()
                         ))
                         .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading.toDouble() - Math.PI)
                         .build()
@@ -92,15 +108,7 @@ public class BlueRightAuto extends AutoBase {
         sched.run();
 
         // Detect spike
-        sched.addAction(new ActionUtil.RunnableAction(() -> {
-            this.preloadProcessor.updateTarget(SPIKE, false);
-            this.preloadProcessor.detecting = false;
-            this.preloadPortal.setProcessorEnabled(this.aprilTagProcessor, true);
-            this.preloadPortal.setProcessorEnabled(this.preloadProcessor, true);
-            this.preloadPortal.resumeStreaming();
-            this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_LAVA_PALETTE);
-            return false;
-        }));
+        sched.addAction(new SleepAction(0.2));
         sched.addAction(new ActionUtil.RunnableAction(() -> {
             if (preloadProcessor.detecting) {
                 Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
@@ -110,14 +118,13 @@ public class BlueRightAuto extends AutoBase {
             }
             return true;
         }));
-        sched.addAction(outtake.wristSideways(!preloadProcessor.preloadLeft));
         sched.run();
 
         // Score
         sched.addAction(drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
-                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
+                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -3 : 3)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .afterDisp(12, new SequentialAction(
-                        outtake.clawOpen()
+                        outtake.clawHalfOpen()
                 ))
                 .build()
         );
@@ -131,6 +138,7 @@ public class BlueRightAuto extends AutoBase {
                         outtake.wristVertical(),
                         outtake.armStored(),
                         new SleepAction(0.3),
+                        outtake.clawOpen(),
                         outtake.retractOuttakeBlocking(),
                         outtake.extendOuttakeBarelyOut()
                 ) : new SequentialAction())
@@ -144,8 +152,17 @@ public class BlueRightAuto extends AutoBase {
                 .splineToSplineHeading(stack, stack.heading, drive.slowVelConstraint)
                 .build()
         );
-        sched.addAction(intake.intakeCount());
         sched.run();
+
+        if (first) {
+            sched.addAction(intake.intakeCount());
+        } else {
+            sched.addAction(drive.actionBuilder(stack)
+                    .afterDisp(0, intake.intakeCount())
+                    .strafeToLinearHeading(stackLastCycle.position, stackLastCycle.heading, drive.slowVelConstraint)
+                    .build()
+            );
+        }
 
         // Update for future cycles
         if (first) {
@@ -153,9 +170,9 @@ public class BlueRightAuto extends AutoBase {
         }
     }
 
-    private void cycle() {
+    private void cycle(boolean first) {
         // Drive to corner & open feed
-        sched.addAction(drive.actionBuilder(stack)
+        sched.addAction(drive.actionBuilderEndEarly(first ? stack : stackLastCycle)
                 .setReversed(true)
                 .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
@@ -166,6 +183,13 @@ public class BlueRightAuto extends AutoBase {
                 .splineToConstantHeading(corner.position, corner.heading.toDouble() - Math.PI)
                 .build()
         );
+        sched.run();
+    }
+
+    private void park() {
+        sched.addAction(drive.actionBuilder(corner)
+                .strafeToLinearHeading(park.position, park.heading)
+                .build());
         sched.run();
     }
 }

@@ -47,8 +47,6 @@ public class BlueLeftAuto extends AutoBase {
 
     @Override
     protected void onRun() {
-        SPIKE = 2;
-
         scorePreload();
 
         // First stack

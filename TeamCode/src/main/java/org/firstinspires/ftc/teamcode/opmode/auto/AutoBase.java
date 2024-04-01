@@ -53,7 +53,7 @@ public abstract class AutoBase extends LinearOpMode {
     }
 
     final public void runOpMode() throws InterruptedException {
-        telemetry.addLine("Initializing... Please wait");
+        telemetry.addLine("Initializing");
         telemetry.update();
 
         Memory.LAST_POSE = getStartPose();
@@ -69,29 +69,32 @@ public abstract class AutoBase extends LinearOpMode {
         this.aprilTagProcessor = PartnerPreloadProcessor.newAprilTagProcessor();
         this.preloadProcessor = new PartnerPreloadProcessor(aprilTagProcessor);
         this.led = new LED(hardwareMap);
+
+        int[] visionPortalViewIDs = VisionPortal.makeMultiPortalView(2, VisionPortal.MultiPortalLayout.HORIZONTAL);
         this.portal = new VisionPortal.Builder()
                 // Get the actual camera on the robot, add the processor, state the orientation of the camera.
                 .setCamera(hardwareMap.get(WebcamName.class, "webcam"))
                 .setCameraResolution(new Size(w, h))
                 .addProcessor(processor)
-                .setCamera(BuiltinCameraDirection.BACK)
+                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                 .enableLiveView(true)
                 .setAutoStopLiveView(true)
+                .setLiveViewContainerId(visionPortalViewIDs[0])
                 .build();
-        /*this.preloadPortal = new VisionPortal.Builder()
+        this.preloadPortal = new VisionPortal.Builder()
                 // Get the actual camera on the robot, add the processor, state the orientation of the camera.
                 .setCamera(hardwareMap.get(WebcamName.class, "WebcamOuttake"))
                 .setCameraResolution(new Size(1280, 720))
-                .addProcessor(aprilTagProcessor)
-                .addProcessor(preloadProcessor)
-                .setCamera(BuiltinCameraDirection.FRONT)
-                .enableLiveView(false)
-                .setAutoStopLiveView(false)
+                .addProcessors(aprilTagProcessor, preloadProcessor)
+                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+                .enableLiveView(true)
+                .setAutoStopLiveView(true)
+                .setLiveViewContainerId(visionPortalViewIDs[1])
                 .build();
 
 
         preloadPortal.setProcessorEnabled(aprilTagProcessor, false);
-        preloadPortal.setProcessorEnabled(preloadProcessor, false);*/
+        preloadPortal.setProcessorEnabled(preloadProcessor, false);
 
         outtake.initialize(false);
         plane.initialize();
@@ -103,14 +106,14 @@ public abstract class AutoBase extends LinearOpMode {
         sleep(200);
         while (opModeInInit() && outtake.initializeSlides()) {}
 
+        telemetry.addLine("Initializing cameras");
+        telemetry.update();
+        while (opModeInInit() && (portal.getCameraState() != VisionPortal.CameraState.STREAMING || preloadPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {}
+
         onInit();
 
         SPIKE = -1;
         while (opModeInInit()) {
-            // Below is the code for the distance sensors
-            // SPIKE = vision.objectPosition();
-            // Below is the code for the camera vision
-
             int cameraReading = processor.position;
             if (cameraReading > -1) {
                 SPIKE = cameraReading;
@@ -127,11 +130,6 @@ public abstract class AutoBase extends LinearOpMode {
 
             led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE);
 
-            /*telemetry.addData("Portal State", preloadPortal.getCameraState());
-            if (preloadPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
-                preloadPortal.stopStreaming();
-            }*/
-
             outtake.update();
             intake.update();
 
@@ -144,6 +142,7 @@ public abstract class AutoBase extends LinearOpMode {
             SPIKE = 0;
         }
         portal.stopStreaming();
+        preloadPortal.stopStreaming();
         portal.setProcessorEnabled(processor, false);
 
         // Auto start

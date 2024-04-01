@@ -178,10 +178,12 @@ public class Intake {
    public int numIntaked = 0;
    public Action prepIntakeCount(boolean start, boolean one) {
       if (start) {
-         numIntaked = 0;
+         numIntaked = -1;
       }
-      if (!one) {
-         numIntaked++; // Intake 2 at once
+      if (one) {
+         numIntaked++;
+      } else {
+         numIntaked += 2; // Intake 2 at once
       }
       if (numIntaked >= WRIST_LEFT_STACK_POSITIONS.length) {
          numIntaked = WRIST_LEFT_STACK_POSITIONS.length-1;
