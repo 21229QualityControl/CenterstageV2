@@ -19,6 +19,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.BeamBreakSensor;
@@ -40,10 +41,10 @@ public class Intake {
    final BeamBreakSensor beamBreakFront;
    final BeamBreakSensor beamBreakBack;
 
-   private DistanceSensor distanceSensor1;
+   final DistanceSensor distanceSensor1;
    private DistanceSensor distanceSensor2;
-   private DistanceSensor distanceLeft;
-   private DistanceSensor distanceRight;
+   final DistanceSensor distanceLeft;
+   final DistanceSensor distanceRight;
 
    public static double WRIST_LEFT_STORED = 0.17;
    public static double WRIST_LEFT_DOWN = 0.43;
@@ -75,6 +76,7 @@ public class Intake {
    public Intake(HardwareMap hardwareMap) {
          this.intakeMotor = new MotorWithVelocityPID(HardwareCreator.createMotor(hardwareMap, "intakeMotor"), intakeMotorPid);
          this.intakeMotor.setMaxPower(1.0);
+         this.intakeMotor.getMotor().setCurrentAlert(5.5, CurrentUnit.AMPS);
          this.intakeWristLeft = HardwareCreator.createServo(hardwareMap, "intakeWristLeft");
          this.intakeWristRight = HardwareCreator.createServo(hardwareMap, "intakeWristRight");
          this.intakeFeed = HardwareCreator.createServo(hardwareMap, "intakeFeed");
@@ -175,6 +177,14 @@ public class Intake {
       return new ActionUtil.ServoPositionAction(intakeFeed, FEED_OPEN);
    }
 
+   public double sideDistance(boolean right) {
+      if (right) {
+         return distanceRight.getDistance(DistanceUnit.INCH);
+      } else {
+         return distanceLeft.getDistance(DistanceUnit.INCH);
+      }
+   }
+
    public int numIntaked = 0;
    public Action prepIntakeCount(boolean start, boolean one) {
       if (start) {
@@ -203,9 +213,10 @@ public class Intake {
       private long waitUntil;
       private long finalTime;
       private boolean done;
+      private boolean jammed;
 
       public IntakeCountAction() {
-         this.waitUntil = System.currentTimeMillis() + 1000;
+         this.waitUntil = System.currentTimeMillis() + 600;
          this.finalTime = System.currentTimeMillis() + 6000;
       }
 
@@ -214,13 +225,34 @@ public class Intake {
          if (done) { // Make it wait 0.2s after it has intaked 2
             return System.currentTimeMillis() < waitUntil;
          }
+
+         if (jammed) {
+            if (!intakeMotor.getMotor().isOverCurrent()) {
+               this.jammed = false;
+               this.waitUntil = System.currentTimeMillis() + 600;
+               wristStackInstant(numIntaked);
+               return true;
+            }
+            if (System.currentTimeMillis() >= waitUntil) {
+               intakeReverse();
+               Log.d("REVERSE", "REVERSE");
+               return true;
+            }
+         }
+         if (intakeMotor.getMotor().isOverCurrent()) {
+            this.jammed = true;
+            this.waitUntil = System.currentTimeMillis() + 200;
+            wristStoredInstant();
+            return true;
+         }
+
          if (pixelCount() < 2 && System.currentTimeMillis() >= waitUntil) {
             wristStackInstant(numIntaked);
             numIntaked++;
             if (numIntaked >= WRIST_LEFT_STACK_POSITIONS.length) {
                numIntaked = WRIST_LEFT_STACK_POSITIONS.length-1;
             }
-            this.waitUntil = System.currentTimeMillis() + 1000;
+            this.waitUntil = System.currentTimeMillis() + 600;
          }
          if (pixelCount() >= 2) {
             done = true;

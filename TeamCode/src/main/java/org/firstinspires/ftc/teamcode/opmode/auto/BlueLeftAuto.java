@@ -56,9 +56,11 @@ public class BlueLeftAuto extends AutoBase {
         intakeStack(false, false);
         cycle(false);
 
-        // Second stack
-        intakeStack(false, true);
-        cycle(true);
+        // Second stack (need 9 seconds)
+        if (getRuntime() < 21) {
+            intakeStack(false, true);
+            cycle(true);
+        }
 
         /*intakeStack(false, true);
         cycle(true);*/

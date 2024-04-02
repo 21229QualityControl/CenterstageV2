@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.util.GamePadController;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 import org.firstinspires.ftc.teamcode.util.MotorWithVelocityPID;
@@ -49,6 +50,7 @@ public class MotorVelocityPIDTest extends LinearOpMode {
       while (opModeIsActive()) {
          telemetry.addData("Real", motor.getVelocity());
          telemetry.addData("Target", motor.getTargetVelocity());
+         telemetry.addData("Current", motor.getMotor().getCurrent(CurrentUnit.AMPS));
          telemetry.update();
 
          motor.setTargetVelocity(TARGET_VELOCITY);
