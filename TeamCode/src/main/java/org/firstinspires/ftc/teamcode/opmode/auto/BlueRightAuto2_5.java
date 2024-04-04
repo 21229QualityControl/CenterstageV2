@@ -1,31 +1,24 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
-import android.util.Log;
-
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.pathing.Pose;
-import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
-@Autonomous(name = "Blue Left Auto", group = "Auto")
-public class BlueLeftAuto extends AutoBase {
-    public static Pose2d start = new Pose2d(12, 63, Math.toRadians(-90));
+@Autonomous(name = "Blue Right Auto 2+5", group = "Auto")
+public class BlueRightAuto2_5 extends AutoBase {
+    public static Pose2d start = new Pose2d(-36, 64, Math.toRadians(-90));
     public static Pose2d[] spike = {
-            new Pose2d(9, 34, Math.toRadians(-135)),
-            new Pose2d(26, 22, Math.toRadians(180)),
-            new Pose2d(35, 33, Math.toRadians(180))
-    };
+            new Pose2d(-46, 44, Math.toRadians(-90)),
+            new Pose2d(-36, 40, Math.toRadians(-90)),
+            new Pose2d(-33, 41, Math.toRadians(-45))};
     public static Pose2d intermediate = new Pose2d(24,  10, Math.toRadians(180));
     public static Pose2d pastTruss = new Pose2d(-36, 10, Math.toRadians(180));
     public static Pose2d stack = new Pose2d(-57, 8, Math.toRadians(180));
-    public static Pose2d secondStack = new Pose2d(-58, 15, Math.toRadians(150));
     public static Pose2d scoring = new Pose2d(56, 21, Math.toRadians(200));
     public static Pose2d park = new Pose2d(53, 22, Math.toRadians(180));
 
@@ -36,13 +29,7 @@ public class BlueLeftAuto extends AutoBase {
 
     @Override
     protected void printDescription() {
-        telemetry.addData("Description", "Blue Left Auto");
-    }
-
-    @Override
-    protected void onInit() {
-        sched.addAction(outtake.clawSingleClosed());
-        sched.run();
+        telemetry.addData("Description", "Blue Right Auto 2+5");
     }
 
     @Override
@@ -50,43 +37,57 @@ public class BlueLeftAuto extends AutoBase {
         scorePreload();
 
         // First stack
-        intakeStack(true, false);
-        cycle(false);
+        intakeStack(true);
+        cycle();
 
-        intakeStack(false, false);
-        cycle(false);
-
-        // Second stack (need 9 seconds)
-        if (getRuntime() < 21) {
-            intakeStack(false, true);
-            cycle(true);
-        }
-
-        /*intakeStack(false, true);
-        cycle(true);*/
+        intakeStack(false);
+        cycle();
 
         park();
     }
 
     private void scorePreload() {
         // Deliver spike
-        sched.addAction(outtake.extendOuttakeBarelyOut());
         sched.addAction(intake.wristPreload());
+        sched.addAction(new SleepAction(0.4));
         sched.addAction(
                 drive.actionBuilder(getStartPose())
-                        .strafeToSplineHeading(spike[SPIKE].position, spike[SPIKE].heading)
+                        .strafeToSplineHeading(spike[SPIKE].position.plus(new Vector2d(0, -4)), spike[SPIKE].heading) // It doesn't go far enough? Perhaps roadrunner needs to be tuned better
                         .build()
         );
         sched.addAction(intake.wristStored());
+        sched.addAction(new SleepAction(0.1));
         sched.run();
+
+        // Intake stack
+        sched.addAction(
+                drive.actionBuilder(spike[SPIKE])
+                        .afterDisp(0, new SequentialAction(
+                                outtake.extendOuttakeBarelyOut(),
+                                intake.prepIntakeCount(true, true)
+                        ))
+                        .strafeToLinearHeading(stack.position, stack.heading)
+                        .build()
+        );
+        sched.addAction(intake.intakeCount());
+        sched.run();
+
 
         // Score preload
         sched.addAction(drive.actionBuilder(spike[SPIKE])
+                .setReversed(true)
+                .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
+                .afterDisp(0, new SequentialAction(
+                        outtake.clawClosed(),
+                        intake.intakeOff()
+                ))
+                .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI)
                 .afterDisp(0, new SequentialAction(
                         outtake.extendOuttakeCloseBlocking(),
                         outtake.armScoring(),
                         outtake.wristSideways(SPIKE == 2)
                 ))
+                .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
                         .build()
         );
@@ -94,7 +95,7 @@ public class BlueLeftAuto extends AutoBase {
         sched.run();
     }
 
-    private void intakeStack(boolean first, boolean nextStack) {
+    private void intakeStack(boolean first) {
         TrajectoryActionBuilder bld = drive.actionBuilder(first ? new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading) : scoring)
                 .afterDisp(1, new SequentialAction(
                         outtake.wristVertical(),
@@ -107,16 +108,12 @@ public class BlueLeftAuto extends AutoBase {
             bld = bld.splineToSplineHeading(intermediate, intermediate.heading);
         }
         bld = bld.afterDisp(0, new SequentialAction(
-                    intake.prepIntakeCount(first || nextStack, false),
-                    nextStack ? intake.intakeOn() : intake.intakeSlow(),
+                    intake.prepIntakeCount(first, false),
+                    intake.intakeOn(),
                     outtake.extendOuttakeBarelyOut()
             ))
-            .splineToConstantHeading(pastTruss.position, pastTruss.heading);
-        if (nextStack) {
-            bld = bld.splineToSplineHeading(secondStack, secondStack.heading, drive.slowVelConstraint);
-        } else {
-            bld = bld.splineToConstantHeading(stack.position, stack.heading, drive.slowVelConstraint);
-        }
+            .splineToConstantHeading(pastTruss.position, pastTruss.heading)
+            .splineToConstantHeading(stack.position, stack.heading, drive.slowVelConstraint);
         sched.addAction(bld.build());
         if (first) { // Score out of the way
             if (SPIKE == 0) {
@@ -132,16 +129,12 @@ public class BlueLeftAuto extends AutoBase {
         sched.run();
     }
 
-    private void cycle(boolean second) {
-        TrajectoryActionBuilder bld = drive.actionBuilder(second ? secondStack : stack).setReversed(true);
-        if (second) {
-            bld = bld.splineToSplineHeading(pastTruss, pastTruss.heading.toDouble() - Math.PI);
-        } else {
-            bld = bld.splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI);
-        }
-        sched.addAction(bld
+    private void cycle() {
+        sched.addAction(drive.actionBuilder(stack)
+                .setReversed(true)
+                .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
                 .afterDisp(0, new SequentialAction(
-                        intake.pixelCount() == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
+                        outtake.clawClosed(),
                         intake.intakeOff()
                 ))
                 .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI)
