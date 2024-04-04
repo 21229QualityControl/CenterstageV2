@@ -117,6 +117,7 @@ public class Intake {
 
    public boolean isIntaking() {
       return intakeMotor.getTargetVelocity() == INTAKE_SPEED;
+      // isIntaking seems to return false when the intake is reversing.
    }
    public boolean isReversing() {
       return intakeMotor.getTargetVelocity() == INTAKE_REVERSE_SPEED;

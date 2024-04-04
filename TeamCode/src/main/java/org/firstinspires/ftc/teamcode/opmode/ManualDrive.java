@@ -200,23 +200,60 @@ public class ManualDrive extends LinearOpMode {
    }
 
    public int INTAKE_STACK_POSITION = 0;
+   double TimeReversedIntake = 0;
    private void intakeControls() {
       // Intake controls
+
+
+      if (TimeReversedIntake - timeLeft() > 1){
+         telemetry.addData("Intake Off", TimeReversedIntake - timeLeft());
+         sched.queueAction(intake.intakeOff());
+      }
+      int pixelCount = intake.pixelCount();
+      if (intake.isIntaking() && pixelCount == 2) { // Check if already two pixels - Stop intake
+         TimeReversedIntake = timeLeft();
+         sched.queueAction(intake.intakeReverse());
+         sched.queueAction(intake.wristStored());
+         //  sched.queueAction(intake.wristStored());
+
+      }
       if (g1.aOnce()) {
          if (intake.isIntaking()) {
             sched.queueAction(intake.intakeOff());
             sched.queueAction(intake.wristStored());
+            if (intake.isIntaking() && pixelCount == 2) { // Check if already two pixels - Stop intake
+               TimeReversedIntake = timeLeft();
+               sched.queueAction(intake.intakeReverse());
+               //  sched.queueAction(intake.wristStored());
+
+            }
          } else {
+            TimeReversedIntake = 0;
             sched.queueAction(intake.intakeOn());
             sched.queueAction(intake.wristDown());
+
+//            sched.queueAction(intake.intakeOff());
+
+
+//            int pixelCount = intake.pixelCount();
+//            while ((pixelCount != 2) || g1.aOnce() ){
+//
+//               sleep(100);
+//            }
+//
+//            if (pixelCount == 2){ //Test to eject pixels
+//               sched.queueAction(intake.intakeReverse());
+//               sleep(2000);
+//               sched.queueAction(intake.intakeOff());
+//            }
          }
       }
-      if (g1.b()) {
-         sched.queueAction(intake.intakeReverse());
-      }
-      if (!g1.b() && intake.isReversing()) {
-         sched.queueAction(intake.intakeOff());
-      }
+//      if (g1.b()) {//Commenting out as test
+//         sched.queueAction(intake.intakeReverse());
+//      }
+//      if (!g1.b() && intake.isReversing()) {
+//         sched.queueAction(intake.intakeOff());
+//      }
       if (g1.xOnce()) {
          sched.queueAction(new SequentialAction(
                  intake.feedOpen(),
