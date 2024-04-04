@@ -121,8 +121,14 @@ public class BlueRightAuto2_3 extends AutoBase {
         sched.run();
 
         // Score
+        double off = 4;
+        if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
+            off = 1.7;
+        } else {
+            sched.addAction(outtake.wristSideways(!preloadProcessor.preloadLeft));
+        }
         sched.addAction(drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
-                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -1.7 : 1.7)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -off : off)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .afterDisp(12, new SequentialAction(
                         outtake.clawHalfOpen()
                 ))
