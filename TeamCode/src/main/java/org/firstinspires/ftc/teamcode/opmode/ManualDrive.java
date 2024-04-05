@@ -203,11 +203,16 @@ public class ManualDrive extends LinearOpMode {
    double TimeReversedIntake = 0;
    private void intakeControls() {
       // Intake controls
-
+      if (intake.IsIntakeOverCurrent()) {
+         sched.queueAction(intake.wristStored());
+         sched.queueAction(intake.wristDown());
+      }
 
       if (TimeReversedIntake - timeLeft() > 1){
          telemetry.addData("Intake Off", TimeReversedIntake - timeLeft());
          sched.queueAction(intake.intakeOff());
+         TimeReversedIntake = -10000;
+
       }
       int pixelCount = intake.pixelCount();
       if (intake.isIntaking() && pixelCount == 2) { // Check if already two pixels - Stop intake
@@ -221,14 +226,12 @@ public class ManualDrive extends LinearOpMode {
          if (intake.isIntaking()) {
             sched.queueAction(intake.intakeOff());
             sched.queueAction(intake.wristStored());
-            if (intake.isIntaking() && pixelCount == 2) { // Check if already two pixels - Stop intake
-               TimeReversedIntake = timeLeft();
-               sched.queueAction(intake.intakeReverse());
+//            if (intake.isIntaking() && pixelCount == 2) { // Check if already two pixels - Stop intake
+//               TimeReversedIntake = timeLeft();
+//               sched.queueAction(intake.intakeReverse());
                //  sched.queueAction(intake.wristStored());
-
-            }
          } else {
-            TimeReversedIntake = 0;
+            TimeReversedIntake = -10000; // TimeReversedIntake will reset to a low number so TimeReversedIntake - TimeLeft < 1 and intake can turn on.
             sched.queueAction(intake.intakeOn());
             sched.queueAction(intake.wristDown());
 
@@ -248,9 +251,13 @@ public class ManualDrive extends LinearOpMode {
 //            }
          }
       }
-//      if (g1.b()) {//Commenting out as test
-//         sched.queueAction(intake.intakeReverse());
-//      }
+      if (g1.bOnce()) {
+         if (intake.isReversing()){
+            sched.queueAction(intake.intakeOff());
+         } else {
+            sched.queueAction(intake.intakeReverse());
+         }
+      }
 //      if (!g1.b() && intake.isReversing()) {
 //         sched.queueAction(intake.intakeOff());
 //      }

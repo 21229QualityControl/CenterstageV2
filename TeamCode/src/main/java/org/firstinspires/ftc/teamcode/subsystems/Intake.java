@@ -109,6 +109,9 @@ public class Intake {
    public Action intakeOn() {
       return intakeMotor.setTargetVelocityAction(INTAKE_SPEED);
    }
+   public boolean IsIntakeOverCurrent() {
+      return intakeMotor.getMotor().isOverCurrent();
+   }
    public Action intakeSlow() {
       return intakeMotor.setTargetVelocityAction(INTAKE_SLOW);
    }
