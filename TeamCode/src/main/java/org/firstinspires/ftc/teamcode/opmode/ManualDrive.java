@@ -197,6 +197,10 @@ public class ManualDrive extends LinearOpMode {
       }
 
       drive.setDrivePowers(new PoseVelocity2d(input, input_turn));
+
+      telemetry.addData("Partner Scoring:", intake.sideDistance(true) < 30);
+      telemetry.addData("Partner Distance:", intake.sideDistance(true));
+      telemetry.update();
    }
 
    public int INTAKE_STACK_POSITION = 0;
