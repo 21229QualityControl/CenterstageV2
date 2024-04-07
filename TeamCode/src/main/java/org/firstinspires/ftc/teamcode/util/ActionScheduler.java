@@ -11,6 +11,7 @@ import java.util.Queue;
 
 public class ActionScheduler {
    final Queue<Action> actions = new LinkedList<>();
+   final Queue<Action> parallelActions = new LinkedList<>();
    final FtcDashboard dash = FtcDashboard.getInstance();
    final Canvas canvas = new Canvas();
 
@@ -21,21 +22,42 @@ public class ActionScheduler {
       actions.add(action);
    }
 
-   public void update() {
+   public void queueActionParallel(Action action) {
       if (actions.peek() == null) {
-         return;
+         action.preview(canvas);
       }
+      parallelActions.add(action);
+   }
 
+   public void cancelParallel() {
+      parallelActions.clear();
+   }
+
+   public void update() {
       TelemetryPacket packet = new TelemetryPacket();
       packet.fieldOverlay().getOperations().addAll(canvas.getOperations());
 
-      boolean running = actions.peek().run(packet);
-      dash.sendTelemetryPacket(packet);
+      if (actions.peek() != null) {
+         boolean running = actions.peek().run(packet);
+         dash.sendTelemetryPacket(packet);
 
-      if (!running) {
-         actions.remove();
-         if (actions.peek() != null) {
-            actions.peek().preview(canvas);
+         if (!running) {
+            actions.remove();
+            if (actions.peek() != null) {
+               actions.peek().preview(canvas);
+            }
+         }
+      }
+
+      if (parallelActions.peek() != null) {
+         boolean running = parallelActions.peek().run(packet);
+         dash.sendTelemetryPacket(packet);
+
+         if (!running) {
+            parallelActions.remove();
+            if (parallelActions.peek() != null) {
+               parallelActions.peek().preview(canvas);
+            }
          }
       }
    }

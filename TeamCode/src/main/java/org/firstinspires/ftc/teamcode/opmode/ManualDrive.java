@@ -45,6 +45,7 @@ public class ManualDrive extends LinearOpMode {
    private Outtake outtake;
    private Plane plane;
    private LED led;
+   private long lastLoopFinish = 0;
 
    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
    private PIDFController headingPid;
@@ -114,10 +115,12 @@ public class ManualDrive extends LinearOpMode {
 
          telemetry.addData("Time left", smartGameTimer.formattedString() + " (" + smartGameTimer.status() + ")");
          telemetry.addData("Pixel Count", intake.pixelCount());
+
+         long finish = System.currentTimeMillis();
+         telemetry.addData("Sample Rate (Hz) ",1/((double)(finish - lastLoopFinish)/1000.0));
          telemetry.update();
 
-         telemetry.update();
-         telemetry.update();
+         lastLoopFinish = finish;
       }
 
       // On termination
@@ -194,14 +197,8 @@ public class ManualDrive extends LinearOpMode {
       }
 
       drive.setDrivePowers(new PoseVelocity2d(input, input_turn));
-
-      telemetry.addData("Partner Scoring:", intake.sideDistance(true) < 30);
-      telemetry.addData("Partner Distance:", intake.sideDistance(true));
-      telemetry.update();
    }
 
-   public int INTAKE_STACK_POSITION = 0;
-   double timeReversedIntake = 0;
    private void intakeControls() {
       // Intake controls
       if (intake.isIntakeOverCurrent()) {
@@ -209,59 +206,35 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(intake.wristDown());
       }
 
-      if (timeReversedIntake - timeLeft() > 1){
-         telemetry.addData("Intake Off", timeReversedIntake - timeLeft());
-         sched.queueAction(intake.intakeOff());
-         timeReversedIntake = -10000;
-
-      }
       int pixelCount = intake.pixelCount();
       if (intake.isIntaking() && pixelCount == 2) { // Check if already two pixels - Stop intake
-         timeReversedIntake = timeLeft();
          sched.queueAction(intake.intakeReverse());
          sched.queueAction(intake.wristStored());
-         //  sched.queueAction(intake.wristStored());
-
+         sched.queueActionParallel(new SequentialAction(
+                 new SleepAction(1),
+                 intake.intakeOff(),
+                 intake.wristStored()
+         ));
       }
       if (g1.aOnce()) {
+         sched.cancelParallel();
          if (intake.isIntaking()) {
             sched.queueAction(intake.intakeOff());
             sched.queueAction(intake.wristStored());
-//            if (intake.isIntaking() && pixelCount == 2) { // Check if already two pixels - Stop intake
-//               timeReversedIntake = timeLeft();
-//               sched.queueAction(intake.intakeReverse());
-               //  sched.queueAction(intake.wristStored());
          } else {
-            timeReversedIntake = -10000; // timeReversedIntake will reset to a low number so timeReversedIntake - TimeLeft < 1 and intake can turn on.
             sched.queueAction(intake.intakeOn());
             sched.queueAction(intake.wristDown());
-
-//            sched.queueAction(intake.intakeOff());
-
-
-//            int pixelCount = intake.pixelCount();
-//            while ((pixelCount != 2) || g1.aOnce() ){
-//
-//               sleep(100);
-//            }
-//
-//            if (pixelCount == 2){ //Test to eject pixels
-//               sched.queueAction(intake.intakeReverse());
-//               sleep(2000);
-//               sched.queueAction(intake.intakeOff());
-//            }
          }
       }
       if (g1.bOnce()) {
-         if (intake.isReversing()){
+         sched.cancelParallel();
+         if (intake.isReversing()) {
             sched.queueAction(intake.intakeOff());
+            sched.queueAction(intake.wristStored());
          } else {
             sched.queueAction(intake.intakeReverse());
          }
       }
-//      if (!g1.b() && intake.isReversing()) {
-//         sched.queueAction(intake.intakeOff());
-//      }
       if (g1.xOnce()) {
          sched.queueAction(new SequentialAction(
                  intake.feedOpen(),
@@ -270,37 +243,23 @@ public class ManualDrive extends LinearOpMode {
          ));
       }
       if (g1.dpadUpOnce()) {
-         INTAKE_STACK_POSITION--;
-         if (INTAKE_STACK_POSITION < 0) {
-            INTAKE_STACK_POSITION = 0;
-            sched.queueAction(intake.wristStored());
-            sched.queueAction(intake.intakeOff());
-         } else {
-            sched.queueAction(intake.wristStack(INTAKE_STACK_POSITION));
-         }
-         Log.d("STACKPOSITION", String.valueOf(INTAKE_STACK_POSITION));
+         sched.cancelParallel();
+         sched.queueAction(intake.prepIntakeCount(true, pixelCount == 1));
+         sched.queueActionParallel(intake.intakeCount());
+         sched.queueActionParallel(new SequentialAction(
+                 intake.intakeCount(),
+                 new SleepAction(1),
+                 intake.intakeOff()
+         ));
       }
       if (g1.dpadDownOnce()) {
-         if (intake.wristIsStored()) {
-            INTAKE_STACK_POSITION = 0; // Reset
-            sched.queueAction(intake.intakeOn());
-         } else {
-            INTAKE_STACK_POSITION++;
-         }
-         if (INTAKE_STACK_POSITION > 3) {
-            INTAKE_STACK_POSITION = 0;
-            sched.queueAction(intake.wristDown());
-         } else {
-            sched.queueAction(intake.wristStack(INTAKE_STACK_POSITION));
-         }
-         Log.d("STACKPOSITION", String.valueOf(INTAKE_STACK_POSITION));
-      }
-      if (g1.dpadLeftOnce()) {
-         INTAKE_STACK_POSITION = 0;
-         sched.queueAction(intake.wristStored());
-      }
-      if (g1.dpadRightOnce()) {
-         sched.queueAction(intake.wristDown());
+         sched.cancelParallel();
+         sched.queueAction(intake.prepIntakeCount(false, pixelCount == 1));
+         sched.queueActionParallel(new SequentialAction(
+                 intake.intakeCount(),
+                 new SleepAction(1),
+                 intake.intakeOff()
+         ));
       }
 
       // Other susbsystems
