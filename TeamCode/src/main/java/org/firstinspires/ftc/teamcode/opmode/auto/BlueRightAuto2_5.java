@@ -14,11 +14,11 @@ public class BlueRightAuto2_5 extends AutoBase {
     public static Pose2d start = new Pose2d(-36, 64, Math.toRadians(-90));
     public static Pose2d[] spike = {
             new Pose2d(-46, 44, Math.toRadians(-90)),
-            new Pose2d(-36, 40, Math.toRadians(-90)),
+            new Pose2d(-36, 20, Math.toRadians(90)),
             new Pose2d(-33, 41, Math.toRadians(-45))};
-    public static Pose2d intermediate = new Pose2d(24,  10, Math.toRadians(180));
-    public static Pose2d pastTruss = new Pose2d(-36, 10, Math.toRadians(180));
-    public static Pose2d stack = new Pose2d(-57, 8, Math.toRadians(180));
+    public static Pose2d intermediate = new Pose2d(24,  14, Math.toRadians(180));
+    public static Pose2d pastTruss = new Pose2d(-36, 14, Math.toRadians(180));
+    public static Pose2d stack = new Pose2d(-59, 12, Math.toRadians(180));
     public static Pose2d scoring = new Pose2d(56, 21, Math.toRadians(200));
     public static Pose2d park = new Pose2d(53, 22, Math.toRadians(180));
 
@@ -62,11 +62,13 @@ public class BlueRightAuto2_5 extends AutoBase {
         // Intake stack
         sched.addAction(
                 drive.actionBuilder(spike[SPIKE])
+                        .setReversed(true)
                         .afterDisp(0, new SequentialAction(
                                 outtake.extendOuttakeBarelyOut(),
                                 intake.prepIntakeCount(true, true)
                         ))
-                        .strafeToLinearHeading(stack.position, stack.heading)
+                        .splineToLinearHeading(pastTruss, pastTruss.heading, drive.defaultVelConstraint, drive.slowAccelConstraint)
+                        .splineToSplineHeading(stack, stack.heading)
                         .build()
         );
         sched.addAction(intake.intakeCount());
@@ -74,7 +76,7 @@ public class BlueRightAuto2_5 extends AutoBase {
 
 
         // Score preload
-        sched.addAction(drive.actionBuilder(spike[SPIKE])
+        sched.addAction(drive.actionBuilder(stack)
                 .setReversed(true)
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
                 .afterDisp(0, new SequentialAction(
@@ -87,7 +89,6 @@ public class BlueRightAuto2_5 extends AutoBase {
                         outtake.armScoring(),
                         outtake.wristSideways(SPIKE == 2)
                 ))
-                .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
                         .build()
         );
