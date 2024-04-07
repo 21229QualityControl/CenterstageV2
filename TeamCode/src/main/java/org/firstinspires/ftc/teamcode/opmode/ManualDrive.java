@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
@@ -14,8 +13,6 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
@@ -204,23 +201,23 @@ public class ManualDrive extends LinearOpMode {
    }
 
    public int INTAKE_STACK_POSITION = 0;
-   double TimeReversedIntake = 0;
+   double timeReversedIntake = 0;
    private void intakeControls() {
       // Intake controls
-      if (intake.IsIntakeOverCurrent()) {
+      if (intake.isIntakeOverCurrent()) {
          sched.queueAction(intake.wristStored());
          sched.queueAction(intake.wristDown());
       }
 
-      if (TimeReversedIntake - timeLeft() > 1){
-         telemetry.addData("Intake Off", TimeReversedIntake - timeLeft());
+      if (timeReversedIntake - timeLeft() > 1){
+         telemetry.addData("Intake Off", timeReversedIntake - timeLeft());
          sched.queueAction(intake.intakeOff());
-         TimeReversedIntake = -10000;
+         timeReversedIntake = -10000;
 
       }
       int pixelCount = intake.pixelCount();
       if (intake.isIntaking() && pixelCount == 2) { // Check if already two pixels - Stop intake
-         TimeReversedIntake = timeLeft();
+         timeReversedIntake = timeLeft();
          sched.queueAction(intake.intakeReverse());
          sched.queueAction(intake.wristStored());
          //  sched.queueAction(intake.wristStored());
@@ -231,11 +228,11 @@ public class ManualDrive extends LinearOpMode {
             sched.queueAction(intake.intakeOff());
             sched.queueAction(intake.wristStored());
 //            if (intake.isIntaking() && pixelCount == 2) { // Check if already two pixels - Stop intake
-//               TimeReversedIntake = timeLeft();
+//               timeReversedIntake = timeLeft();
 //               sched.queueAction(intake.intakeReverse());
                //  sched.queueAction(intake.wristStored());
          } else {
-            TimeReversedIntake = -10000; // TimeReversedIntake will reset to a low number so TimeReversedIntake - TimeLeft < 1 and intake can turn on.
+            timeReversedIntake = -10000; // timeReversedIntake will reset to a low number so timeReversedIntake - TimeLeft < 1 and intake can turn on.
             sched.queueAction(intake.intakeOn());
             sched.queueAction(intake.wristDown());
 
