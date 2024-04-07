@@ -217,7 +217,7 @@ public class Intake {
 
       public IntakeCountAction() {
          this.waitUntil = System.currentTimeMillis() + 600;
-         this.finalTime = System.currentTimeMillis() + 6000;
+         this.finalTime = System.currentTimeMillis() + 3000;
       }
 
       @Override
@@ -259,6 +259,10 @@ public class Intake {
             this.waitUntil = System.currentTimeMillis() + 200;
             wristStoredInstant();
             return true;
+         }
+
+         if (System.currentTimeMillis() >= finalTime) {
+            wristStoredInstant();
          }
          return System.currentTimeMillis() < finalTime;
       }

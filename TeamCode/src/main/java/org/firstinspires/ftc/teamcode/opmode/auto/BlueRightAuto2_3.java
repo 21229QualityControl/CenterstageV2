@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
+import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 
 @Autonomous(name = "Blue Right Auto 2+3", group = "Auto")
 public class BlueRightAuto2_3 extends AutoBase {
@@ -72,7 +73,12 @@ public class BlueRightAuto2_3 extends AutoBase {
         sched.addAction(intake.intakeCount());
         sched.run();
 
+        if (intake.pixelCount() == 0) {
+            tryAgain(stackAfterPreload, true, true);
+        }
+
         // Drive to preload
+        boolean single = intake.pixelCount() != 2;
         sched.addAction(
                 drive.actionBuilder(stackAfterPreload)
                         .setReversed(true)
@@ -100,6 +106,21 @@ public class BlueRightAuto2_3 extends AutoBase {
         );
         sched.run();
 
+        while (intake.pixelCount() > 0) {
+            sched.addAction(new SequentialAction(
+                    outtake.clawOpen(),
+                    outtake.wristVerticalFlip(),
+                    new SleepAction(0.2),
+                    outtake.armStored(),
+                    outtake.retractOuttakeBlocking(),
+                    outtake.clawClosed(),
+                    new SleepAction(0.3),
+                    outtake.extendOuttakePartnerBlocking(),
+                    outtake.armScoring(),
+                    outtake.wristVerticalFlip()
+            ));
+        }
+
         // Wait for partner to move out of the way
         sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(false) < 30));
         sched.addAction(drive.actionBuilder(detectPartner)
@@ -122,10 +143,14 @@ public class BlueRightAuto2_3 extends AutoBase {
 
         // Score
         double off = 4;
-        if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
-            off = 1.7;
+        if (single) {
+            off = 0;
+            sched.addAction(outtake.wristVertical());
+        } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
+            off = 2.2;
         } else {
-            sched.addAction(outtake.wristSideways(!preloadProcessor.preloadLeft));
+            sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
+            sched.addAction(outtake.extendOuttakeCloseBlocking());
         }
         sched.addAction(drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -off : off)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
@@ -163,9 +188,25 @@ public class BlueRightAuto2_3 extends AutoBase {
 
         sched.addAction(intake.intakeCount());
         sched.run();
+
+        if (intake.pixelCount() == 0) {
+            tryAgain(stack, false, false);
+        }
+    }
+
+    private void tryAgain(Pose2d current, boolean start, boolean one) {
+        sched.addAction(drive.actionBuilder(current)
+                .afterDisp(0, intake.intakeReverse())
+                .strafeToLinearHeading(current.position.plus(new Vector2d(6, 0)), current.heading)
+                .afterDisp(0, intake.prepIntakeCount(start, one))
+                .strafeToLinearHeading(current.position, current.heading)
+                .build());
+        sched.addAction(intake.intakeCount());
     }
 
     private void cycle() {
+        int pixelCount = intake.pixelCount();
+
         sched.addAction(drive.actionBuilder(stack)
                 .setReversed(true)
                 .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
@@ -177,14 +218,18 @@ public class BlueRightAuto2_3 extends AutoBase {
                         intake.intakeOff()
                 ))
                 .splineToConstantHeading(detectPartner.position, detectPartner.heading.toDouble() - Math.PI)
-                .afterDisp(0, new SequentialAction(
+                .afterDisp(0, pixelCount > 0 ? new SequentialAction(
                         outtake.extendOuttakeCycleBlocking(),
                         outtake.armScoring(),
                         intake.feedOpen()
-                ))
+                ) : new SequentialAction())
                 .build()
         );
         sched.run();
+
+        if (pixelCount == 0) {
+            return;
+        }
 
         // Wait for partner to move out of the way
         sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(false) < 24));
