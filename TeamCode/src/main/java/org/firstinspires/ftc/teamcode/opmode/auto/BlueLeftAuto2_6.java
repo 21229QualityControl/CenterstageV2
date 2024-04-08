@@ -1,21 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
-import android.util.Log;
-
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.pathing.Pose;
-import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
-@Autonomous(name = "Blue Left Auto", group = "Auto")
-public class BlueLeftAuto extends AutoBase {
+@Autonomous(name = "Blue Left Auto 2+6", group = "Auto")
+public class BlueLeftAuto2_6 extends AutoBase {
     public static Pose2d start = new Pose2d(12, 63, Math.toRadians(-90));
     public static Pose2d[] spike = {
             new Pose2d(9, 34, Math.toRadians(-135)),
@@ -36,7 +30,7 @@ public class BlueLeftAuto extends AutoBase {
 
     @Override
     protected void printDescription() {
-        telemetry.addData("Description", "Blue Left Auto");
+        telemetry.addData("Description", "Blue Left Auto 2+6");
     }
 
     @Override
