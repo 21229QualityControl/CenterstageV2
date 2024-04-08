@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Memory;
 import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.Plane;
 import org.firstinspires.ftc.teamcode.util.ActionScheduler;
+import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.GamePadController;
 import org.firstinspires.ftc.teamcode.util.LED;
 import org.firstinspires.ftc.teamcode.util.SmartGameTimer;
@@ -202,8 +203,20 @@ public class ManualDrive extends LinearOpMode {
    private void intakeControls() {
       // Intake controls
       if (intake.isIntakeOverCurrent()) {
-         sched.queueAction(intake.wristStored());
-         sched.queueAction(intake.wristDown());
+         sched.queueActionParallel(intake.wristStored());
+         long start = System.currentTimeMillis();
+         sched.queueActionParallel(new ActionUtil.RunnableAction(() -> {
+            Log.d("CURRENT", intake.isIntakeOverCurrent() ? "true" : "false");
+            if (!intake.isIntakeOverCurrent() || intake.pixelCount() == 2) {
+               sched.queueAction(intake.wristDown());
+               sched.queueAction(intake.intakeOn());
+               return false;
+            }
+            if (System.currentTimeMillis() - start > 1000 && !intake.isReversing()) {
+               sched.queueAction(intake.intakeReverse());
+            }
+            return true;
+         }));
       }
 
       int pixelCount = intake.pixelCount();
