@@ -245,9 +245,8 @@ public class ManualDrive extends LinearOpMode {
       if (g1.dpadUpOnce()) {
          sched.cancelParallel();
          sched.queueAction(intake.prepIntakeCount(true, pixelCount == 1));
-         sched.queueActionParallel(intake.intakeCount());
          sched.queueActionParallel(new SequentialAction(
-                 intake.intakeCount(),
+                 intake.intakeCount(false),
                  new SleepAction(1),
                  intake.intakeOff()
          ));
@@ -256,7 +255,7 @@ public class ManualDrive extends LinearOpMode {
          sched.cancelParallel();
          sched.queueAction(intake.prepIntakeCount(false, pixelCount == 1));
          sched.queueActionParallel(new SequentialAction(
-                 intake.intakeCount(),
+                 intake.intakeCount(false),
                  new SleepAction(1),
                  intake.intakeOff()
          ));

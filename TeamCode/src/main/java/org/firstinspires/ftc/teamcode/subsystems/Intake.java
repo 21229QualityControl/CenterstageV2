@@ -46,10 +46,10 @@ public class Intake {
    public static double WRIST_LEFT_DOWN = 0.43;
    public static double WRIST_LEFT_PRELOAD = 0.45;
    public static double[] WRIST_LEFT_STACK_POSITIONS = {
-           0.35, // Getting 1
-           0.37, // Getting 2
-           0.39, // Getting 3
-           0.41, // Getting 4
+           0.34, // Getting 1
+           0.36, // Getting 2
+           0.37, // Getting 3
+           0.40, // Getting 4
            WRIST_LEFT_DOWN,
    };
 
@@ -57,10 +57,10 @@ public class Intake {
    public static double WRIST_RIGHT_DOWN = 0.09;
    public static double WRIST_RIGHT_PRELOAD = 0.07;
    public static double[] WRIST_RIGHT_STACK_POSITIONS = {
-           0.17, // Getting 1
-           0.15, // Getting 2
-           0.13, // Getting 3
-           0.11, // Getting 4
+           0.18, // Getting 1
+           0.16, // Getting 2
+           0.14, // Getting 3
+           0.12, // Getting 4
            WRIST_RIGHT_DOWN,
    };
 
@@ -203,9 +203,9 @@ public class Intake {
               wristStack(numIntaked)
       );
    }
-   public Action intakeCount() {
+   public Action intakeCount(boolean fast) {
       return new SequentialAction(
-              new IntakeCountAction(),
+              new IntakeCountAction(fast),
               intakeReverse()
       );
    }
@@ -215,9 +215,9 @@ public class Intake {
       private boolean done;
       private boolean jammed;
 
-      public IntakeCountAction() {
+      public IntakeCountAction(boolean fast) {
          this.waitUntil = System.currentTimeMillis() + 600;
-         this.finalTime = System.currentTimeMillis() + 3000;
+         this.finalTime = System.currentTimeMillis() + (fast ? 3000 : 6000);
       }
 
       @Override
@@ -225,25 +225,27 @@ public class Intake {
          if (done) { // Make it wait 0.2s after it has intaked 2
             return System.currentTimeMillis() < waitUntil;
          }
+         if (System.currentTimeMillis() >= finalTime) {
+            wristStoredInstant();
+         }
 
          if (jammed) {
             if (!intakeMotor.getMotor().isOverCurrent()) {
                this.jammed = false;
                this.waitUntil = System.currentTimeMillis() + 600;
                wristStackInstant(numIntaked);
-               return true;
+               return System.currentTimeMillis() < finalTime;
             }
             if (System.currentTimeMillis() >= waitUntil) {
                intakeReverse();
-               Log.d("REVERSE", "REVERSE");
-               return true;
+               return System.currentTimeMillis() < finalTime;
             }
          }
          if (intakeMotor.getMotor().isOverCurrent()) {
             this.jammed = true;
             this.waitUntil = System.currentTimeMillis() + 200;
             wristStoredInstant();
-            return true;
+            return System.currentTimeMillis() < finalTime;
          }
 
          if (pixelCount() < 2 && System.currentTimeMillis() >= waitUntil) {
@@ -259,10 +261,6 @@ public class Intake {
             this.waitUntil = System.currentTimeMillis() + 200;
             wristStoredInstant();
             return true;
-         }
-
-         if (System.currentTimeMillis() >= finalTime) {
-            wristStoredInstant();
          }
          return System.currentTimeMillis() < finalTime;
       }

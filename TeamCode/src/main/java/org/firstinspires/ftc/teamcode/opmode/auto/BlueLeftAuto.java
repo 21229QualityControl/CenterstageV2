@@ -27,7 +27,7 @@ public class BlueLeftAuto extends AutoBase {
     public static Pose2d stack = new Pose2d(-57, 8, Math.toRadians(180));
     public static Pose2d secondStack = new Pose2d(-58, 15, Math.toRadians(150));
     public static Pose2d scoring = new Pose2d(56, 21, Math.toRadians(200));
-    public static Pose2d park = new Pose2d(53, 22, Math.toRadians(180));
+    public static Pose2d park = new Pose2d(48, 22, Math.toRadians(180));
 
     @Override
     protected Pose2d getStartPose() {
@@ -126,7 +126,7 @@ public class BlueLeftAuto extends AutoBase {
             }
         }
         sched.addAction(new SequentialAction(
-                intake.intakeCount(),
+                intake.intakeCount(false),
                 outtake.retractOuttake()
         ));
         sched.run();

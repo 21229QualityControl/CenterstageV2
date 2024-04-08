@@ -70,7 +70,7 @@ public class BlueRightAuto2_3 extends AutoBase {
                         .strafeToLinearHeading(stackAfterPreload.position, stackAfterPreload.heading)
                         .build()
         );
-        sched.addAction(intake.intakeCount());
+        sched.addAction(intake.intakeCount(true));
         sched.run();
 
         if (intake.pixelCount() == 0) {
@@ -186,7 +186,7 @@ public class BlueRightAuto2_3 extends AutoBase {
         sched.run();
 
 
-        sched.addAction(intake.intakeCount());
+        sched.addAction(intake.intakeCount(true));
         sched.run();
 
         if (intake.pixelCount() == 0) {
@@ -201,7 +201,7 @@ public class BlueRightAuto2_3 extends AutoBase {
                 .afterDisp(0, intake.prepIntakeCount(start, one))
                 .strafeToLinearHeading(current.position, current.heading)
                 .build());
-        sched.addAction(intake.intakeCount());
+        sched.addAction(intake.intakeCount(true));
     }
 
     private void cycle() {

@@ -120,7 +120,7 @@ public class RedRightAuto extends AutoBase {
             }
         }
         sched.addAction(new SequentialAction(
-                intake.intakeCount(),
+                intake.intakeCount(false),
                 outtake.retractOuttake()
         ));
         sched.run();

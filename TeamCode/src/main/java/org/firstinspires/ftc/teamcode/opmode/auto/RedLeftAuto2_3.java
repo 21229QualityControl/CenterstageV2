@@ -68,7 +68,7 @@ public class RedLeftAuto2_3 extends AutoBase {
                         .strafeToLinearHeading(stackAfterPreload.position, stackAfterPreload.heading)
                         .build()
         );
-        sched.addAction(intake.intakeCount());
+        sched.addAction(intake.intakeCount(false));
         sched.run();
 
         // Drive to preload
@@ -160,7 +160,7 @@ public class RedLeftAuto2_3 extends AutoBase {
         sched.run();
 
 
-        sched.addAction(intake.intakeCount());
+        sched.addAction(intake.intakeCount(false));
         sched.run();
     }
 
