@@ -1,12 +1,16 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
+import android.util.Log;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
 @Autonomous(name = "Blue Right Auto 2+5", group = "Auto")
@@ -83,7 +87,8 @@ public class BlueRightAuto2_5 extends AutoBase {
         sched.run();
 
 
-        // Score preload
+        // Drive to preload
+        boolean single = intake.pixelCount() != 2;
         sched.addAction(drive.actionBuilder(stack)
                 .setReversed(true)
                 .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
@@ -92,16 +97,56 @@ public class BlueRightAuto2_5 extends AutoBase {
                         intake.intakeOff()
                 ))
                 .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI)
-                .afterDisp(0, new SequentialAction(
+                .afterDisp(0, new ActionUtil.RunnableAction(() -> {
+                    this.preloadProcessor.updateTarget(SPIKE, false);
+                    this.preloadProcessor.detecting = false;
+                    this.preloadPortal.setProcessorEnabled(this.aprilTagProcessor, true);
+                    this.preloadPortal.setProcessorEnabled(this.preloadProcessor, true);
+                    this.preloadPortal.resumeStreaming();
+                    this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_LAVA_PALETTE);
+                    return false;
+                }))
+                .afterDisp(1, new SequentialAction(
                         outtake.extendOuttakeCloseBlocking(),
                         outtake.armScoring(),
                         outtake.wristSideways(SPIKE == 2)
                 ))
                 .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading.toDouble() - Math.PI)
-                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
                         .build()
         );
-        sched.addAction(outtake.clawHalfOpen());
+        sched.run();
+
+        // Detect spike
+        sched.addAction(new SleepAction(0.2));
+        sched.addAction(new ActionUtil.RunnableAction(() -> {
+            if (preloadProcessor.detecting) {
+                Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
+                this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+                this.portal.stopStreaming();
+                return false;
+            }
+            return true;
+        }));
+        sched.run();
+
+        // Score
+        double off = 4;
+        if (single) {
+            off = 0;
+            sched.addAction(outtake.wristVertical());
+        } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
+            off = 2.2;
+        } else {
+            sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
+            sched.addAction(outtake.extendOuttakeCloseBlocking());
+        }
+        sched.addAction(drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
+                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -off : off)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .afterDisp(12, new SequentialAction(
+                        outtake.clawHalfOpen()
+                ))
+                .build()
+        );
         sched.run();
     }
 
