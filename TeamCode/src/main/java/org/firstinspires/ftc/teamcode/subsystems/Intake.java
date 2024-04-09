@@ -54,7 +54,7 @@ public class Intake {
    };
 
    public static double WRIST_RIGHT_STORED = 0.34;
-   public static double WRIST_RIGHT_DOWN = 0.09;
+   public static double WRIST_RIGHT_DOWN = 0.1;
    public static double WRIST_RIGHT_PRELOAD = 0.07;
    public static double[] WRIST_RIGHT_STACK_POSITIONS = {
            0.18, // Getting 1
