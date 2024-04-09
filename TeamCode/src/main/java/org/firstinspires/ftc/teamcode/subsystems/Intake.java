@@ -116,6 +116,10 @@ public class Intake {
       return intakeMotor.setTargetVelocityAction(INTAKE_REVERSE_SPEED);
    }
 
+   public void intakeReverseInstant() {
+      intakeMotor.setTargetVelocity(INTAKE_REVERSE_SPEED);
+   }
+
    public boolean isIntaking() {
       return intakeMotor.getTargetVelocity() == INTAKE_SPEED;
       // isIntaking seems to return false when the intake is reversing.
@@ -237,7 +241,7 @@ public class Intake {
                return System.currentTimeMillis() < finalTime;
             }
             if (System.currentTimeMillis() >= waitUntil) {
-               intakeReverse();
+               intakeReverseInstant();
                return System.currentTimeMillis() < finalTime;
             }
          }

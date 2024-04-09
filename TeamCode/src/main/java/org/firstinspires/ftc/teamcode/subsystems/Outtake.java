@@ -22,6 +22,7 @@ public class Outtake {
    public static int OUTTAKE_CLOSE = 400; // For close side auto
    public static int OUTTAKE_PARTNER = 650; // For far side auto, start of TeleOp
    public static int OUTTAKE_CYCLE = 1100; // For cycling during auto
+   public static int OUTTAKE_CYCLE_HIGH = 1400; // For cycling during auto
    public static int OUTTAKE_HANG_EXTEND = 1550;
    public static int OUTTAKE_HANG_RETRACT = 800;
 
@@ -132,6 +133,9 @@ public class Outtake {
 
    public Action extendOuttakeCycleBlocking() {
       return this.slide.setTargetPositionActionBlocking(OUTTAKE_CYCLE);
+   }
+   public Action extendOuttakeCycleHighBlocking() {
+      return this.slide.setTargetPositionActionBlocking(OUTTAKE_CYCLE_HIGH);
    }
 
    public Action extendOuttakeTeleopBlocking() {

@@ -140,7 +140,7 @@ public class BlueLeftAuto2_6 extends AutoBase {
                 ))
                 .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI)
                         .afterDisp(0, new SequentialAction(
-                                outtake.extendOuttakeCycleBlocking(),
+                                second ? outtake.extendOuttakeCycleHighBlocking() : outtake.extendOuttakeCycleBlocking(),
                                 outtake.armScoring(),
                                 intake.feedOpen()
                         ))
