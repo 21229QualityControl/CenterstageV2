@@ -24,6 +24,12 @@ public class PartnerPreloadProcessor implements VisionProcessor {
     public int leftZoneAverage;
     public int rightZoneAverage;
     public boolean detecting = false;
+    public boolean fallback = false;
+
+    public static int fallbackCenterX = 0;
+    public static int fallbackCenterY = 0;
+    public static int fallbackWidth = 0;
+    public static int fallbackHeight = 0;
 
     public PartnerPreloadProcessor(AprilTagProcessor aprilTag) {
         this.aprilTag = aprilTag;
@@ -49,10 +55,16 @@ public class PartnerPreloadProcessor implements VisionProcessor {
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
         List<AprilTagDetection> det = aprilTag.getDetections();
-        if (det == null) {
+        if (det != null && !fallback) {
             return null;
         }
 
+        int tagCenterX = 0;
+        int tagCenterY = 0;
+        int tagWidth = 0;
+        int tagHeight = 0;
+
+        boolean foundTag = false;
         for (AprilTagDetection d : det) {
             if (d.id != targetAprilTag) {
                 continue;
@@ -71,36 +83,48 @@ public class PartnerPreloadProcessor implements VisionProcessor {
                 if (point.y < bottomY) bottomY = (int) point.y;
             }
 
-            int tagCenterX = (int) d.center.x;
-            int tagCenterY = (int) d.center.y;
+            tagCenterX = (int) d.center.x;
+            tagCenterY = (int) d.center.y;
 
-            int tagWidth = rightX - leftX;
-            int tagHeight = topY - bottomY;
+            tagWidth = rightX - leftX;
+            tagHeight = topY - bottomY;
 
-            int inclusionZoneWidth = (int) (tagWidth * 1.3);
-            int inclusionZoneHeight = (int) (tagHeight * 1.3);
-
-            int exclusionZoneWidth = (int) (tagWidth * 0.28);
-            int exclusionZoneHeight = (int) (tagHeight * 0.28);
-
-            Rect leftInclusionZone = new Rect(tagCenterX - inclusionZoneWidth, tagCenterY - (int)(inclusionZoneHeight*1.8), inclusionZoneWidth, inclusionZoneHeight);
-            Rect rightInclusionZone = new Rect(tagCenterX, tagCenterY - (int)(inclusionZoneHeight*1.8), inclusionZoneWidth, inclusionZoneHeight);
-
-            Rect leftExclusionZone = new Rect(tagCenterX - (int) (inclusionZoneWidth * 0.6), tagCenterY - (int)(inclusionZoneHeight*1.3), exclusionZoneWidth, exclusionZoneHeight);
-            Rect rightExclusionZone = new Rect(tagCenterX + (int) (inclusionZoneWidth * 0.35), tagCenterY - (int)(inclusionZoneHeight*1.3), exclusionZoneWidth, exclusionZoneHeight);
-
-            Imgproc.rectangle(frame, leftInclusionZone, new Scalar(0, 255, 0), 7);
-            Imgproc.rectangle(frame, rightInclusionZone, new Scalar(0, 255, 0), 7);
-
-            Imgproc.rectangle(frame, leftExclusionZone, new Scalar(255, 0, 0), 7);
-            Imgproc.rectangle(frame, rightExclusionZone, new Scalar(255, 0, 0), 7);
-
-            leftZoneAverage = meanColor(frame, leftInclusionZone, leftExclusionZone);
-            rightZoneAverage = meanColor(frame, rightInclusionZone, rightExclusionZone);
-
-            preloadLeft = leftZoneAverage > rightZoneAverage;
-            detecting = true; // Found it!
+            foundTag = true; // Found it!
         }
+        if (!foundTag) {
+            if (fallback) {
+                tagCenterX = fallbackCenterX;
+                tagCenterY = fallbackCenterY;
+                tagWidth = fallbackWidth;
+                tagHeight = fallbackHeight;
+            } else {
+                return null;
+            }
+        }
+
+        int inclusionZoneWidth = (int) (tagWidth * 1.3);
+        int inclusionZoneHeight = (int) (tagHeight * 1.3);
+
+        int exclusionZoneWidth = (int) (tagWidth * 0.28);
+        int exclusionZoneHeight = (int) (tagHeight * 0.28);
+
+        Rect leftInclusionZone = new Rect(tagCenterX - inclusionZoneWidth, tagCenterY - (int)(inclusionZoneHeight*1.8), inclusionZoneWidth, inclusionZoneHeight);
+        Rect rightInclusionZone = new Rect(tagCenterX, tagCenterY - (int)(inclusionZoneHeight*1.8), inclusionZoneWidth, inclusionZoneHeight);
+
+        Rect leftExclusionZone = new Rect(tagCenterX - (int) (inclusionZoneWidth * 0.6), tagCenterY - (int)(inclusionZoneHeight*1.3), exclusionZoneWidth, exclusionZoneHeight);
+        Rect rightExclusionZone = new Rect(tagCenterX + (int) (inclusionZoneWidth * 0.35), tagCenterY - (int)(inclusionZoneHeight*1.3), exclusionZoneWidth, exclusionZoneHeight);
+
+        Imgproc.rectangle(frame, leftInclusionZone, new Scalar(0, 255, 0), 7);
+        Imgproc.rectangle(frame, rightInclusionZone, new Scalar(0, 255, 0), 7);
+
+        Imgproc.rectangle(frame, leftExclusionZone, new Scalar(255, 0, 0), 7);
+        Imgproc.rectangle(frame, rightExclusionZone, new Scalar(255, 0, 0), 7);
+
+        leftZoneAverage = meanColor(frame, leftInclusionZone, leftExclusionZone);
+        rightZoneAverage = meanColor(frame, rightInclusionZone, rightExclusionZone);
+
+        preloadLeft = leftZoneAverage > rightZoneAverage;
+        detecting = true;
         return null;
     }
 

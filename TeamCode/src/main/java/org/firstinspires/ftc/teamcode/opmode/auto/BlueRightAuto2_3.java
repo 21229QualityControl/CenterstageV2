@@ -89,6 +89,7 @@ public class BlueRightAuto2_3 extends AutoBase {
                         .afterDisp(0, new ActionUtil.RunnableAction(() -> {
                             this.preloadProcessor.updateTarget(SPIKE, false);
                             this.preloadProcessor.detecting = false;
+                            this.preloadProcessor.fallback = false;
                             this.preloadPortal.setProcessorEnabled(this.aprilTagProcessor, true);
                             this.preloadPortal.setProcessorEnabled(this.preloadProcessor, true);
                             this.preloadPortal.resumeStreaming();
@@ -129,6 +130,7 @@ public class BlueRightAuto2_3 extends AutoBase {
         sched.run();
 
         // Detect spike
+        long finalDetectTime = System.currentTimeMillis() + 500;
         sched.addAction(new SleepAction(0.2));
         sched.addAction(new ActionUtil.RunnableAction(() -> {
             if (preloadProcessor.detecting) {
@@ -136,6 +138,8 @@ public class BlueRightAuto2_3 extends AutoBase {
                 this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
                 this.portal.stopStreaming();
                 return false;
+            } else if (System.currentTimeMillis() > finalDetectTime) {
+                this.preloadProcessor.fallback = true;
             }
             return true;
         }));
