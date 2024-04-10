@@ -45,6 +45,9 @@ public class Outtake {
    public static double WRIST_LEFT = 0.71;
    public static double WRIST_RIGHT = 0.145;
 
+   public static double MOSAIC_FIXING = 0.835;
+   public static double MOSAIC_STORED = 0.2;
+
    public double mosaicPosition;
    final DualMotorWithPID slide;
    public boolean slidePIDEnabled = true;
@@ -52,6 +55,7 @@ public class Outtake {
    final Servo wrist;
    final Servo armLeft;
    final Servo armRight;
+   final Servo mosaic;
 
    public double outtakeFF(double target, double measured, double vel) {
       if ((target + slide.internalOffset) == 0 && (measured + slide.internalOffset) > 5 && Math.abs(this.slide.getVelocity()) < 5) {
@@ -67,6 +71,7 @@ public class Outtake {
       this.wrist = HardwareCreator.createServo(hardwareMap, "outtakeWrist");
       this.armLeft = HardwareCreator.createServo(hardwareMap, "outtakeArmLeft");
       this.armRight = HardwareCreator.createServo(hardwareMap, "outtakeArmRight");
+      this.mosaic = HardwareCreator.createServo(hardwareMap, "mosaic");
    }
 
    public void initialize(boolean teleop) {
@@ -74,6 +79,7 @@ public class Outtake {
       OUTTAKE_TELEOP = OUTTAKE_PARTNER;
       this.claw.setPosition(CLAW_OPEN);
       this.wrist.setPosition(WRIST_VERTICAL);
+      this.mosaic.setPosition(MOSAIC_STORED);
       if (!Memory.FINISHED_AUTO && teleop) {
          this.slide.setTargetPosition(OUTTAKE_PARTNER);
          this.armLeft.setPosition(ARM_LEFT_SCORING);
@@ -228,5 +234,17 @@ public class Outtake {
    }
    public boolean isArmScoring() {
       return Math.abs(armLeft.getPosition() - ARM_LEFT_SCORING) < EPSILON;
+   }
+
+   public Action mosaicFix() {
+      return new ActionUtil.ServoPositionAction(mosaic, MOSAIC_FIXING);
+   }
+
+   public boolean isMosaicFixing() {
+      return Math.abs(mosaic.getPosition() - MOSAIC_FIXING) < EPSILON;
+   }
+
+   public Action mosaicStored() {
+      return new ActionUtil.ServoPositionAction(mosaic, MOSAIC_STORED);
    }
 }

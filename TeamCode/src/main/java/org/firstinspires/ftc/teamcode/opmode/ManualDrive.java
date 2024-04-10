@@ -281,6 +281,8 @@ public class ManualDrive extends LinearOpMode {
       if (g2.startOnce()) {
          if (outtake.isSlideRetracted()) {
             sched.queueAction(outtake.extendOuttakeHangBlocking());
+            // Make mosaic fixer go out to not interfere with hanging
+            sched.queueAction(outtake.mosaicFix());
          } else {
             sched.queueAction(outtake.retractOuttakeHang());
          }
@@ -391,6 +393,16 @@ public class ManualDrive extends LinearOpMode {
       // Mosaic controls
       if (g2.startOnce()) { // Press start to mosaic adjust with outtake
          sched.queueAction(outtake.clawClosed());
+      }
+
+      // Press back to toggle between mosaic fix and mosaic stored.
+      if (g2.backOnce()) {
+         if (outtake.isMosaicFixing()) {
+            sched.queueAction(outtake.mosaicStored());
+         }
+         else {
+            sched.queueAction(outtake.mosaicFix());
+         }
       }
    }
 
