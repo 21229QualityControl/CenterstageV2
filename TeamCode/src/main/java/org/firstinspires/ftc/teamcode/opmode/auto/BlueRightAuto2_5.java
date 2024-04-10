@@ -108,9 +108,9 @@ public class BlueRightAuto2_5 extends AutoBase {
                     return false;
                 }))
                 .afterDisp(1, new SequentialAction(
-                        outtake.extendOuttakeCloseBlocking(),
+                        outtake.extendOuttakePartnerBlocking(),
                         outtake.armScoring(),
-                        outtake.wristSideways(SPIKE == 2)
+                        outtake.wristVerticalFlip()
                 ))
                 .splineToConstantHeading(AutoConstants.blueScoring[SPIKE].position, AutoConstants.blueScoring[SPIKE].heading.toDouble() - Math.PI)
                         .build()
@@ -119,7 +119,6 @@ public class BlueRightAuto2_5 extends AutoBase {
 
         // Detect spike
         long finalDetectTime = System.currentTimeMillis() + 500;
-        sched.addAction(new SleepAction(0.2));
         sched.addAction(new ActionUtil.RunnableAction(() -> {
             if (preloadProcessor.detecting) {
                 Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
@@ -139,7 +138,7 @@ public class BlueRightAuto2_5 extends AutoBase {
             off = 0;
             sched.addAction(outtake.wristVertical());
         } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
-            off = 2.2;
+            off = 2.5;
         } else {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
             sched.addAction(outtake.extendOuttakeCloseBlocking());
