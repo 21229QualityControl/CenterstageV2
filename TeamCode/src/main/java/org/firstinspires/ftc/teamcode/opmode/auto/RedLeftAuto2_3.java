@@ -120,25 +120,26 @@ public class RedLeftAuto2_3 extends AutoBase {
         }
 
         // Wait for partner to move out of the way
-//        sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(true) < 30));
+        sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(true) < 30));
         sched.addAction(drive.actionBuilder(detectPartner)
                 .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
                 .build());
         sched.run();
 
         // Detect spike
+        long finalDetectTime = System.currentTimeMillis() + 500;
         sched.addAction(new SleepAction(0.2));
-        telemetry.addLine("In Scoring Positions");
-        telemetry.update();
-//        sched.addAction(new ActionUtil.RunnableAction(() -> {
-//            if (preloadProcessor.detecting) {
-//                Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
-//                this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
-//                this.portal.stopStreaming();
-//                return false;
-//            }
-//            return true;
-//        }));
+        sched.addAction(new ActionUtil.RunnableAction(() -> {
+            if (preloadProcessor.detecting) {
+                Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
+                this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+                this.portal.stopStreaming();
+                return false;
+            } else if (System.currentTimeMillis() > finalDetectTime) {
+                this.preloadProcessor.fallback = true;
+            }
+            return true;
+        }));
         telemetry.addLine("detected");
         telemetry.update();
         sched.run();
