@@ -19,6 +19,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 public class PartnerPreloadTest extends LinearOpMode {
     public static boolean RED = false;
     public static int SPIKE = 0; // 0 = right, 1 = middle, 2 = left
+    public static boolean FALLBACK = false;
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
@@ -30,16 +31,17 @@ public class PartnerPreloadTest extends LinearOpMode {
                 .setCameraResolution(new Size(1280, 720)) // THIS CRASHES AT 1920x1080, GL ERROR: Out of memory!
                 .addProcessor(aprilTag)
                 .addProcessor(processor)
-                .setCamera(BuiltinCameraDirection.FRONT)
                 .enableLiveView(true)
                 .setAutoStopLiveView(true)
                 .build();
 
         while (opModeInInit()) {
             processor.updateTarget(SPIKE, RED);
+            processor.fallback = FALLBACK;
 
             telemetry.addData("Red Side", RED);
             telemetry.addData("Spike Position", SPIKE);
+            telemetry.addData("Target April Tag", processor.targetAprilTag);
             telemetry.addLine();
 
             telemetry.addData("April Tag Detected", processor.detecting);

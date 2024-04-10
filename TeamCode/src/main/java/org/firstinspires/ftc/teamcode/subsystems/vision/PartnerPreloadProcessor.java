@@ -19,17 +19,17 @@ import java.util.List;
 
 public class PartnerPreloadProcessor implements VisionProcessor {
     private AprilTagProcessor aprilTag;
-    int targetAprilTag;
+    public int targetAprilTag;
     public boolean preloadLeft = false;
     public int leftZoneAverage;
     public int rightZoneAverage;
     public boolean detecting = false;
     public boolean fallback = false;
 
-    public static int fallbackCenterX = 0;
-    public static int fallbackCenterY = 0;
-    public static int fallbackWidth = 0;
-    public static int fallbackHeight = 0;
+    public static int fallbackCenterX = 692;
+    public static int fallbackCenterY = 167;
+    public static int fallbackWidth = 137;
+    public static int fallbackHeight = 111;
 
     public PartnerPreloadProcessor(AprilTagProcessor aprilTag) {
         this.aprilTag = aprilTag;
@@ -55,7 +55,7 @@ public class PartnerPreloadProcessor implements VisionProcessor {
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
         List<AprilTagDetection> det = aprilTag.getDetections();
-        if (det != null && !fallback) {
+        if (det == null && !fallback) {
             return null;
         }
 

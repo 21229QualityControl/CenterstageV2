@@ -151,7 +151,7 @@ public class BlueRightAuto2_3 extends AutoBase {
             off = 0;
             sched.addAction(outtake.wristVertical());
         } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
-            off = 2.2;
+            off = 2.5;
         } else {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
             sched.addAction(outtake.extendOuttakeCloseBlocking());
