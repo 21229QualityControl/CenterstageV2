@@ -10,6 +10,7 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 
+import org.firstinspires.ftc.teamcode.pathing.Pose;
 import org.firstinspires.ftc.teamcode.util.ActionUtil;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 import org.firstinspires.ftc.teamcode.util.HardwareCreator;
@@ -19,7 +20,7 @@ public class BlueRightAuto2_3 extends AutoBase {
     public static Pose2d start = new Pose2d(-36, 64, Math.toRadians(-90));
     public static Pose2d[] spike = {
             new Pose2d(-46, 44, Math.toRadians(-90)),
-            new Pose2d(-36, 40, Math.toRadians(-90)),
+            new Pose2d(-48, 36, Math.toRadians(-45)),
             new Pose2d(-33, 41, Math.toRadians(-45))};
     public static Pose2d intermediate = new Pose2d(-36, 60, Math.toRadians(180));
     public static Pose2d pastTruss = new Pose2d(40, 60, Math.toRadians(180));
@@ -27,7 +28,7 @@ public class BlueRightAuto2_3 extends AutoBase {
     public static Pose2d stack = new Pose2d(-59, 39, Math.toRadians(205));
     public static Pose2d park = new Pose2d(50, 60, Math.toRadians(180));
     public static Pose2d detectPartner = new Pose2d(48, 60, Math.toRadians(180));
-    public static Pose2d scoring = new Pose2d(56, 45, Math.toRadians(160));
+    public static Pose2d scoring = new Pose2d(56, 42, Math.toRadians(180));
 
     @Override
     protected Pose2d getStartPose() {
@@ -140,6 +141,7 @@ public class BlueRightAuto2_3 extends AutoBase {
                 return false;
             } else if (System.currentTimeMillis() > finalDetectTime) {
                 this.preloadProcessor.fallback = true;
+                Log.d("BACKDROP_PRELOADLEFT", "FALLBACK");
             }
             return true;
         }));
@@ -154,7 +156,6 @@ public class BlueRightAuto2_3 extends AutoBase {
             off = 2.5;
         } else {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
-            sched.addAction(outtake.extendOuttakeCloseBlocking());
         }
         sched.addAction(drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -off : off)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
@@ -238,13 +239,15 @@ public class BlueRightAuto2_3 extends AutoBase {
         // Wait for partner to move out of the way
         sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(false) < 24));
         sched.addAction(drive.actionBuilder(detectPartner)
-                .strafeToLinearHeading(scoring.position, scoring.heading)
+                .splineToConstantHeading(scoring.position.plus(new Vector2d(-5, 0)), scoring.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .splineToConstantHeading(scoring.position, scoring.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .build());
         sched.run();
 
         // Score
         sched.addAction(outtake.clawOpen());
         sched.addAction(intake.feedClosed());
+        sched.addAction(new SleepAction(0.4));
         sched.run();
 
         // Park

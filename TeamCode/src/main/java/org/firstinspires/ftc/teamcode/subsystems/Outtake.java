@@ -48,7 +48,6 @@ public class Outtake {
    public static double MOSAIC_FIXING = 0.835;
    public static double MOSAIC_STORED = 0.2;
 
-   public double mosaicPosition;
    final DualMotorWithPID slide;
    public boolean slidePIDEnabled = true;
    final Servo claw;

@@ -357,19 +357,19 @@ public class ManualDrive extends LinearOpMode {
 
       if (Math.abs(g2.right_stick_y) > 0.01) {
          outtake.slidePIDEnabled = false;
-         outtake.setSlidePower(-g2.right_stick_y);
+         outtake.setSlidePower(-g2.right_stick_y/1.6);
       } else if (!outtake.slidePIDEnabled) {
          outtake.slidePIDEnabled = true;
          sched.queueAction(outtake.lockPosition());
       }
       if (g2.aOnce()) {
          sched.queueAction(new SequentialAction(
+                 outtake.mosaicStored(),
                  outtake.clawHalfOpen(),
-                 new SleepAction(0.5),
+                 new SleepAction(outtake.isArmScoring() ? 0.5 : 0),
                  outtake.wristVertical(),
                  outtake.armStored(),
                  outtake.clawOpen(),
-                 new SleepAction(0.5),
                  outtake.retractOuttakeBlocking()
          ));
       }
@@ -399,9 +399,11 @@ public class ManualDrive extends LinearOpMode {
       if (g2.backOnce()) {
          if (outtake.isMosaicFixing()) {
             sched.queueAction(outtake.mosaicStored());
-         }
-         else {
+         } else {
             sched.queueAction(outtake.mosaicFix());
+            sched.queueAction(outtake.wristVertical());
+            sched.queueAction(outtake.armStored());
+            sched.queueAction(outtake.clawOpen());
          }
       }
    }

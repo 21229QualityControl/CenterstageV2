@@ -18,7 +18,7 @@ public class BlueRightAuto2_5 extends AutoBase {
     public static Pose2d start = new Pose2d(-36, 64, Math.toRadians(-90));
     public static Pose2d[] spike = {
             new Pose2d(-48, 28, Math.toRadians(-90)),
-            new Pose2d(-34, 20, Math.toRadians(-90)),
+            new Pose2d(-42, 27, Math.toRadians(200)),
             new Pose2d(-36, 38, Math.toRadians(180))};
     public static Pose2d intermediate = new Pose2d(24,  11, Math.toRadians(180));
     public static Pose2d pastTruss = new Pose2d(-36, 11, Math.toRadians(180));
@@ -127,6 +127,7 @@ public class BlueRightAuto2_5 extends AutoBase {
                 return false;
             } else if (System.currentTimeMillis() > finalDetectTime) {
                 this.preloadProcessor.fallback = true;
+                Log.d("BACKDROP_PRELOADLEFT", "FALLBACK");
             }
             return true;
         }));
@@ -141,7 +142,6 @@ public class BlueRightAuto2_5 extends AutoBase {
             off = 2.5;
         } else {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
-            sched.addAction(outtake.extendOuttakeCloseBlocking());
         }
         sched.addAction(drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
                 .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -off : off)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
