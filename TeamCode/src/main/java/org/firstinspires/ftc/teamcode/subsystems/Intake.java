@@ -26,7 +26,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 @Config
 public class Intake {
    public static int INTAKE_SPEED = 1000; // Max speed is 2400
-   public static int INTAKE_SLOW = 600;
+   public static int INTAKE_SLOW = 2400; //previously 600
    public static int INTAKE_REVERSE_SPEED = -2400;
 
    final MotorWithVelocityPID intakeMotor;
@@ -220,7 +220,7 @@ public class Intake {
       private boolean jammed;
 
       public IntakeCountAction(boolean fast) {
-         this.waitUntil = System.currentTimeMillis() + 600;
+         this.waitUntil = System.currentTimeMillis() + 300;
          this.finalTime = System.currentTimeMillis() + (fast ? 3000 : 6000);
       }
 

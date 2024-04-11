@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 public class BlueLeftAuto2_6 extends AutoBase {
     public static Pose2d start = new Pose2d(12, 63, Math.toRadians(-90));
     public static Pose2d[] spike = {
-            new Pose2d(9, 34, Math.toRadians(-135)),
+            new Pose2d(10, 34, Math.toRadians(-135)),
             new Pose2d(26, 22, Math.toRadians(180)),
             new Pose2d(35, 33, Math.toRadians(180))
     };
@@ -20,7 +20,7 @@ public class BlueLeftAuto2_6 extends AutoBase {
     public static Pose2d pastTruss = new Pose2d(-36, 10, Math.toRadians(180));
     public static Pose2d stack = new Pose2d(-57, 8, Math.toRadians(180));
     public static Pose2d secondStack = new Pose2d(-58, 15, Math.toRadians(150));
-    public static Pose2d scoring = new Pose2d(56, 21, Math.toRadians(200));
+    public static Pose2d scoring = new Pose2d(56, 21.5, Math.toRadians(200));
     public static Pose2d park = new Pose2d(48, 22, Math.toRadians(180));
 
     @Override

@@ -23,7 +23,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
     };
     public static Pose2d intermediate = new Pose2d(-36, 58, Math.toRadians(180));
     public static Pose2d pastTruss = new Pose2d(24, 58, Math.toRadians(180));
-    public static Pose2d stack = new Pose2d(-59, 39, Math.toRadians(210));
+    public static Pose2d stack = new Pose2d(-59, 37.5, Math.toRadians(210));
     public static Pose2d park = new Pose2d(48, 43, Math.toRadians(180));
     public static Pose2d scoring = new Pose2d(56, 43, Math.toRadians(160));
 
@@ -75,7 +75,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
                         outtake.armScoring(),
                         outtake.wristSideways(SPIKE == 2)
                 ))
-                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
+                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint)
                 .build()
         );
         sched.addAction(outtake.clawOpen());
