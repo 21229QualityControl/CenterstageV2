@@ -255,18 +255,9 @@ public class ManualDrive extends LinearOpMode {
                  intake.feedClosed()
          ));
       }
-      if (g1.dpadUpOnce()) {
+      if (g1.yOnce()) {
          sched.cancelParallel();
          sched.queueAction(intake.prepIntakeCount(true, pixelCount == 1));
-         sched.queueActionParallel(new SequentialAction(
-                 intake.intakeCount(false),
-                 new SleepAction(1),
-                 intake.intakeOff()
-         ));
-      }
-      if (g1.dpadDownOnce()) {
-         sched.cancelParallel();
-         sched.queueAction(intake.prepIntakeCount(false, pixelCount == 1));
          sched.queueActionParallel(new SequentialAction(
                  intake.intakeCount(false),
                  new SleepAction(1),
@@ -279,7 +270,7 @@ public class ManualDrive extends LinearOpMode {
          sched.queueAction(plane.scorePlane());
       }
       if (g2.startOnce()) {
-         if (outtake.isSlideRetracted()) {
+         if (!outtake.isSlideHanging()) {
             sched.queueAction(outtake.extendOuttakeHangBlocking());
             // Make mosaic fixer go out to not interfere with hanging
             sched.queueAction(outtake.mosaicFix());
@@ -292,8 +283,10 @@ public class ManualDrive extends LinearOpMode {
    private void outtakeControls() {
       // Outtake controls
       if (g2.yOnce()) {
+         boolean one = false;
          if (!outtake.isArmScoring()) {
             if (intake.pixelCount() == 1) {
+               one = true;
                sched.queueAction(new SequentialAction(outtake.extendOuttakeBarelyOut(), new SleepAction(0.3)));
             }
             sched.queueAction(intake.intakeOff());
@@ -306,7 +299,7 @@ public class ManualDrive extends LinearOpMode {
                     outtake.extendOuttakeTeleopBlocking()
             ));
          }
-         sched.queueAction(outtake.wristVertical());
+         sched.queueAction(one ? outtake.wristVerticalFlip() : outtake.wristVertical());
       }
       if (g2.xOnce()) {
          if (!outtake.isArmScoring()) {
@@ -319,11 +312,14 @@ public class ManualDrive extends LinearOpMode {
                     new SleepAction(0.3)
             ));
             sched.queueAction(new ParallelAction(
-                    new SequentialAction(new SleepAction(0.4), outtake.armScoring()),
+                    new SequentialAction(new SleepAction(0.4),
+                            outtake.armScoring(),
+                            new SleepAction(0.2),
+                            outtake.wristMosaic(true)
+                    ),
                     outtake.extendOuttakeTeleopBlocking()
             ));
          }
-         sched.queueAction(outtake.wristMosaic(true));
       }
 
       if (g2.leftBumperOnce()) {
@@ -388,11 +384,6 @@ public class ManualDrive extends LinearOpMode {
       }
       if (g2.dpadDownOnce()) {
          sched.queueAction(outtake.increaseSlideLayer(-1));
-      }
-
-      // Mosaic controls
-      if (g2.startOnce()) { // Press start to mosaic adjust with outtake
-         sched.queueAction(outtake.clawClosed());
       }
 
       // Press back to toggle between mosaic fix and mosaic stored.

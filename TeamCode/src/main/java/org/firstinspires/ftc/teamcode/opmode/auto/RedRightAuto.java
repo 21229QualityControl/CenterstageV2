@@ -18,8 +18,8 @@ public class RedRightAuto extends AutoBase {
     };
     public static Pose2d intermediate = new Pose2d(24,  -10, Math.toRadians(-180));
     public static Pose2d pastTruss = new Pose2d(-36, -10, Math.toRadians(-180));
-    public static Pose2d stack = new Pose2d(-57, -12, Math.toRadians(-180));
-    public static Pose2d secondStack = new Pose2d(-58, -15, Math.toRadians(-150));
+    public static Pose2d stack = new Pose2d(-56, -12, Math.toRadians(-180));
+    public static Pose2d secondStack = new Pose2d(-58, -20, Math.toRadians(-150));
     public static Pose2d scoring = new Pose2d(56, -23, Math.toRadians(-200));
     public static Pose2d park = new Pose2d(53, -22, Math.toRadians(-180));
 

@@ -22,10 +22,10 @@ public class RedLeftAuto2_5 extends AutoBase {
             new Pose2d(-48, -28, Math.toRadians(90))};
     public static Pose2d intermediate = new Pose2d(24,  -11, Math.toRadians(-180));
     public static Pose2d pastTruss = new Pose2d(-36, -11, Math.toRadians(-180));
-    public static Pose2d stack = new Pose2d(-57, -12, Math.toRadians(-180));
+    public static Pose2d stack = new Pose2d(-58, -12, Math.toRadians(-180));
 
-    public static Pose2d secondStack = new Pose2d(-58, -18, Math.toRadians(-150));
-    public static Pose2d scoring = new Pose2d(56, -23, Math.toRadians(-200));
+    public static Pose2d secondStack = new Pose2d(-59, -19, Math.toRadians(-150));
+    public static Pose2d scoring = new Pose2d(56, -26, Math.toRadians(-200));
     public static Pose2d park = new Pose2d(48, -24, Math.toRadians(-180));
 
     @Override
@@ -54,12 +54,12 @@ public class RedLeftAuto2_5 extends AutoBase {
 
     private void scorePreload() {
         // Deliver spike
-        if (SPIKE != 2) {
+        if (SPIKE != 0) {
             sched.addAction(intake.wristDown());
         }
         TrajectoryActionBuilder bld = drive.actionBuilder(getStartPose())
                 .strafeToLinearHeading(spike[SPIKE].position.plus(new Vector2d(0, 4)), spike[SPIKE].heading);
-        if (SPIKE == 2) {
+        if (SPIKE == 0) {
             bld = bld.strafeToLinearHeading(spike[SPIKE].position.plus(new Vector2d(6, 4)), spike[SPIKE].heading);
         }
         sched.addAction(bld.build());

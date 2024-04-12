@@ -26,7 +26,7 @@ public class BlueRightAuto2_3 extends AutoBase {
     public static Pose2d pastTruss = new Pose2d(40, 60, Math.toRadians(180));
     public static Pose2d stackAfterPreload = new Pose2d(-59, 44, Math.toRadians(210));
     public static Pose2d stack = new Pose2d(-59, 39, Math.toRadians(205));
-    public static Pose2d park = new Pose2d(50, 60, Math.toRadians(180));
+    public static Pose2d park = new Pose2d(48, 42, Math.toRadians(180));
     public static Pose2d detectPartner = new Pose2d(48, 60, Math.toRadians(180));
     public static Pose2d scoring = new Pose2d(56, 42, Math.toRadians(180));
 

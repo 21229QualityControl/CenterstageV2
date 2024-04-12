@@ -155,6 +155,9 @@ public class Outtake {
    public boolean isSlideRetracted() {
       return this.slide.getTargetPosition() == 0;
    }
+   public boolean isSlideHanging() {
+      return this.slide.getTargetPosition() == OUTTAKE_HANG_EXTEND;
+   }
 
    public Action retractOuttakeBlocking() {
       return this.slide.setTargetPositionActionBlocking(0);
