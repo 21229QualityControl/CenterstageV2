@@ -309,7 +309,8 @@ public class ManualDrive extends LinearOpMode {
             sched.queueAction(intake.intakeOff());
             sched.queueAction(new SequentialAction(
                     intake.pixelCount() == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
-                    new SleepAction(0.3)
+                    new SleepAction(0.3),
+                    outtake.wristMosaic(true)
             ));
             sched.queueAction(new ParallelAction(
                     new SequentialAction(new SleepAction(0.4),
@@ -318,9 +319,9 @@ public class ManualDrive extends LinearOpMode {
                     ),
                     outtake.extendOuttakeTeleopBlocking()
             ));
+         } else {
+            sched.queueAction(outtake.wristMosaic(true));
          }
-         // Toggle between diagonal and sideways/vertical
-         sched.queueAction((outtake.isWristSideways() || outtake.isWristVertical()) ? outtake.wristMosaic(true) : outtake.wristSideways(true));
       }
 
       if (g2.leftBumperOnce()) {
