@@ -314,12 +314,13 @@ public class ManualDrive extends LinearOpMode {
             sched.queueAction(new ParallelAction(
                     new SequentialAction(new SleepAction(0.4),
                             outtake.armScoring(),
-                            new SleepAction(0.2),
-                            outtake.wristMosaic(true)
+                            new SleepAction(0.2)
                     ),
                     outtake.extendOuttakeTeleopBlocking()
             ));
          }
+         // Toggle between diagonal and sideways/vertical
+         sched.queueAction((outtake.isWristSideways() || outtake.isWristVertical()) ? outtake.wristMosaic(true) : outtake.wristSideways(true));
       }
 
       if (g2.leftBumperOnce()) {
