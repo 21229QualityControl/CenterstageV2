@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
 @Autonomous(name = "Red Right Auto", group = "Auto")
-public class RedRightAuto extends AutoBase {
+public class RedRightAuto2_6 extends AutoBase {
     public static Pose2d start = new Pose2d(12, -63, Math.toRadians(90));
     public static Pose2d[] spike = {
             new Pose2d(35, -33, Math.toRadians(-180)),
@@ -30,7 +30,7 @@ public class RedRightAuto extends AutoBase {
 
     @Override
     protected void printDescription() {
-        telemetry.addData("Description", "Blue Left Auto");
+        telemetry.addData("Description", "Red Right Auto 2+6");
     }
 
     @Override

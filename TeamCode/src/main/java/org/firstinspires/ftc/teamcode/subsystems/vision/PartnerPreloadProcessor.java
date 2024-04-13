@@ -1,12 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystems.vision;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.util.Log;
 
+import org.firstinspires.ftc.robotcore.external.function.Consumer;
+import org.firstinspires.ftc.robotcore.external.function.Continuation;
+import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.teamcode.util.CameraUtil;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -14,10 +21,11 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 // https://github.com/KookyBotz/CenterStage/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/common/vision/PreloadDetectionPipeline.java#L107
 
-public class PartnerPreloadProcessor implements VisionProcessor {
+public class PartnerPreloadProcessor implements VisionProcessor, CameraStreamSource {
     private AprilTagProcessor aprilTag;
     public int targetAprilTag;
     public boolean preloadLeft = false;
@@ -30,6 +38,8 @@ public class PartnerPreloadProcessor implements VisionProcessor {
     public static int fallbackCenterY = 167;
     public static int fallbackWidth = 137;
     public static int fallbackHeight = 111;
+
+    public AprilTagPoseFtc detectedPose = null;
 
     public PartnerPreloadProcessor(AprilTagProcessor aprilTag) {
         this.aprilTag = aprilTag;
@@ -46,6 +56,10 @@ public class PartnerPreloadProcessor implements VisionProcessor {
                 .setLensIntrinsics(578.272, 578.272, 402.145, 221.506) // TODO: Calibrate for real camera, this is for logitech c720
                 .build();
     }
+
+    private CameraUtil.DebugMode debugMode = CameraUtil.DebugMode.None;
+    private final AtomicReference<Bitmap> lastFrame =
+            new AtomicReference<>(Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
 
     @Override
     public void init(int width, int height, CameraCalibration calibration) {
@@ -69,6 +83,8 @@ public class PartnerPreloadProcessor implements VisionProcessor {
             if (d.id != targetAprilTag) {
                 continue;
             }
+
+            detectedPose = d.ftcPose;
 
             // General logic taken from kookybotz
             int leftX = Integer.MAX_VALUE;
@@ -125,12 +141,27 @@ public class PartnerPreloadProcessor implements VisionProcessor {
 
         preloadLeft = leftZoneAverage > rightZoneAverage;
         detecting = true;
+
+        if (debugMode == CameraUtil.DebugMode.Dashboard) {
+            saveDebugMat(frame, leftInclusionZone, rightInclusionZone, leftExclusionZone, rightExclusionZone);
+        }
+
         return null;
     }
 
     @Override
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
 
+    }
+
+    public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
+        if (debugMode == CameraUtil.DebugMode.Dashboard) {
+            continuation.dispatch(bitmapConsumer -> bitmapConsumer.accept(lastFrame.get()));
+        }
+    }
+
+    public void setDebugMode(CameraUtil.DebugMode debugMode) {
+        this.debugMode = debugMode;
     }
 
     // Thanks KookyBotz
@@ -161,5 +192,28 @@ public class PartnerPreloadProcessor implements VisionProcessor {
         }
 
         return count > 0 ? sum / count : 0;
+    }
+
+    private void saveDebugMat(Mat frame, Rect leftInclusionZone, Rect rightInclusiveZone, Rect leftExclusionZone, Rect rightExclusionZone) {
+        // Make a color "green."
+        Scalar green = new Scalar(0, 255, 0);
+        Scalar red = new Scalar(0, 0, 255);
+        Scalar yellow = new Scalar(0, 255, 255);
+        Scalar blue = new Scalar(255, 0, 0);
+
+        // Clone the Matrix. The original matrix is for the processing purposes and the cloned matrix is for the display purposes.
+        Mat tempFrame = frame.clone();
+        // Draw rectangles on the cloned matrix.
+        Imgproc.rectangle(tempFrame, leftInclusionZone, green);
+        Imgproc.rectangle(tempFrame, rightInclusiveZone, red);
+        Imgproc.rectangle(tempFrame, leftExclusionZone, yellow);
+        Imgproc.rectangle(tempFrame, rightExclusionZone, blue);
+
+        // Create a Bitmap "bb" that is the same size as "frameWithBoundingRect."
+        Bitmap bb = Bitmap.createBitmap(tempFrame.width(), tempFrame.height(), Bitmap.Config.RGB_565);
+        // Convert the cloned matrix to the Bitmap "bb."
+        Utils.matToBitmap(tempFrame, bb);
+        // Set the "lastFrameWithBoundingRect" to the Bitmap "bb." So that AtomicReference container ACTUALLY holds the Bitmap.
+        lastFrame.set(bb);
     }
 }
