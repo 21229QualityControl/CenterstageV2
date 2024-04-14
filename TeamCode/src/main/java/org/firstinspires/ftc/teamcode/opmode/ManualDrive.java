@@ -338,6 +338,10 @@ public class ManualDrive extends LinearOpMode {
          }
       }
 
+      if (g2.leftStickButton()) {
+         outtake.resetSlideOffset();
+      }
+
       if (g2.rightBumperOnce()) {
          if (outtake.isWristVertical()) {
             sched.queueAction(outtake.wristSideways(false));

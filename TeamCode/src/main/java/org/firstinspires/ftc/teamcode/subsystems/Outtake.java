@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.util.control.PIDFControllerKt.EPSILON;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -93,7 +95,10 @@ public class Outtake {
    }
 
    public void prepInitializeSlides() {
-      this.slide.setPower(-0.3);
+      this.wrist.setPosition(WRIST_VERTICAL);
+      this.armLeft.setPosition(ARM_LEFT_STORED);
+      this.armRight.setPosition(ARM_RIGHT_STORED);
+      this.slide.setPower(-0.6);
    }
 
    public boolean initializeSlides() {
@@ -114,6 +119,10 @@ public class Outtake {
 
    public void setSlidePower(double power) {
       slide.setPower(power);
+   }
+   public void resetSlideOffset() {
+      this.slide.setCurrentPosition(0);
+      this.slide.setTargetPosition(0);
    }
    public Action lockPosition() {
       int pos = this.slide.getCurrentPosition();
