@@ -18,7 +18,7 @@ public class BlueRightAuto2_5 extends AutoBase {
     public static Pose2d start = new Pose2d(-36, 64, Math.toRadians(-90));
     public static Pose2d[] spike = {
             new Pose2d(-48, 28, Math.toRadians(-90)),
-            new Pose2d(-42, 27, Math.toRadians(200)),
+            new Pose2d(-42, 25, Math.toRadians(200)),
             new Pose2d(-36, 38, Math.toRadians(180))};
     public static Pose2d intermediate = new Pose2d(24,  11, Math.toRadians(180));
     public static Pose2d pastTruss = new Pose2d(-36, 11, Math.toRadians(180));

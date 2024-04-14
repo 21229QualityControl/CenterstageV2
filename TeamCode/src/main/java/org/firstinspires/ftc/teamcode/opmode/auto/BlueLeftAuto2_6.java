@@ -79,9 +79,9 @@ public class BlueLeftAuto2_6 extends AutoBase {
                 .afterDisp(0, new SequentialAction(
                         outtake.extendOuttakeCloseBlocking(),
                         outtake.armScoring(),
-                        outtake.wristSideways(SPIKE == 2)
+                        outtake.wristVerticalFlip()
                 ))
-                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading)
+                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, SPIKE == 2 ? 2 : -2)), AutoConstants.blueScoring[SPIKE].heading)
                         .build()
         );
         sched.addAction(outtake.clawOpen());

@@ -22,11 +22,11 @@ public class RedLeftAuto2_5 extends AutoBase {
             new Pose2d(-48, -28, Math.toRadians(90))};
     public static Pose2d intermediate = new Pose2d(24,  -11, Math.toRadians(-180));
     public static Pose2d pastTruss = new Pose2d(-36, -11, Math.toRadians(-180));
-    public static Pose2d stack = new Pose2d(-58, -12, Math.toRadians(-180));
+    public static Pose2d stack = new Pose2d(-58, -14, Math.toRadians(-180));
 
-    public static Pose2d secondStack = new Pose2d(-59, -19, Math.toRadians(-150));
-    public static Pose2d scoring = new Pose2d(56, -26, Math.toRadians(-200));
-    public static Pose2d park = new Pose2d(48, -24, Math.toRadians(-180));
+    public static Pose2d secondStack = new Pose2d(-59, -23, Math.toRadians(-150));
+    public static Pose2d scoring = new Pose2d(54, -27, Math.toRadians(-200));
+    public static Pose2d park = new Pose2d(48, -27, Math.toRadians(-180));
 
     @Override
     protected Pose2d getStartPose() {
@@ -91,12 +91,12 @@ public class RedLeftAuto2_5 extends AutoBase {
         boolean single = intake.pixelCount() != 2;
         sched.addAction(drive.actionBuilder(stack)
                 .setReversed(true)
-                .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
+                .splineToConstantHeading(pastTruss.position.plus(new Vector2d(0, 4)), pastTruss.heading.toDouble() - Math.PI)
                 .afterDisp(0, new SequentialAction(
                         intake.pixelCount() == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
                         intake.intakeOff()
                 ))
-                .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI)
+                .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint)
                 .afterDisp(0, new ActionUtil.RunnableAction(() -> {
                     this.preloadProcessor.updateTarget(SPIKE, true);
                     this.preloadProcessor.detecting = false;
@@ -108,11 +108,11 @@ public class RedLeftAuto2_5 extends AutoBase {
                     return false;
                 }))
                 .afterDisp(1, new SequentialAction(
-                        outtake.extendOuttakeCloseBlocking(),
+                        outtake.extendOuttakePartnerBlocking(),
                         outtake.armScoring(),
-                        outtake.wristSideways(SPIKE == 2)
+                        outtake.wristVerticalFlip()
                 ))
-                .splineToConstantHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading.toDouble() - Math.PI)
+                .splineToConstantHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(-2, 0)), AutoConstants.redScoring[SPIKE].heading.toDouble() - Math.PI, drive.slowVelConstraint)
                         .build()
         );
         sched.run();
@@ -128,6 +128,7 @@ public class RedLeftAuto2_5 extends AutoBase {
                 return false;
             } else if (System.currentTimeMillis() > finalDetectTime) {
                 this.preloadProcessor.fallback = true;
+                Log.d("BACKDROP_PRELOADLEFT", "FALLBACK");
             }
             return true;
         }));
@@ -139,13 +140,12 @@ public class RedLeftAuto2_5 extends AutoBase {
             off = 0;
             sched.addAction(outtake.wristVertical());
         } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
-            off = -2.2;
+            off = 2.2;
         } else {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
-            sched.addAction(outtake.extendOuttakeCloseBlocking());
         }
         sched.addAction(drive.actionBuilder(AutoConstants.redScoring[SPIKE])
-                .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -off : off)), AutoConstants.redScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(10, preloadProcessor.preloadLeft ? -off : off)), AutoConstants.redScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .afterDisp(12, new SequentialAction(
                         outtake.clawHalfOpen()
                 ))

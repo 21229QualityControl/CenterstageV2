@@ -25,7 +25,7 @@ public class RedLeftAuto2_3 extends AutoBase {
     public static Pose2d stack = new Pose2d(-59.5, -40.5, Math.toRadians(-205));
     public static Pose2d park = new Pose2d(50, -60, Math.toRadians(-180));
     public static Pose2d detectPartner = new Pose2d(46, -58.5, Math.toRadians(-180));
-    public static Pose2d scoring = new Pose2d(55, -42, Math.toRadians(-160));
+    public static Pose2d scoring = new Pose2d(53, -42, Math.toRadians(-160));
 
     @Override
     protected Pose2d getStartPose() {
@@ -137,11 +137,10 @@ public class RedLeftAuto2_3 extends AutoBase {
                 return false;
             } else if (System.currentTimeMillis() > finalDetectTime) {
                 this.preloadProcessor.fallback = true;
+                Log.d("BACKDROP_PRELOADLEFT", "FALLBACK");
             }
             return true;
         }));
-        telemetry.addLine("detected");
-        telemetry.update();
         sched.run();
 
         // Score
@@ -149,11 +148,10 @@ public class RedLeftAuto2_3 extends AutoBase {
         if (single) {
             off = 0;
             sched.addAction(outtake.wristVertical());
-        } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft) || (SPIKE == 1 && preloadProcessor.preloadLeft)) { // Sides
+        } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
             off = 2.2;
         } else {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
-            sched.addAction(outtake.extendOuttakeCloseBlocking());
         }
 
         sched.addAction(drive.actionBuilder(AutoConstants.redScoring[SPIKE])

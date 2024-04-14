@@ -13,15 +13,15 @@ public class RedRightAuto2_6 extends AutoBase {
     public static Pose2d start = new Pose2d(12, -63, Math.toRadians(90));
     public static Pose2d[] spike = {
             new Pose2d(34, -33, Math.toRadians(-180)),
-            new Pose2d(26, -22, Math.toRadians(-180)),
+            new Pose2d(30, -22, Math.toRadians(-180)),
             new Pose2d(9, -34, Math.toRadians(135))
     };
     public static Pose2d intermediate = new Pose2d(24,  -10, Math.toRadians(-180));
     public static Pose2d pastTruss = new Pose2d(-36, -10, Math.toRadians(-180));
     public static Pose2d stack = new Pose2d(-56, -12, Math.toRadians(-180));
     public static Pose2d secondStack = new Pose2d(-58, -20, Math.toRadians(-150));
-    public static Pose2d scoring = new Pose2d(55, -24, Math.toRadians(-200));
-    public static Pose2d park = new Pose2d(53, -22, Math.toRadians(-200));
+    public static Pose2d scoring = new Pose2d(55, -27, Math.toRadians(-200));
+    public static Pose2d park = new Pose2d(48, -26, Math.toRadians(-200));
 
     @Override
     protected Pose2d getStartPose() {
@@ -79,7 +79,7 @@ public class RedRightAuto2_6 extends AutoBase {
                 .afterDisp(0, new SequentialAction(
                         outtake.extendOuttakeCloseBlocking(),
                         outtake.armScoring(),
-                        outtake.wristSideways(SPIKE == 2)
+                        outtake.wristVerticalFlip()
                 ))
                 .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.redScoring[SPIKE].heading)
                         .build()

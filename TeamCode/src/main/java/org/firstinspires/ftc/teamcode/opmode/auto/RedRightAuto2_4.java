@@ -21,8 +21,8 @@ public class RedRightAuto2_4 extends AutoBase {
             new Pose2d(26, -22, Math.toRadians(-180)),
             new Pose2d(9, -34, Math.toRadians(135))
     };
-    public static Pose2d intermediate = new Pose2d(-36, -58, Math.toRadians(-180));
-    public static Pose2d pastTruss = new Pose2d(26, -58, Math.toRadians(-180));
+    public static Pose2d intermediate = new Pose2d(-36, -57, Math.toRadians(-180));
+    public static Pose2d pastTruss = new Pose2d(26, -57, Math.toRadians(-180));
     public static Pose2d stack = new Pose2d(-59, -41, Math.toRadians(-210));
     public static Pose2d park = new Pose2d(48, -43, Math.toRadians(-180));
     public static Pose2d scoring = new Pose2d(56, -45, Math.toRadians(-160));
@@ -73,9 +73,9 @@ public class RedRightAuto2_4 extends AutoBase {
                 .afterDisp(0, new SequentialAction(
                         outtake.extendOuttakeCloseBlocking(),
                         outtake.armScoring(),
-                        outtake.wristSideways(SPIKE == 2)
+                        outtake.wristVerticalFlip()
                 ))
-                .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.redScoring[SPIKE].heading, drive.slowVelConstraint)
+                .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, SPIKE == 2 ? 2 : -2)), AutoConstants.redScoring[SPIKE].heading, drive.slowVelConstraint)
                 .build()
         );
         sched.addAction(outtake.clawOpen());
@@ -103,7 +103,7 @@ public class RedRightAuto2_4 extends AutoBase {
                 .afterDisp(0, new SequentialAction(
                         intake.feedClosed()
                 ))
-                .splineToConstantHeading(intermediate.position, intermediate.heading)
+                .splineToConstantHeading(intermediate.position, intermediate.heading, drive.slowVelConstraint)
                 .afterDisp(0, intake.prepIntakeCount(first, false))
                 .splineToSplineHeading(stack, stack.heading, drive.slowVelConstraint)
                 .build()
@@ -117,7 +117,7 @@ public class RedRightAuto2_4 extends AutoBase {
 
     private void cycle() {
         sched.addAction(drive.actionBuilder(stack)
-                .setReversed(true)
+                .setTangent(Math.toRadians(-90))
                 .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .afterDisp(1, new SequentialAction(
                         intake.pixelCount() == 2 ? outtake.clawClosed() : outtake.clawSingleClosed()

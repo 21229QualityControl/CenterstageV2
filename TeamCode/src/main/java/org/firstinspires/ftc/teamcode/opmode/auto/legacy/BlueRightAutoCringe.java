@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.auto;
+package org.firstinspires.ftc.teamcode.opmode.auto.legacy;
 
 import android.util.Log;
 import android.util.Size;
@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -19,7 +20,7 @@ import org.firstinspires.ftc.teamcode.util.AutoConstants;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Config
-//@Disabled
+@Disabled
 @Autonomous(name = "Blue Right Auto Cringe", group = "Auto", preselectTeleOp = "Manual Drive")
 public class BlueRightAutoCringe extends AutoBase {
     public static Pose2d start = new Pose2d(-36, 64, Math.toRadians(-90));

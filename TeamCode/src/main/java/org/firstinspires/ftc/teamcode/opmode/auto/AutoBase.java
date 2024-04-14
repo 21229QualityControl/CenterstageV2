@@ -43,10 +43,18 @@ public abstract class AutoBase extends LinearOpMode {
     public static int SPIKE = -1;
 
     final public void update() {
+        int pixelCount = intake.pixelCount();
         telemetry.addData("Time left", 30 - getRuntime());
-        telemetry.addData("Pixel Count", intake.pixelCount());
+        telemetry.addData("Pixel Count", pixelCount);
         telemetry.addData("Number Intaked", intake.numIntaked);
         telemetry.addData("Intake Reversing", intake.isReversing());
+        if (pixelCount == 0) {
+            led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+        } else if (pixelCount == 1) {
+            led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+        } else if (pixelCount == 2) {
+            led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+        }
         outtake.update();
         intake.update();
         telemetry.update();

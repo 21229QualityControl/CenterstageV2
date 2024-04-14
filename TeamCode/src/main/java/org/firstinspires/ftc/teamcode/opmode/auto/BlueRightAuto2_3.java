@@ -28,7 +28,7 @@ public class BlueRightAuto2_3 extends AutoBase {
     public static Pose2d stack = new Pose2d(-59, 39, Math.toRadians(205));
     public static Pose2d park = new Pose2d(48, 42, Math.toRadians(180));
     public static Pose2d detectPartner = new Pose2d(48, 60, Math.toRadians(180));
-    public static Pose2d scoring = new Pose2d(56, 42, Math.toRadians(180));
+    public static Pose2d scoring = new Pose2d(55, 42, Math.toRadians(180));
 
     @Override
     protected Pose2d getStartPose() {
@@ -84,7 +84,7 @@ public class BlueRightAuto2_3 extends AutoBase {
                 drive.actionBuilder(stackAfterPreload)
                         .setReversed(true)
                         .afterDisp(0, outtake.retractOuttakeBlocking())
-                        .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
+                        .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI, drive.slowestVelConstraint, drive.slowestAccelConstraint)
                         .afterDisp(0, intake.pixelCount() == 2 ? outtake.clawClosed() : outtake.clawSingleClosed())
                         .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
                         .afterDisp(0, new ActionUtil.RunnableAction(() -> {
@@ -179,7 +179,7 @@ public class BlueRightAuto2_3 extends AutoBase {
                         outtake.extendOuttakeBarelyOut()
                 ))
                 .afterDisp(10, outtake.retractOuttake())
-                .splineToConstantHeading(pastTruss.position, pastTruss.heading, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .splineToConstantHeading(pastTruss.position, pastTruss.heading, drive.slowestVelConstraint, drive.slowestAccelConstraint)
                 .afterDisp(0, new SequentialAction(
                         intake.feedClosed()
                 ))
@@ -240,7 +240,7 @@ public class BlueRightAuto2_3 extends AutoBase {
         sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(false) < 24));
         sched.addAction(drive.actionBuilder(detectPartner)
                 .splineToConstantHeading(scoring.position.plus(new Vector2d(-5, 0)), scoring.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
-                .splineToConstantHeading(scoring.position, scoring.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .splineToConstantHeading(scoring.position, scoring.heading.toDouble() - Math.PI, drive.slowestVelConstraint, drive.slowestAccelConstraint)
                 .build());
         sched.run();
 
