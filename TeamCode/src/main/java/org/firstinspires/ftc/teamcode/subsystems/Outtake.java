@@ -45,7 +45,7 @@ public class Outtake {
    public static double WRIST_LEFT = 0.71;
    public static double WRIST_RIGHT = 0.145;
 
-   public static double MOSAIC_FIXING = 0.835;
+   public static double MOSAIC_FIXING = 0.87;
    public static double MOSAIC_STORED = 0.2;
 
    final DualMotorWithPID slide;

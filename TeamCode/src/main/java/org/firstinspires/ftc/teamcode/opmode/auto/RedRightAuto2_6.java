@@ -8,11 +8,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.util.AutoConstants;
 
-@Autonomous(name = "Red Right Auto", group = "Auto")
+@Autonomous(name = "Red Right Auto 2+6", group = "Auto")
 public class RedRightAuto2_6 extends AutoBase {
     public static Pose2d start = new Pose2d(12, -63, Math.toRadians(90));
     public static Pose2d[] spike = {
-            new Pose2d(35, -33, Math.toRadians(-180)),
+            new Pose2d(34, -33, Math.toRadians(-180)),
             new Pose2d(26, -22, Math.toRadians(-180)),
             new Pose2d(9, -34, Math.toRadians(135))
     };
@@ -20,8 +20,8 @@ public class RedRightAuto2_6 extends AutoBase {
     public static Pose2d pastTruss = new Pose2d(-36, -10, Math.toRadians(-180));
     public static Pose2d stack = new Pose2d(-56, -12, Math.toRadians(-180));
     public static Pose2d secondStack = new Pose2d(-58, -20, Math.toRadians(-150));
-    public static Pose2d scoring = new Pose2d(56, -23, Math.toRadians(-200));
-    public static Pose2d park = new Pose2d(53, -22, Math.toRadians(-180));
+    public static Pose2d scoring = new Pose2d(55, -24, Math.toRadians(-200));
+    public static Pose2d park = new Pose2d(53, -22, Math.toRadians(-200));
 
     @Override
     protected Pose2d getStartPose() {
@@ -140,7 +140,7 @@ public class RedRightAuto2_6 extends AutoBase {
                 ))
                 .splineToConstantHeading(intermediate.position, intermediate.heading.toDouble() - Math.PI)
                         .afterDisp(0, new SequentialAction(
-                                outtake.extendOuttakeCycleBlocking(),
+                                second ? outtake.extendOuttakeCycleHighBlocking() : outtake.extendOuttakeCycleBlocking(),
                                 outtake.armScoring(),
                                 intake.feedOpen()
                         ))

@@ -19,13 +19,13 @@ public class RedLeftAuto2_3 extends AutoBase {
             new Pose2d(-33, -41, Math.toRadians(45)),
             new Pose2d(-36, -40, Math.toRadians(90)),
             new Pose2d(-46, -44, Math.toRadians(90))};
-    public static Pose2d intermediate = new Pose2d(-36, -58.5, Math.toRadians(-180));
-    public static Pose2d pastTruss = new Pose2d(40, -58.5, Math.toRadians(-180));
+    public static Pose2d intermediate = new Pose2d(-36, -58, Math.toRadians(-180));
+    public static Pose2d pastTruss = new Pose2d(40, -58, Math.toRadians(-180));
     public static Pose2d stackAfterPreload = new Pose2d(-59, -44, Math.toRadians(-210));
-    public static Pose2d stack = new Pose2d(-59, -39, Math.toRadians(-205));
+    public static Pose2d stack = new Pose2d(-59.5, -40.5, Math.toRadians(-205));
     public static Pose2d park = new Pose2d(50, -60, Math.toRadians(-180));
-    public static Pose2d detectPartner = new Pose2d(48, -58.5, Math.toRadians(-180));
-    public static Pose2d scoring = new Pose2d(56, -45, Math.toRadians(-160));
+    public static Pose2d detectPartner = new Pose2d(46, -58.5, Math.toRadians(-180));
+    public static Pose2d scoring = new Pose2d(55, -42, Math.toRadians(-160));
 
     @Override
     protected Pose2d getStartPose() {
@@ -81,9 +81,9 @@ public class RedLeftAuto2_3 extends AutoBase {
                 drive.actionBuilder(stackAfterPreload)
                         .setReversed(true)
                         .afterDisp(0, outtake.retractOuttakeBlocking())
-                        .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI, drive.slowestVelConstraint, drive.slowestAccelConstraint)
+                        .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI)
                         .afterDisp(0, intake.pixelCount() == 2 ? outtake.clawClosed() : outtake.clawSingleClosed())
-                        .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
+                        .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI, drive.slowestVelConstraint, drive.slowestAccelConstraint)
                         .afterDisp(0, new ActionUtil.RunnableAction(() -> {
                             this.preloadProcessor.updateTarget(SPIKE, true);
                             this.preloadProcessor.detecting = false;
@@ -149,14 +149,13 @@ public class RedLeftAuto2_3 extends AutoBase {
         if (single) {
             off = 0;
             sched.addAction(outtake.wristVertical());
-        } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
+        } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft) || (SPIKE == 1 && preloadProcessor.preloadLeft)) { // Sides
             off = 2.2;
         } else {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
             sched.addAction(outtake.extendOuttakeCloseBlocking());
         }
-        telemetry.addLine("robot wrist sideways");
-        telemetry.update();
+
         sched.addAction(drive.actionBuilder(AutoConstants.redScoring[SPIKE])
                 .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -off : off)), AutoConstants.redScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .afterDisp(12, new SequentialAction(
@@ -179,13 +178,13 @@ public class RedLeftAuto2_3 extends AutoBase {
                         outtake.extendOuttakeBarelyOut()
                 ))
                 .afterDisp(10, outtake.retractOuttake())
-                .splineToConstantHeading(pastTruss.position, pastTruss.heading, drive.slowestVelConstraint, drive.slowestAccelConstraint)
+                .splineToConstantHeading(pastTruss.position, pastTruss.heading)
                 .afterDisp(0, new SequentialAction(
                         intake.feedClosed()
                 ))
-                .splineToConstantHeading(intermediate.position, intermediate.heading)
+                .splineToConstantHeading(intermediate.position, intermediate.heading, drive.slowestVelConstraint, drive.slowestAccelConstraint)
                 .afterDisp(0, intake.prepIntakeCount(false, false))
-                .splineToSplineHeading(stack, stack.heading, drive.slowVelConstraint)
+                .splineToSplineHeading(stack, stack.heading, drive.slowestVelConstraint)
                 .build()
         );
         sched.run();
@@ -214,11 +213,11 @@ public class RedLeftAuto2_3 extends AutoBase {
 
         sched.addAction(drive.actionBuilder(stack)
                 .setReversed(true)
-                .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI, drive.slowestVelConstraint, drive.slowestAccelConstraint)
+                .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI)
                 .afterDisp(1, new SequentialAction(
                         intake.pixelCount() == 2 ? outtake.clawClosed() : outtake.clawSingleClosed()
                 ))
-                .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
+                .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI, drive.slowestVelConstraint, drive.slowestAccelConstraint)
                 .afterDisp(1, new SequentialAction(
                         intake.intakeOff()
                 ))
@@ -237,9 +236,10 @@ public class RedLeftAuto2_3 extends AutoBase {
         }
 
         // Wait for partner to move out of the way
-//        sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(true) < 30));
+        sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(true) < 30));
         sched.addAction(drive.actionBuilder(detectPartner)
-                .strafeToLinearHeading(scoring.position, scoring.heading)
+                .splineToConstantHeading(scoring.position.plus(new Vector2d(-5, 0)), scoring.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .splineToConstantHeading(scoring.position, scoring.heading.toDouble() - Math.PI, drive.slowestVelConstraint, drive.slowestAccelConstraint)
                 .build());
         sched.run();
 

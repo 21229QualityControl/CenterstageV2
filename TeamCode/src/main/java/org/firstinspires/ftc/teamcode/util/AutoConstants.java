@@ -12,7 +12,7 @@ public class AutoConstants {
    };
    public static Pose2d[] redScoring = {
            new Pose2d(43, -41, Math.toRadians(180)),
-           new Pose2d(43, -36, Math.toRadians(180)),
+           new Pose2d(43, -35, Math.toRadians(180)),
            new Pose2d(43, -29, Math.toRadians(180))
    };
 }
