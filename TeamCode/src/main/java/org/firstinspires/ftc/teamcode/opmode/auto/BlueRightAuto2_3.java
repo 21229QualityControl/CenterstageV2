@@ -48,6 +48,7 @@ public class BlueRightAuto2_3 extends AutoBase {
         cycle();
     }
 
+    double off;
     private void firstCycle() {
         // Deliver spike
         sched.addAction(intake.wristPreload());
@@ -148,7 +149,7 @@ public class BlueRightAuto2_3 extends AutoBase {
         sched.run();
 
         // Score
-        double off = 4;
+        off = 4;
         if (single) {
             off = 0;
             sched.addAction(outtake.wristVertical());
@@ -157,8 +158,11 @@ public class BlueRightAuto2_3 extends AutoBase {
         } else {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
         }
+        if (preloadProcessor.preloadLeft) {
+            off *= -1;
+        }
         sched.addAction(drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
-                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -off : off)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, off)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .afterDisp(12, new SequentialAction(
                         outtake.clawHalfOpen()
                 ))

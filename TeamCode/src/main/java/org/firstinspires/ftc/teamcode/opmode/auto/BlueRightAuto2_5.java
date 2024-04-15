@@ -52,6 +52,7 @@ public class BlueRightAuto2_5 extends AutoBase {
         park();
     }
 
+    double off;
     private void scorePreload() {
         // Deliver spike
         if (SPIKE != 2) {
@@ -134,7 +135,7 @@ public class BlueRightAuto2_5 extends AutoBase {
         sched.run();
 
         // Score
-        double off = 4;
+        off = 4;
         if (single) {
             off = 0;
             sched.addAction(outtake.wristVertical());
@@ -143,8 +144,11 @@ public class BlueRightAuto2_5 extends AutoBase {
         } else {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
         }
+        if (preloadProcessor.preloadLeft) {
+            off *= -1;
+        }
         sched.addAction(drive.actionBuilder(AutoConstants.blueScoring[SPIKE])
-                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, preloadProcessor.preloadLeft ? -off : off)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .strafeToLinearHeading(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, off)), AutoConstants.blueScoring[SPIKE].heading, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .afterDisp(12, new SequentialAction(
                         outtake.clawHalfOpen()
                 ))
@@ -154,7 +158,7 @@ public class BlueRightAuto2_5 extends AutoBase {
     }
 
     private void intakeStack(boolean first) {
-        TrajectoryActionBuilder bld = drive.actionBuilder(first ? new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.blueScoring[SPIKE].heading) : scoring)
+        TrajectoryActionBuilder bld = drive.actionBuilder(first ? new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, off)), AutoConstants.blueScoring[SPIKE].heading) : scoring)
                 .afterDisp(1, new SequentialAction(
                         outtake.wristVertical(),
                         outtake.armStored(),
