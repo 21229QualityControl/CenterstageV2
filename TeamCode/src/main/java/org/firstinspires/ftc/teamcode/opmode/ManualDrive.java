@@ -256,13 +256,8 @@ public class ManualDrive extends LinearOpMode {
          ));
       }
       if (g1.yOnce()) {
-         sched.cancelParallel();
-         sched.queueAction(intake.prepIntakeCount(true, pixelCount == 1));
-         sched.queueActionParallel(new SequentialAction(
-                 intake.intakeCount(false),
-                 new SleepAction(1),
-                 intake.intakeOff()
-         ));
+         sched.queueAction(intake.intakeOn());
+         sched.queueAction(intake.wristStack(1));
       }
 
       // Other susbsystems
@@ -271,9 +266,9 @@ public class ManualDrive extends LinearOpMode {
       }
       if (g2.startOnce()) {
          if (!outtake.isSlideHanging()) {
-            sched.queueAction(outtake.extendOuttakeHangBlocking());
             // Make mosaic fixer go out to not interfere with hanging
             sched.queueAction(outtake.mosaicFix());
+            sched.queueAction(outtake.extendOuttakeHangBlocking());
          } else {
             sched.queueAction(outtake.retractOuttakeHang());
          }
@@ -309,13 +304,14 @@ public class ManualDrive extends LinearOpMode {
             sched.queueAction(intake.intakeOff());
             sched.queueAction(new SequentialAction(
                     intake.pixelCount() == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
-                    new SleepAction(0.3),
-                    outtake.wristMosaic(true)
+                    new SleepAction(0.3)
             ));
             sched.queueAction(new ParallelAction(
-                    new SequentialAction(new SleepAction(0.4),
+                 new SequentialAction(
+                            new SleepAction(0.2),
                             outtake.armScoring(),
-                            new SleepAction(0.2)
+                            new SleepAction(0.2),
+                            outtake.wristMosaic(true)
                     ),
                     outtake.extendOuttakeTeleopBlocking()
             ));
