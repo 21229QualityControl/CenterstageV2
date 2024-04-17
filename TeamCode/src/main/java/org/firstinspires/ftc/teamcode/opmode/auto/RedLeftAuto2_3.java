@@ -238,6 +238,9 @@ public class RedLeftAuto2_3 extends AutoBase {
         }
 
         // Wait for partner to move out of the way
+        if (getRuntime() < 26) {
+            sched.addAction(new SleepAction(1));
+        }
         sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(true) < 30));
         sched.addAction(drive.actionBuilder(detectPartner)
                 .splineToConstantHeading(scoring.position.plus(new Vector2d(-5, 0)), scoring.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
@@ -248,17 +251,6 @@ public class RedLeftAuto2_3 extends AutoBase {
         // Score
         sched.addAction(outtake.clawOpen());
         sched.addAction(intake.feedClosed());
-        sched.addAction(new SleepAction(0.5));
-        sched.run();
-
-        // Park
-        sched.addAction(drive.actionBuilder(scoring)
-                .afterDisp(1, new SequentialAction(
-                        outtake.armStored(),
-                        outtake.retractOuttakeBlocking()
-                ))
-                .strafeToLinearHeading(park.position, park.heading)
-                .build());
         sched.run();
     }
 }

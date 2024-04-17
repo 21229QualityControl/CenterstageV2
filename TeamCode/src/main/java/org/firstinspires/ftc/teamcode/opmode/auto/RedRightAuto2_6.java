@@ -13,7 +13,7 @@ public class RedRightAuto2_6 extends AutoBase {
     public static Pose2d start = new Pose2d(12, -63, Math.toRadians(90));
     public static Pose2d[] spike = {
             new Pose2d(34, -33, Math.toRadians(-180)),
-            new Pose2d(30, -22, Math.toRadians(-180)),
+            new Pose2d(28, -22, Math.toRadians(-180)),
             new Pose2d(9, -34, Math.toRadians(135))
     };
     public static Pose2d intermediate = new Pose2d(24,  -10, Math.toRadians(-180));
