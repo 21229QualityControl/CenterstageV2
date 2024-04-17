@@ -34,10 +34,10 @@ public class PartnerPreloadProcessor implements VisionProcessor, CameraStreamSou
     public boolean detecting = false;
     public boolean fallback = false;
 
-    public static int fallbackCenterX = 692;
-    public static int fallbackCenterY = 167;
-    public static int fallbackWidth = 137;
-    public static int fallbackHeight = 111;
+    public static int fallbackCenterX = 663;
+    public static int fallbackCenterY = 314;
+    public static int fallbackWidth = 125;
+    public static int fallbackHeight = 94;
 
     public AprilTagPoseFtc detectedPose = null;
 
@@ -117,6 +117,11 @@ public class PartnerPreloadProcessor implements VisionProcessor, CameraStreamSou
                 return null;
             }
         }
+
+        Log.d("CX", String.valueOf(tagCenterX));
+        Log.d("CY", String.valueOf(tagCenterY));
+        Log.d("WI", String.valueOf(tagWidth));
+        Log.d("HI", String.valueOf(tagHeight));
 
         int inclusionZoneWidth = (int) (tagWidth * 1.3);
         int inclusionZoneHeight = (int) (tagHeight * 1.3);
