@@ -239,7 +239,7 @@ public class RedLeftAuto2_3 extends AutoBase {
 
         // Wait for partner to move out of the way
         if (getRuntime() < 26) {
-            sched.addAction(new SleepAction(1));
+            sched.addAction(new SleepAction(26 - getRuntime() + 0.5));
         }
         sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(true) < 30));
         sched.addAction(drive.actionBuilder(detectPartner)
