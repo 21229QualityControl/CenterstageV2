@@ -159,7 +159,7 @@ public class BlueRightAuto2_5 extends AutoBase {
 
     private void intakeStack(boolean first) {
         TrajectoryActionBuilder bld = drive.actionBuilder(first ? new Pose2d(AutoConstants.blueScoring[SPIKE].position.plus(new Vector2d(12, off)), AutoConstants.blueScoring[SPIKE].heading) : scoring)
-                .afterDisp(1, new SequentialAction(
+                .afterDisp(7, new SequentialAction(
                         outtake.wristVertical(),
                         outtake.armStored(),
                         outtake.clawOpen(),

@@ -20,8 +20,8 @@ public class RedLeftAuto2_5 extends AutoBase {
             new Pose2d(-36, -38, Math.toRadians(-180)),
             new Pose2d(-42, -25, Math.toRadians(-200)),
             new Pose2d(-48, -28, Math.toRadians(90))};
-    public static Pose2d intermediate = new Pose2d(18,  -11, Math.toRadians(-180));
-    public static Pose2d pastTruss = new Pose2d(-36, -5, Math.toRadians(-180));
+    public static Pose2d intermediate = new Pose2d(18,  -9, Math.toRadians(-180));
+    public static Pose2d pastTruss = new Pose2d(-36, -9, Math.toRadians(-180));
     public static Pose2d stack = new Pose2d(-58, -14, Math.toRadians(-180));
 
     public static Pose2d secondStack = new Pose2d(-59, -21, Math.toRadians(-150));
@@ -137,13 +137,13 @@ public class RedLeftAuto2_5 extends AutoBase {
 
         // Score
         off = 4;
-        if (single) {
-            off = 0;
-            sched.addAction(outtake.wristVertical());
-        } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
+        if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
             off = 2.2;
         } else {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
+        }
+        if (single) {
+            sched.addAction(outtake.wristVertical());
         }
         if (preloadProcessor.preloadLeft) {
             off *= -1;
@@ -160,7 +160,7 @@ public class RedLeftAuto2_5 extends AutoBase {
 
     private void intakeStack(boolean first) {
         TrajectoryActionBuilder bld = drive.actionBuilder(first ? new Pose2d(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, off)), AutoConstants.redScoring[SPIKE].heading) : scoring)
-                .afterDisp(1, new SequentialAction(
+                .afterDisp(7, new SequentialAction(
                         outtake.wristVertical(),
                         outtake.armStored(),
                         outtake.clawOpen(),

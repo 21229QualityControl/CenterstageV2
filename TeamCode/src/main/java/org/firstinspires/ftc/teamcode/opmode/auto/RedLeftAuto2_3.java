@@ -25,7 +25,7 @@ public class RedLeftAuto2_3 extends AutoBase {
     public static Pose2d stack = new Pose2d(-59.5, -40.5, Math.toRadians(-205));
     public static Pose2d park = new Pose2d(50, -60, Math.toRadians(-180));
     public static Pose2d detectPartner = new Pose2d(46, -58.5, Math.toRadians(-180));
-    public static Pose2d scoring = new Pose2d(53, -42, Math.toRadians(-160));
+    public static Pose2d scoring = new Pose2d(52, -42, Math.toRadians(-160));
 
     @Override
     protected Pose2d getStartPose() {
@@ -121,7 +121,10 @@ public class RedLeftAuto2_3 extends AutoBase {
         }
 
         // Wait for partner to move out of the way
-        sched.addAction(new ActionUtil.RunnableAction(() -> intake.sideDistance(true) < 30));
+        sched.addAction(new ActionUtil.RunnableAction(() -> {
+            Log.d("DIST", String.valueOf(intake.sideDistance(true)));
+            return intake.sideDistance(true) < 30;
+        }));
         sched.addAction(drive.actionBuilder(detectPartner)
                 .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position, AutoConstants.redScoring[SPIKE].heading)
                 .build());
@@ -146,13 +149,13 @@ public class RedLeftAuto2_3 extends AutoBase {
 
         // Score
         off = 4;
-        if (single) {
-            off = 0;
-            sched.addAction(outtake.wristVertical());
-        } else if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
+        if ((SPIKE == 0 && preloadProcessor.preloadLeft) || (SPIKE == 2 && !preloadProcessor.preloadLeft)) { // Sides
             off = 2.2;
-        } else {
+        } else if (!single) {
             sched.addAction(outtake.wristSideways(preloadProcessor.preloadLeft));
+        }
+        if (single) {
+            sched.addAction(outtake.wristVertical());
         }
         if (preloadProcessor.preloadLeft) {
             off *= -1;
