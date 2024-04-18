@@ -266,6 +266,16 @@ public class ManualDrive extends LinearOpMode {
       }
       if (g2.startOnce()) {
          if (!outtake.isSlideHanging()) {
+            // Handle scoring
+            if (outtake.isArmScoring()) {
+               sched.queueAction(new SequentialAction(
+                       outtake.clawOpen(),
+                       outtake.wristVertical(),
+                       new SleepAction(0.4),
+                       outtake.armStored()
+               ));
+            }
+
             // Make mosaic fixer go out to not interfere with hanging
             sched.queueAction(outtake.mosaicFix());
             sched.queueAction(outtake.extendOuttakeHangBlocking());
@@ -429,7 +439,7 @@ public class ManualDrive extends LinearOpMode {
             g1.rumbleBlips(3);
             warning2 = true;
          }
-      } else if (isBetween(timeLeft(), 0, 5)) { // last 5 sec, go park
+      } else if (isBetween(timeLeft(), 0, 8)) { // last 8 sec, go hang
          led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
          if (!warning3) {
             g1.rumbleBlips(3);

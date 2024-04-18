@@ -96,7 +96,7 @@ public class RedRightAuto2_6 extends AutoBase {
                         outtake.retractOuttakeBlocking()
                 ));
         if (first) {
-            bld = bld.splineToConstantHeading(intermediate.position, intermediate.heading);
+            bld = bld.splineToConstantHeading(intermediate.position.plus(new Vector2d(0, -3)), intermediate.heading);
         } else {
             bld = bld.splineToSplineHeading(intermediate, intermediate.heading);
         }

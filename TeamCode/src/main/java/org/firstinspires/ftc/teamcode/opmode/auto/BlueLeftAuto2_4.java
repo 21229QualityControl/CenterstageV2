@@ -96,15 +96,15 @@ public class BlueLeftAuto2_4 extends AutoBase {
                 ))
                 .afterDisp(10, outtake.retractOuttake());
         if (first) {
-            bld = bld.splineToConstantHeading(pastTruss.position, pastTruss.heading, drive.slowVelConstraint, drive.slowAccelConstraint);
+            bld = bld.splineToConstantHeading(pastTruss.position, pastTruss.heading);
         } else {
-            bld = bld.splineToSplineHeading(pastTruss, pastTruss.heading, drive.slowVelConstraint, drive.slowAccelConstraint);
+            bld = bld.splineToSplineHeading(pastTruss, pastTruss.heading);
         }
         sched.addAction(bld
                 .afterDisp(0, new SequentialAction(
                         intake.feedClosed()
                 ))
-                .splineToConstantHeading(intermediate.position, intermediate.heading, drive.slowVelConstraint)
+                .splineToConstantHeading(intermediate.position.plus(new Vector2d(0, first ? 0 : 1)), intermediate.heading, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .afterDisp(0, intake.prepIntakeCount(first, false))
                 .splineToSplineHeading(stack, stack.heading, drive.slowVelConstraint)
                 .build()
@@ -119,7 +119,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
     private void cycle() {
         sched.addAction(drive.actionBuilder(stack)
                 .setTangent(Math.toRadians(90))
-                .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .splineToSplineHeading(intermediate, intermediate.heading.toDouble() - Math.PI)
                 .afterDisp(1, new SequentialAction(
                         intake.pixelCount() == 2 ? outtake.clawClosed() : outtake.clawSingleClosed()
                 ))
@@ -130,7 +130,7 @@ public class BlueLeftAuto2_4 extends AutoBase {
                         intake.intakeOff()
 
                 ))
-                .splineToConstantHeading(pastTrussScoring.position, pastTrussScoring.heading.toDouble() - Math.PI)
+                .splineToConstantHeading(pastTrussScoring.position, pastTrussScoring.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .splineToSplineHeading(scoring, scoring.heading.toDouble() - Math.PI)
                 .build()
         );

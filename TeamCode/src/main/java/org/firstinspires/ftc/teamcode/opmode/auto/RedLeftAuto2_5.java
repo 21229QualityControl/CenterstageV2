@@ -40,6 +40,8 @@ public class RedLeftAuto2_5 extends AutoBase {
 
     @Override
     protected void onRun() {
+        //sched.addAction(new SleepAction(4));
+
         scorePreload();
 
         // First stack
@@ -125,7 +127,11 @@ public class RedLeftAuto2_5 extends AutoBase {
             if (preloadProcessor.detecting) {
                 Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
                 this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
-                this.portal.stopStreaming();
+                this.preloadPortal.stopStreaming();
+
+                long now = System.currentTimeMillis();
+                preloadPortal.saveNextFrameRaw(String.valueOf(System.nanoTime()));
+                Log.d("TIME", String.valueOf(System.currentTimeMillis() - now));
                 return false;
             } else if (System.currentTimeMillis() > finalDetectTime) {
                 this.preloadProcessor.fallback = true;

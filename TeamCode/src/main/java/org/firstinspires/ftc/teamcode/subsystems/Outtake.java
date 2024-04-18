@@ -47,8 +47,8 @@ public class Outtake {
    public static double WRIST_LEFT = 0.71;
    public static double WRIST_RIGHT = 0.145;
 
-   public static double MOSAIC_FIXING = 0.87;
-   public static double MOSAIC_STORED = 0.2;
+   public static double MOSAIC_FIXING = 0.85;
+   public static double MOSAIC_STORED = 0.18;
 
    final DualMotorWithPID slide;
    public boolean slidePIDEnabled = true;
@@ -112,6 +112,7 @@ public class Outtake {
    }
 
    public void update() {
+      Log.d("POW", "update");
       if (slidePIDEnabled) {
          slide.update();
       }
