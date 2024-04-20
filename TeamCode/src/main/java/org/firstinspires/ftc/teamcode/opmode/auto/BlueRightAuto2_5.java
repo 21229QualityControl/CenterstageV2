@@ -46,7 +46,7 @@ public class BlueRightAuto2_5 extends AutoBase {
         intakeStack(true);
         cycle(false);
 
-        if (getRuntime() < 21) {
+        if (getRuntime() < 22) {
             intakeStack(false);
             cycle(true);
         }
