@@ -138,7 +138,8 @@ public class BlueRightAuto2_3 extends AutoBase {
             if (preloadProcessor.detecting) {
                 Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
                 this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
-                this.portal.stopStreaming();
+                saveImage(this.preloadPortal);
+                this.preloadPortal.stopStreaming();
                 return false;
             } else if (System.currentTimeMillis() > finalDetectTime) {
                 this.preloadProcessor.fallback = true;

@@ -97,7 +97,7 @@ public class Outtake {
    public void prepInitializeSlides() {
       this.wrist.setPosition(WRIST_VERTICAL);
       this.armLeft.setPosition(ARM_LEFT_STORED);
-      this.armRight.setPosition(ARM_RIGHT_STORED);
+      //this.armRight.setPosition(ARM_RIGHT_STORED);
       this.slide.setPower(-0.6);
    }
 

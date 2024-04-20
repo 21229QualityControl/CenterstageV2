@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.util.HardwareCreator;
 public class Plane {
    public static double LATCH_SCORED = 0.32;
    public static double LATCH_CLOSED = 0.36;
+   public static double LATCH_PUSH = 1;
 //   public static double WRIST_STORED = 0.47;
 //   public static double WRIST_SCORED = 0.34;
 
@@ -32,11 +33,10 @@ public class Plane {
 
    public Action scorePlane() {
       return new SequentialAction(
-//              new ActionUtil.ServoPositionAction(wrist, WRIST_SCORED),
-//              new SleepAction(0.4),
+              /*new ActionUtil.ServoPositionAction(latch, LATCH_PUSH),
+              new SleepAction(0.4),*/
               new ActionUtil.ServoPositionAction(latch, LATCH_SCORED),
               new SleepAction(0.3),
-//              new ActionUtil.ServoPositionAction(wrist, WRIST_STORED),
               new ActionUtil.ServoPositionAction(latch, LATCH_CLOSED)
       );
    }

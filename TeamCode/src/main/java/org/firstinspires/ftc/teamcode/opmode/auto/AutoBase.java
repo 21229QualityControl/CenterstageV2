@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 import android.util.Log;
 import android.util.Size;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -22,6 +24,10 @@ import org.firstinspires.ftc.teamcode.util.AutoActionScheduler;
 import org.firstinspires.ftc.teamcode.util.LED;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 @Config
 public abstract class AutoBase extends LinearOpMode {
@@ -58,6 +64,15 @@ public abstract class AutoBase extends LinearOpMode {
         outtake.update();
         intake.update();
         telemetry.update();
+    }
+
+    final public void saveImage(@NonNull VisionPortal portal) {
+        long now = System.currentTimeMillis();
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-HH:mm:ss", Locale.US);
+        portal.saveNextFrameRaw(dateFormat.format(currentDate));
+        Log.d("TIME", String.valueOf(System.currentTimeMillis() - now));
+        Log.d("TIME_STATE", portal.getCameraState().toString());
     }
 
     final public void runOpMode() throws InterruptedException {

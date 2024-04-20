@@ -19,13 +19,13 @@ public class RedLeftAuto2_5 extends AutoBase {
     public static Pose2d[] spike = {
             new Pose2d(-36, -38, Math.toRadians(-180)),
             new Pose2d(-42, -25, Math.toRadians(-200)),
-            new Pose2d(-48, -28, Math.toRadians(90))};
+            new Pose2d(-48, -25, Math.toRadians(90))};
     public static Pose2d intermediate = new Pose2d(18,  -9, Math.toRadians(-180));
     public static Pose2d pastTruss = new Pose2d(-36, -9, Math.toRadians(-180));
     public static Pose2d stack = new Pose2d(-58, -14, Math.toRadians(-180));
 
-    public static Pose2d secondStack = new Pose2d(-59, -21, Math.toRadians(-150));
-    public static Pose2d scoring = new Pose2d(53, -27, Math.toRadians(-200));
+    //public static Pose2d secondStack = new Pose2d(-59, -21, Math.toRadians(-150));
+    public static Pose2d scoring = new Pose2d(53, -25, Math.toRadians(-200));
     public static Pose2d park = new Pose2d(48, -27, Math.toRadians(-180));
 
     @Override
@@ -127,11 +127,9 @@ public class RedLeftAuto2_5 extends AutoBase {
             if (preloadProcessor.detecting) {
                 Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
                 this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
-                this.preloadPortal.stopStreaming();
+                saveImage(this.preloadPortal);
 
-                long now = System.currentTimeMillis();
-                preloadPortal.saveNextFrameRaw(String.valueOf(System.nanoTime()));
-                Log.d("TIME", String.valueOf(System.currentTimeMillis() - now));
+                this.preloadPortal.stopStreaming();
                 return false;
             } else if (System.currentTimeMillis() > finalDetectTime) {
                 this.preloadProcessor.fallback = true;
@@ -164,6 +162,16 @@ public class RedLeftAuto2_5 extends AutoBase {
         sched.run();
     }
 
+    private void tryAgain(Pose2d current, boolean start) {
+        sched.addAction(drive.actionBuilder(current)
+                .afterDisp(0, intake.intakeReverse())
+                .strafeToLinearHeading(current.position.plus(new Vector2d(6, 0)), current.heading)
+                .afterDisp(0, intake.prepIntakeCount(start, false))
+                .strafeToLinearHeading(current.position, current.heading)
+                .build());
+        sched.addAction(intake.intakeCount(true));
+    }
+
     private void intakeStack(boolean first) {
         TrajectoryActionBuilder bld = drive.actionBuilder(first ? new Pose2d(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, off)), AutoConstants.redScoring[SPIKE].heading) : scoring)
                 .afterDisp(7, new SequentialAction(
@@ -178,18 +186,21 @@ public class RedLeftAuto2_5 extends AutoBase {
             bld = bld.splineToSplineHeading(intermediate, intermediate.heading);
         }
         bld = bld.afterDisp(0, new SequentialAction(
-                    intake.prepIntakeCount(!first, true), // One should be false here?
+                    intake.prepIntakeCount(/*!first*/ false, true), // One should be false here?
                     intake.intakeOn(),
                     outtake.extendOuttakeBarelyOut()
             ))
             .splineToConstantHeading(pastTruss.position, pastTruss.heading);
-        if (first) {
+        /*if (first) {
             bld = bld.splineToConstantHeading(stack.position, stack.heading, drive.slowVelConstraint);
         } else {
             bld = bld.splineToSplineHeading(secondStack, secondStack.heading, drive.slowVelConstraint);
-        }
+        }*/
+        bld = bld.splineToConstantHeading(stack.position, stack.heading, drive.slowVelConstraint);
 
         sched.addAction(bld.build());
+        sched.run();
+
         if (first) { // Score out of the way
             if (SPIKE == 0) {
                 SPIKE = 1;
@@ -198,14 +209,18 @@ public class RedLeftAuto2_5 extends AutoBase {
             }
         }
         sched.addAction(new SequentialAction(
-                intake.intakeCount(false),
+                intake.intakeCount(true),
                 outtake.retractOuttake()
         ));
         sched.run();
+
+        if (intake.pixelCount() == 0) {
+            tryAgain(/*first ? stack : secondStack*/ stack, /*!first*/ false);
+        }
     }
 
     private void cycle(boolean second) {
-        TrajectoryActionBuilder bld = drive.actionBuilder(second ? secondStack : stack)
+        TrajectoryActionBuilder bld = drive.actionBuilder(/*second ? secondStack : stack*/ stack)
                 .setReversed(true);
         if (second) {
             bld = bld.splineToSplineHeading(pastTruss, pastTruss.heading.toDouble() - Math.PI);

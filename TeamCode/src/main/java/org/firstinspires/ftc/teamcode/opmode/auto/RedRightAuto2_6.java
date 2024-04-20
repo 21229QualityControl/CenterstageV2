@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -16,9 +17,9 @@ public class RedRightAuto2_6 extends AutoBase {
             new Pose2d(28, -22, Math.toRadians(-180)),
             new Pose2d(9, -34, Math.toRadians(135))
     };
-    public static Pose2d intermediate = new Pose2d(24,  -10, Math.toRadians(-180));
-    public static Pose2d pastTruss = new Pose2d(-36, -10, Math.toRadians(-180));
-    public static Pose2d stack = new Pose2d(-56, -12, Math.toRadians(-180));
+    public static Pose2d intermediate = new Pose2d(24,  -9, Math.toRadians(-180));
+    public static Pose2d pastTruss = new Pose2d(-36, -9, Math.toRadians(-180));
+    public static Pose2d stack = new Pose2d(-57, -13, Math.toRadians(-180));
     public static Pose2d secondStack = new Pose2d(-58, -20, Math.toRadians(-150));
     public static Pose2d scoring = new Pose2d(55, -27, Math.toRadians(-200));
     public static Pose2d park = new Pose2d(48, -26, Math.toRadians(-200));
@@ -81,7 +82,7 @@ public class RedRightAuto2_6 extends AutoBase {
                         outtake.armScoring(),
                         outtake.wristVerticalFlip()
                 ))
-                .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.redScoring[SPIKE].heading)
+                .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, 0.3)), AutoConstants.redScoring[SPIKE].heading)
                         .build()
         );
         sched.addAction(outtake.clawOpen());
@@ -89,7 +90,7 @@ public class RedRightAuto2_6 extends AutoBase {
     }
 
     private void intakeStack(boolean first, boolean nextStack) {
-        TrajectoryActionBuilder bld = drive.actionBuilder(first ? new Pose2d(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, 0)), AutoConstants.redScoring[SPIKE].heading) : scoring)
+        TrajectoryActionBuilder bld = drive.actionBuilder(first ? new Pose2d(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, 0.3)), AutoConstants.redScoring[SPIKE].heading) : scoring)
                 .afterDisp(1, new SequentialAction(
                         outtake.wristVertical(),
                         outtake.armStored(),

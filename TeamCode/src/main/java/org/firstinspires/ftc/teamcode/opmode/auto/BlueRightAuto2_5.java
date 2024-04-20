@@ -46,8 +46,10 @@ public class BlueRightAuto2_5 extends AutoBase {
         intakeStack(true);
         cycle(false);
 
-        intakeStack(false);
-        cycle(true);
+        if (getRuntime() < 21) {
+            intakeStack(false);
+            cycle(true);
+        }
 
         park();
     }
@@ -124,6 +126,8 @@ public class BlueRightAuto2_5 extends AutoBase {
             if (preloadProcessor.detecting) {
                 Log.d("BACKDROP_PRELOADLEFT", String.valueOf(preloadProcessor.preloadLeft));
                 this.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+                saveImage(this.preloadPortal);
+
                 this.portal.stopStreaming();
                 return false;
             } else if (System.currentTimeMillis() > finalDetectTime) {

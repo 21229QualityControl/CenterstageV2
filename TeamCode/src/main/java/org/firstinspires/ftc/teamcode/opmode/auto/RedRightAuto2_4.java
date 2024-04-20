@@ -21,9 +21,9 @@ public class RedRightAuto2_4 extends AutoBase {
             new Pose2d(26, -22, Math.toRadians(-180)),
             new Pose2d(9, -34, Math.toRadians(135))
     };
-    public static Pose2d intermediate = new Pose2d(-36, -57, Math.toRadians(-180));
-    public static Pose2d pastTruss = new Pose2d(26, -57, Math.toRadians(-180));
-    public static Pose2d stack = new Pose2d(-59, -41, Math.toRadians(-210));
+    public static Pose2d intermediate = new Pose2d(-36, -60, Math.toRadians(-180));
+    public static Pose2d pastTruss = new Pose2d(26, -60, Math.toRadians(-180));
+    public static Pose2d stack = new Pose2d(-59, -43, Math.toRadians(-210));
     public static Pose2d park = new Pose2d(48, -43, Math.toRadians(-180));
     public static Pose2d scoring = new Pose2d(56, -45, Math.toRadians(-160));
 
@@ -75,7 +75,7 @@ public class RedRightAuto2_4 extends AutoBase {
                         outtake.armScoring(),
                         outtake.wristVerticalFlip()
                 ))
-                .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, SPIKE == 2 ? 2 : -2)), AutoConstants.redScoring[SPIKE].heading, drive.slowVelConstraint)
+                .strafeToLinearHeading(AutoConstants.redScoring[SPIKE].position.plus(new Vector2d(12, -0.3)), AutoConstants.redScoring[SPIKE].heading, drive.slowVelConstraint)
                 .build()
         );
         sched.addAction(outtake.clawOpen());
@@ -95,7 +95,7 @@ public class RedRightAuto2_4 extends AutoBase {
                 ))
                 .afterDisp(10, outtake.retractOuttake());
         if (first) {
-            bld = bld.splineToConstantHeading(pastTruss.position, pastTruss.heading, drive.slowVelConstraint, drive.slowAccelConstraint);
+            bld = bld.splineToConstantHeading(pastTruss.position.plus(new Vector2d(0, 2)), pastTruss.heading, drive.slowVelConstraint, drive.slowAccelConstraint);
         } else {
             bld = bld.splineToSplineHeading(pastTruss, pastTruss.heading, drive.slowVelConstraint, drive.slowAccelConstraint);
         }
@@ -103,15 +103,35 @@ public class RedRightAuto2_4 extends AutoBase {
                 .afterDisp(0, new SequentialAction(
                         intake.feedClosed()
                 ))
-                .splineToConstantHeading(intermediate.position, intermediate.heading, drive.slowVelConstraint)
+                .splineToConstantHeading(intermediate.position.plus(new Vector2d(0, first ? 2 : 0)), intermediate.heading, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .afterDisp(0, intake.prepIntakeCount(first, false))
-                .splineToSplineHeading(stack, stack.heading, drive.slowVelConstraint)
+                .splineToSplineHeading(stack, stack.heading, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .build()
         );
         sched.run();
 
 
-        sched.addAction(intake.intakeCount(false));
+        sched.addAction(intake.intakeCount(true));
+        sched.run();
+
+
+        if (intake.pixelCount() == 0) {
+            tryAgain(stack, first);
+        } else {
+            if (first) {
+                sched.addAction(new SleepAction(4));
+            }
+        }
+    }
+
+    private void tryAgain(Pose2d current, boolean start) {
+        sched.addAction(drive.actionBuilder(current)
+                .afterDisp(0, intake.intakeReverse())
+                .strafeToLinearHeading(current.position.plus(new Vector2d(6, 0)), current.heading)
+                .afterDisp(0, intake.prepIntakeCount(start, false))
+                .strafeToLinearHeading(current.position, current.heading)
+                .build());
+        sched.addAction(intake.intakeCount(true));
         sched.run();
     }
 
@@ -129,8 +149,8 @@ public class RedRightAuto2_4 extends AutoBase {
                         intake.intakeOff()
 
                 ))
-                .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI)
-                .splineToSplineHeading(scoring, scoring.heading.toDouble() - Math.PI, drive.slowVelConstraint)
+                .splineToConstantHeading(pastTruss.position, pastTruss.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
+                .splineToSplineHeading(scoring, scoring.heading.toDouble() - Math.PI, drive.slowVelConstraint, drive.slowAccelConstraint)
                 .build()
         );
         sched.addAction(outtake.clawOpen());
