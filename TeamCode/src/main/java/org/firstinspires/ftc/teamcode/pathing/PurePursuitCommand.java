@@ -28,10 +28,10 @@ public class PurePursuitCommand implements Action {
     private boolean PID = false;
     private boolean finished = false;
 
-    public static double xP = 0.0335;
+    public static double xP = 0.06;
     public static double xD = 0.006;
 
-    public static double yP = 0.0335;
+    public static double yP = 0.06;
     public static double yD = 0.006;
 
     public static double hP = 1;
@@ -45,18 +45,24 @@ public class PurePursuitCommand implements Action {
 
     private ElapsedTime timer;
 
+    private double[] xPoints;
+    private double[] yPoints;
+
     public PurePursuitCommand(MecanumDrive drivetrain, PurePursuitPath purePursuitPath) {
         this.drivetrain = drivetrain;
         this.purePursuitPath = purePursuitPath;
         this.endPose = purePursuitPath.getEndPose();
+        this.xPoints = purePursuitPath.xPoints();
+        this.yPoints = purePursuitPath.yPoints();
+        hController.setTargetPosition(0);
     }
 
     @Override
     public boolean run(TelemetryPacket p) {
         if (purePursuitPath.isFinished()) PID = true;
 
-        PoseVelocity2d rawPose = drivetrain.updatePoseEstimate();
-        Pose robotPose = new Pose(rawPose.component1().x, rawPose.component1().y, rawPose.component2());
+        PoseVelocity2d vel = drivetrain.updatePoseEstimate();
+        Pose robotPose = new Pose(drivetrain.pose.position.x, drivetrain.pose.position.y, drivetrain.pose.heading.toDouble());
         Pose targetPose = purePursuitPath.update(robotPose);
 
         if(PID && timer == null){
@@ -64,7 +70,12 @@ public class PurePursuitCommand implements Action {
         }
 
         if (PID && targetPose.subt(robotPose).toVec2D().magnitude() < PurePursuitConfig.ALLOWED_TRANSLATIONAL_ERROR
-                && Math.abs(targetPose.subt(robotPose).heading) < PurePursuitConfig.ALLOWED_HEADING_ERROR) finished = true;
+                && Math.abs(targetPose.subt(robotPose).heading) < PurePursuitConfig.ALLOWED_HEADING_ERROR
+                && Math.abs(vel.linearVel.x) < PurePursuitConfig.ALLOWED_VELOCITY_ERROR
+                && Math.abs(vel.linearVel.y) < PurePursuitConfig.ALLOWED_VELOCITY_ERROR) {
+            finished = true;
+            drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+        }
 
         Canvas c = p.fieldOverlay();
 
@@ -74,15 +85,21 @@ public class PurePursuitCommand implements Action {
         c.setStroke("#3F51B5");
         MecanumDrive.drawRobot(c, new Pose2d(robotPose.x, robotPose.y, robotPose.heading));
 
+        c.setStroke("#4CAF50FF");
+        c.setStrokeWidth(1);
+        c.strokePolyline(xPoints, yPoints);
+
         if (PID) {
             Pose delta = targetPose.subtract(robotPose);
 
-            double xPower = xController.update(robotPose.x, targetPose.x);
-            double yPower = yController.update(robotPose.y, targetPose.y);
-            double hPower = -hController.update(0, delta.heading);
+            xController.setTargetPosition(targetPose.x);
+            yController.setTargetPosition(targetPose.y);
+            double xPower = xController.update(robotPose.x);
+            double yPower = yController.update(robotPose.y);
+            double hPower = -hController.update(delta.heading);
 
-            double x_rotated = xPower * Math.cos(robotPose.heading) - yPower * Math.sin(robotPose.heading);
-            double y_rotated = xPower * Math.sin(robotPose.heading) + yPower * Math.cos(robotPose.heading);
+            double y_rotated = xPower * Math.cos(robotPose.heading) + yPower * Math.sin(robotPose.heading);
+            double x_rotated = xPower * -Math.sin(robotPose.heading) + yPower * Math.cos(robotPose.heading);
 
             if (Math.abs(x_rotated) < 0.01) x_rotated = 0;
             else x_rotated += kStatic * Math.signum(x_rotated);
@@ -90,20 +107,21 @@ public class PurePursuitCommand implements Action {
             else y_rotated += kStatic * Math.signum(y_rotated);
             if (Math.abs(hPower) < 0.01) hPower = 0;
 
+            Log.d("DELTAX", String.valueOf(xPower));
+            Log.d("DELTAY", String.valueOf(yPower));
+            Log.d("DELTAXROTATED", String.valueOf(x_rotated));
+            Log.d("DELTAYROTATED", String.valueOf(y_rotated));
+            Log.d("DELTAH", String.valueOf(delta.heading));
+
             drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(y_rotated, x_rotated), hPower));
         } else {
             Pose delta = targetPose.subtract(robotPose);
-            double y_rotated = delta.x * Math.cos(robotPose.heading) - delta.y * Math.sin(robotPose.heading);
-            double x_rotated = delta.x * Math.sin(robotPose.heading) + delta.y * Math.cos(robotPose.heading);
+            double y_rotated = delta.x * Math.cos(robotPose.heading) + delta.y * Math.sin(robotPose.heading);
+            double x_rotated = delta.x * -Math.sin(robotPose.heading) + delta.y * Math.cos(robotPose.heading);
 
             double xPercentage = x_rotated / purePursuitPath.getRadius() * PurePursuitConfig.FOLLOW_SPEED;
             double yPercentage = y_rotated / purePursuitPath.getRadius() * PurePursuitConfig.FOLLOW_SPEED;
-            double hPower = -hController.update(0, delta.heading);
-
-            Log.d("DELTAX", String.valueOf(delta.x));
-            Log.d("DELTAY", String.valueOf(delta.y));
-            Log.d("DELTAXROTATED", String.valueOf(x_rotated));
-            Log.d("DELTAYROTATED", String.valueOf(y_rotated));
+            double hPower = -hController.update(delta.heading);
 
             drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(yPercentage, xPercentage * 1.6), hPower));
         }

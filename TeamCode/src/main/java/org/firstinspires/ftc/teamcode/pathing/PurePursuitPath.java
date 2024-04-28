@@ -19,6 +19,25 @@ public class PurePursuitPath {
         if(waypoints.getLast().getType() != Waypoint.Type.POSE) throw new IllegalArgumentException();
     }
 
+    public double[] xPoints() {
+        double[] res = new double[waypoints.size()];
+        int i = 0;
+        for (Waypoint pt : waypoints) {
+            res[i] = pt.getPoint().x;
+            i++;
+        }
+        return res;
+    }
+    public double[] yPoints() {
+        double[] res = new double[waypoints.size()];
+        int i = 0;
+        for (Waypoint pt : waypoints) {
+            res[i] = pt.getPoint().y;
+            i++;
+        }
+        return res;
+    }
+
     public Pose update(Pose robot) {
         Waypoint prev = waypoints.get(targetIdx - 1);
         Waypoint target = waypoints.get(targetIdx);
