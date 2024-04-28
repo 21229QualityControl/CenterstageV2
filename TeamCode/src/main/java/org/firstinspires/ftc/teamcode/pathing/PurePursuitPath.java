@@ -1,16 +1,14 @@
 package org.firstinspires.ftc.teamcode.pathing;
 
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.pathing.Point;
-import org.firstinspires.ftc.teamcode.pathing.Pose;
+import org.firstinspires.ftc.teamcode.pathing.Waypoint;
 
 import java.util.Collections;
 import java.util.LinkedList;
 
 public class PurePursuitPath {
-    public LinkedList<Waypoint> waypoints = new LinkedList<>();
-    public int targetIdx = 1;
+    private final LinkedList<Waypoint> waypoints = new LinkedList<>();
+    private int targetIdx = 1;
     private boolean finished;
 
     public PurePursuitPath(Waypoint... ws) {
@@ -53,7 +51,7 @@ public class PurePursuitPath {
                 targetPose = new Pose(intersection, ((Pose)target.getPoint()).heading);
             }else{
                 double robotAngle = AngleUnit.normalizeRadians(robot.heading);
-                double forwardAngle = intersection.subtract(robot).atan() - (Math.PI/2);
+                double forwardAngle = -intersection.subtract(robot).atan();
                 double backwardsAngle = AngleUnit.normalizeRadians(forwardAngle + Math.PI);
 
                 double autoAngle =
