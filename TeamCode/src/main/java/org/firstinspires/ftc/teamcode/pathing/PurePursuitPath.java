@@ -9,8 +9,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 public class PurePursuitPath {
-    private LinkedList<Waypoint> waypoints = new LinkedList<>();
-    private int targetIdx = 1;
+    public LinkedList<Waypoint> waypoints = new LinkedList<>();
+    public int targetIdx = 1;
     private boolean finished;
 
     public PurePursuitPath(Waypoint... ws) {

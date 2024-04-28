@@ -119,8 +119,9 @@ public class PurePursuitCommand implements Action {
             double y_rotated = delta.x * Math.cos(robotPose.heading) + delta.y * Math.sin(robotPose.heading);
             double x_rotated = delta.x * -Math.sin(robotPose.heading) + delta.y * Math.cos(robotPose.heading);
 
-            double xPercentage = x_rotated / purePursuitPath.getRadius() * PurePursuitConfig.FOLLOW_SPEED;
-            double yPercentage = y_rotated / purePursuitPath.getRadius() * PurePursuitConfig.FOLLOW_SPEED;
+            double speed = purePursuitPath.targetIdx == purePursuitPath.waypoints.size() - 1 ? PurePursuitConfig.SLOW_FOLLOW_SPEED : PurePursuitConfig.FOLLOW_SPEED;
+            double xPercentage = x_rotated / purePursuitPath.getRadius() * speed;
+            double yPercentage = y_rotated / purePursuitPath.getRadius() * speed;
             double hPower = -hController.update(delta.heading);
 
             drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(yPercentage, xPercentage * 1.6), hPower));

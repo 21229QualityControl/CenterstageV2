@@ -33,28 +33,28 @@ public final class PurePursuitTest extends LinearOpMode {
                                 // Drive to stack
                                 new Waypoint(new Pose(24,  10, Math.toRadians(180)), 15),
                                 new Waypoint(new Pose(-36, 10, Math.toRadians(180)), 15),
-                                new Waypoint(new Pose(-54, 8, Math.toRadians(180)), 15)
+                                new Waypoint(new Pose(-55, 8, Math.toRadians(180)), 15)
                         )),
                         new PurePursuitCommand(drive, new PurePursuitPath(
                                 // Score
-                                new Waypoint(new Pose(-54, 8, Math.toRadians(180)), 15),
+                                new Waypoint(new Pose(-55, 8, Math.toRadians(180)), 15),
                                 new Waypoint(new Pose(-36, 10, Math.toRadians(180)), 15),
                                 new Waypoint(new Pose(24,  10, Math.toRadians(180)), 15),
-                                new Waypoint(new Pose(53, 21.5, Math.toRadians(200)), 15)
+                                new Waypoint(new Pose(51, 21.5, Math.toRadians(200)), 15)
                         )),
                         new PurePursuitCommand(drive, new PurePursuitPath(
                                 // Drive to stack
-                                new Waypoint(new Pose(53, 21.5, Math.toRadians(200)), 15),
+                                new Waypoint(new Pose(51, 21.5, Math.toRadians(200)), 15),
                                 new Waypoint(new Pose(24,  10, Math.toRadians(180)), 15),
                                 new Waypoint(new Pose(-36, 10, Math.toRadians(180)), 15),
-                                new Waypoint(new Pose(-54, 8, Math.toRadians(180)), 15)
+                                new Waypoint(new Pose(-55, 8, Math.toRadians(180)), 15)
                         )),
                         new PurePursuitCommand(drive, new PurePursuitPath(
                                 // Score
-                                new Waypoint(new Pose(-54, 8, Math.toRadians(180)), 15),
+                                new Waypoint(new Pose(-55, 8, Math.toRadians(180)), 15),
                                 new Waypoint(new Pose(-36, 10, Math.toRadians(180)), 15),
                                 new Waypoint(new Pose(24,  10, Math.toRadians(180)), 15),
-                                new Waypoint(new Pose(53, 21.5, Math.toRadians(200)), 15)
+                                new Waypoint(new Pose(51, 21.5, Math.toRadians(200)), 15)
                         ))
                 ));
     }
