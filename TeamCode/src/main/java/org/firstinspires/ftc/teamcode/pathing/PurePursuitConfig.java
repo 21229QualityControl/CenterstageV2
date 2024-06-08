@@ -13,7 +13,7 @@ public class PurePursuitConfig {
     public static double hP = 1.1;
     public static double hD = 0.045;
 
-    public static double END_GAIN = 5;
+    public static double END_GAIN = 3;
 
     public static double MAX_TRANSLATIONAL_SPEED = 1.0;
     public static double MAX_ROTATIONAL_SPEED = 0.9;

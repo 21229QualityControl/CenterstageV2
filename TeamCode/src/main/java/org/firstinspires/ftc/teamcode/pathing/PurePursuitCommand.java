@@ -118,6 +118,9 @@ public class PurePursuitCommand implements Action {
                 hPower*accelScale
         ));
 
-        return !(PID && finished || (timer != null && timer.milliseconds() > 2000));
+        if (PID && finished || (timer != null && timer.milliseconds() > 1500)) { // Unpower motors when done
+            drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+        }
+        return !(PID && finished || (timer != null && timer.milliseconds() > 1500));
     }
 }
