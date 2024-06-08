@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.control.PIDFController;
 
 import static org.firstinspires.ftc.teamcode.pathing.PurePursuitConfig.ACCEL_TIME;
+import static org.firstinspires.ftc.teamcode.pathing.PurePursuitConfig.END_GAIN;
 import static org.firstinspires.ftc.teamcode.pathing.PurePursuitConfig.MAX_ROTATIONAL_SPEED;
 import static org.firstinspires.ftc.teamcode.pathing.PurePursuitConfig.MAX_TRANSLATIONAL_SPEED;
 import static org.firstinspires.ftc.teamcode.pathing.PurePursuitConfig.X_GAIN;
@@ -24,6 +25,8 @@ import static org.firstinspires.ftc.teamcode.pathing.PurePursuitConfig.xD;
 import static org.firstinspires.ftc.teamcode.pathing.PurePursuitConfig.xP;
 import static org.firstinspires.ftc.teamcode.pathing.PurePursuitConfig.yD;
 import static org.firstinspires.ftc.teamcode.pathing.PurePursuitConfig.yP;
+
+import android.util.Log;
 
 @Config
 public class PurePursuitCommand implements Action {
@@ -35,9 +38,9 @@ public class PurePursuitCommand implements Action {
     private boolean finished = false;
 
 
-    public static PIDFController xController = new PIDFController(new PIDCoefficients(xP, 0.0, xD));
-    public static PIDFController yController = new PIDFController(new PIDCoefficients(yP, 0.0, yD));
-    public static PIDFController hController = new PIDFController(new PIDCoefficients(hP, 0.0, hD));
+    public PIDFController xController = new PIDFController(new PIDCoefficients(xP, 0.0, xD));
+    public PIDFController yController = new PIDFController(new PIDCoefficients(yP, 0.0, yD));
+    public PIDFController hController = new PIDFController(new PIDCoefficients(hP, 0.0, hD));
 
     private ElapsedTime accelLimit;
 
@@ -56,7 +59,9 @@ public class PurePursuitCommand implements Action {
     @Override
     public boolean run(TelemetryPacket p) {
         if (accelLimit == null) accelLimit = new ElapsedTime();
-        if (purePursuitPath.isFinished()) PID = true;
+        if (purePursuitPath.isFinished()) {
+            PID = true;
+        }
 
         PoseVelocity2d vel = drivetrain.updatePoseEstimate();
         Pose robotPose = new Pose(drivetrain.pose.position.x, drivetrain.pose.position.y, drivetrain.pose.heading.toDouble());
@@ -90,12 +95,18 @@ public class PurePursuitCommand implements Action {
         hController.setTargetPosition(targetPose.heading);
         double xPower = xController.update(robotPose.x);
         double yPower = yController.update(robotPose.y);
-        double hPower = -hController.update(robotPose.heading);
+        double hPower = hController.update(robotPose.heading);
+
+        if (PID && timer.milliseconds() > 350) { // Once its slowed down, give it better control to get rid of the error
+            Log.d("end", "end");
+            xPower *= END_GAIN;
+            yPower *= END_GAIN;
+        }
 
         /*double x_rotated = xPower * Math.cos(-robotPose.heading) - yPower * Math.sin(-robotPose.heading);
         double y_rotated = xPower * Math.sin(-robotPose.heading) + yPower * Math.cos(-robotPose.heading);*/
-        double y_rotated = xPower * Math.cos(-robotPose.heading) + yPower * Math.sin(-robotPose.heading); // TODO: Check if -robotPose.heading is right
-        double x_rotated = xPower * -Math.sin(-robotPose.heading) + yPower * Math.cos(-robotPose.heading);
+        double y_rotated = xPower * Math.cos(robotPose.heading) + yPower * Math.sin(robotPose.heading);
+        double x_rotated = xPower * -Math.sin(robotPose.heading) + yPower * Math.cos(robotPose.heading);
 
         hPower = Range.clip(hPower, -MAX_ROTATIONAL_SPEED, MAX_ROTATIONAL_SPEED);
         x_rotated = Range.clip(x_rotated, -MAX_TRANSLATIONAL_SPEED / X_GAIN, MAX_TRANSLATIONAL_SPEED / X_GAIN);
