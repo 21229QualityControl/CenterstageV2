@@ -30,11 +30,12 @@ public class BlueLeftAuto2_6 extends AutoBase {
             new Waypoint(new Pose(54, 43, Math.toRadians(180)), 15)
     };
     public static Waypoint intermediate = new Waypoint(new Pose(30,  7, Math.toRadians(180)), 20);
+    public static Waypoint intermediateAfterPreload = new Waypoint(new Pose(43,  6, Math.toRadians(180)), 20);
     public static Waypoint pastTruss = new Waypoint(new Pose(-36, 7, Math.toRadians(180)), 20);
-    public static Waypoint stack = new Waypoint(new Pose(-55.5, 9, Math.toRadians(180)), 15);
+    public static Waypoint stack = new Waypoint(new Pose(-54, 9, Math.toRadians(180)), 15);
     public static Waypoint secondStack = new Waypoint(new Pose(-59, 15, Math.toRadians(150)), 15);
-    public static Waypoint scoring = new Waypoint(new Pose(55, 20, Math.toRadians(200)), 15);
-    public static Waypoint park = new Waypoint(new Pose(44, 20, Math.toRadians(180)), 15);
+    public static Waypoint scoring = new Waypoint(new Pose(54, 20, Math.toRadians(200)), 15);
+    public static Waypoint park = new Waypoint(new Pose(46, 20, Math.toRadians(180)), 15);
 
     @Override
     protected Pose2d getStartPose() {
@@ -112,7 +113,7 @@ public class BlueLeftAuto2_6 extends AutoBase {
         sched.addAction(new ParallelAction(
                 new PurePursuitCommand(drive, new PurePursuitPath(
                         first ? backdrop[SPIKE] : scoring,
-                        intermediate,
+                        first ? intermediateAfterPreload : intermediate,
                         pastTruss,
                         nextStack ? secondStack : stack
                 )),
@@ -159,7 +160,7 @@ public class BlueLeftAuto2_6 extends AutoBase {
                                 intake.pixelCount() == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
                                 intake.intakeOff()
                         ),
-                        new WaitPositionCommand(drive, 21, true, true), // intermediate
+                        new WaitPositionCommand(drive, 10, true, true), // intermediate
                         new SequentialAction(
                                 second ? outtake.extendOuttakeCycleHighBlocking() : outtake.extendOuttakeCycleBlocking(),
                                 outtake.armScoring(),
