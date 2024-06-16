@@ -17,7 +17,7 @@ public class RedRightAuto2_6 extends AutoBase {
     public static Waypoint[] spike = {
             new Waypoint(new Pose(34, -33, Math.toRadians(-180)), 15),
             new Waypoint(new Pose(29, -23, Math.toRadians(-180)), 15),
-            new Waypoint(new Pose(9, -34, Math.toRadians(135)), 15)
+            new Waypoint(new Pose(8, -34, Math.toRadians(135)), 15)
     };
     public static Waypoint[] backdrop = {
             new Waypoint(new Pose(54, -42.5, Math.toRadians(180)), 15),
@@ -27,9 +27,11 @@ public class RedRightAuto2_6 extends AutoBase {
     public static Waypoint intermediate = new Waypoint(new Pose(30,  -8, Math.toRadians(-180)), 20);
     public static Waypoint intermediateAfterPreload = new Waypoint(new Pose(43,  -7, Math.toRadians(-180)), 20);
     public static Waypoint pastTruss = new Waypoint(new Pose(-36, -8, Math.toRadians(-180)), 20);
-    public static Waypoint stack = new Waypoint(new Pose(-56, -13, Math.toRadians(-180)), 15);
-    public static Waypoint secondStack = new Waypoint(new Pose(-57.5, -21, Math.toRadians(-150)), 15);
-    public static Waypoint scoring = new Waypoint(new Pose(54.5, -28, Math.toRadians(-200)), 15);
+    public static Waypoint pastTrussSecond = new Waypoint(new Pose(-50, -8, Math.toRadians(-180)), 20);
+    public static Waypoint stack = new Waypoint(new Pose(-57.5, -13, Math.toRadians(-180)), 15);
+    public static Waypoint stackSpike2 = new Waypoint(new Pose(-59, -13, Math.toRadians(-180)), 15);
+    public static Waypoint secondStack = new Waypoint(new Pose(-58, -19, Math.toRadians(-150)), 15);
+    public static Waypoint scoring = new Waypoint(new Pose(54, -28, Math.toRadians(-200)), 15);
     public static Waypoint park = new Waypoint(new Pose(46, -24, Math.toRadians(-180)), 15);
 
     @Override
@@ -109,8 +111,8 @@ public class RedRightAuto2_6 extends AutoBase {
                 new PurePursuitCommand(drive, new PurePursuitPath(
                         first ? backdrop[SPIKE] : scoring,
                         first ? intermediateAfterPreload : intermediate,
-                        pastTruss,
-                        nextStack ? secondStack : stack
+                        nextStack ? pastTrussSecond : pastTruss,
+                        nextStack ? secondStack : (SPIKE == 2 ? stackSpike2 : stack)
                 )),
                 new SequentialAction(
                         new WaitPositionCommand(drive, 48, false, true), // Away from backdrop
@@ -145,7 +147,7 @@ public class RedRightAuto2_6 extends AutoBase {
         sched.addAction(new ParallelAction(
                 new PurePursuitCommand(drive, new PurePursuitPath(
                         second ? secondStack : stack,
-                        pastTruss,
+                        second ? pastTrussSecond : pastTruss,
                         intermediate,
                         scoring
                 )),

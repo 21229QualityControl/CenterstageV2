@@ -32,8 +32,9 @@ public class BlueLeftAuto2_6 extends AutoBase {
     public static Waypoint intermediate = new Waypoint(new Pose(30,  7, Math.toRadians(180)), 20);
     public static Waypoint intermediateAfterPreload = new Waypoint(new Pose(43,  6, Math.toRadians(180)), 20);
     public static Waypoint pastTruss = new Waypoint(new Pose(-36, 7, Math.toRadians(180)), 20);
-    public static Waypoint stack = new Waypoint(new Pose(-54, 9, Math.toRadians(180)), 15);
-    public static Waypoint secondStack = new Waypoint(new Pose(-59, 15, Math.toRadians(150)), 15);
+    public static Waypoint pastTrussSecond = new Waypoint(new Pose(-50, 7, Math.toRadians(180)), 20);
+    public static Waypoint stack = new Waypoint(new Pose(-57, 9, Math.toRadians(180)), 15);
+    public static Waypoint secondStack = new Waypoint(new Pose(-60, 13, Math.toRadians(150)), 15);
     public static Waypoint scoring = new Waypoint(new Pose(54, 20, Math.toRadians(200)), 15);
     public static Waypoint park = new Waypoint(new Pose(46, 20, Math.toRadians(180)), 15);
 
@@ -114,7 +115,7 @@ public class BlueLeftAuto2_6 extends AutoBase {
                 new PurePursuitCommand(drive, new PurePursuitPath(
                         first ? backdrop[SPIKE] : scoring,
                         first ? intermediateAfterPreload : intermediate,
-                        pastTruss,
+                        nextStack ? pastTrussSecond : pastTruss,
                         nextStack ? secondStack : stack
                 )),
                 new SequentialAction(
@@ -150,7 +151,7 @@ public class BlueLeftAuto2_6 extends AutoBase {
         sched.addAction(new ParallelAction(
                 new PurePursuitCommand(drive, new PurePursuitPath(
                         second ? secondStack : stack,
-                        pastTruss,
+                        second ? pastTrussSecond : pastTruss,
                         intermediate,
                         scoring
                 )),
