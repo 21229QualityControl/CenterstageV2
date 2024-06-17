@@ -35,7 +35,7 @@ public class BlueLeftAuto2_6 extends AutoBase {
     public static Waypoint pastTrussSecond = new Waypoint(new Pose(-50, 7, Math.toRadians(180)), 20);
     public static Waypoint stack = new Waypoint(new Pose(-57, 9, Math.toRadians(180)), 15);
     public static Waypoint secondStack = new Waypoint(new Pose(-60, 13, Math.toRadians(150)), 15);
-    public static Waypoint scoring = new Waypoint(new Pose(54, 20, Math.toRadians(200)), 15);
+    public static Waypoint scoring = new Waypoint(new Pose(54, 25, Math.toRadians(200)), 15);
     public static Waypoint park = new Waypoint(new Pose(46, 20, Math.toRadians(180)), 15);
 
     @Override

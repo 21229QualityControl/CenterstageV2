@@ -26,11 +26,12 @@ public class RedLeftAuto2_5_Wall extends AutoBase {
     };
     public static Waypoint spikeBackedOut = new Waypoint(new Pose(-48, -50, Math.toRadians(-90)), 15);
     public static Waypoint[] vision = {
+            new Waypoint(new Pose(42, -42, Math.toRadians(-180)), 15),
             new Waypoint(new Pose(42, -36, Math.toRadians(-180)), 15),
-            new Waypoint(new Pose(42, -30, Math.toRadians(-180)), 15),
-            new Waypoint(new Pose(42, -22.5, Math.toRadians(-180)), 15)
+            new Waypoint(new Pose(42, -28.5, Math.toRadians(-180)), 15)
     };
     public static Waypoint intermediate = new Waypoint( new Pose(-39, -60.5, Math.toRadians(-180)), 20);
+    public static Waypoint intermediateCycle = new Waypoint( new Pose(-50, -63, Math.toRadians(-180)), 20);
     public static Waypoint postStack = new Waypoint( new Pose(-58, -59, Math.toRadians(-180)), 20);
     public static Waypoint intermediateAfterPreload = new Waypoint( new Pose(-40, -61, Math.toRadians(-180)), 15);
     public static Waypoint pastTruss = new Waypoint(new Pose(30, -57, Math.toRadians(-180)), 20);
@@ -41,9 +42,9 @@ public class RedLeftAuto2_5_Wall extends AutoBase {
     public static Waypoint scoring = new Waypoint(new Pose(53, -43, Math.toRadians(-160)), 15);
     private Waypoint backdrop(int pos, double off) {
         Waypoint[] backdrop = {
+                new Waypoint(new Pose(54, -42 + off, Math.toRadians(-180)), 15),
                 new Waypoint(new Pose(54, -36 + off, Math.toRadians(-180)), 15),
-                new Waypoint(new Pose(54, -30 + off, Math.toRadians(-180)), 15),
-                new Waypoint(new Pose(54, -22.5 + off, Math.toRadians(-180)), 15)
+                new Waypoint(new Pose(54, -28.5 + off, Math.toRadians(-180)), 15)
         };
         return backdrop[pos];
     }
@@ -93,7 +94,7 @@ public class RedLeftAuto2_5_Wall extends AutoBase {
         sched.run();
 
         // Intake stack
-        if (SPIKE == 0) {
+        if (SPIKE == 2) {
             sched.addAction(new PurePursuitCommand(drive, new PurePursuitPath(
                     spike[SPIKE],
                     spikeBackedOut
@@ -222,7 +223,7 @@ public class RedLeftAuto2_5_Wall extends AutoBase {
                 new PurePursuitCommand(drive, new PurePursuitPath(
                         first ? stack : stackLast,
                         postStack,
-                        intermediate,
+                        intermediateCycle,
                         pastTruss,
                         scoring
                 )),

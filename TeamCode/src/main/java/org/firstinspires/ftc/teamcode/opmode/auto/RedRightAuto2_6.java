@@ -152,12 +152,12 @@ public class RedRightAuto2_6 extends AutoBase {
                         scoring
                 )),
                 new SequentialAction(
-                        new WaitPositionCommand(drive, -36, true, true), // pastTruss
+                        new WaitPositionCommand(drive, -40, true, true), // pastTruss
                         new SequentialAction(
                                 intake.pixelCount() == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
                                 intake.intakeOff()
                         ),
-                        new WaitPositionCommand(drive, 21, true, true), // intermediate
+                        new WaitPositionCommand(drive, 7, true, true), // intermediate
                         new SequentialAction(
                                 second ? outtake.extendOuttakeCycleHighBlocking() : outtake.extendOuttakeCycleBlocking(),
                                 outtake.armScoring(),
