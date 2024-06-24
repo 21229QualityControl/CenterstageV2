@@ -36,7 +36,7 @@ public class Outtake {
    public static double ARM_LEFT_STORED = 0.5;
    public static double ARM_LEFT_SCORING = 0.77;
    public static double ARM_RIGHT_STORED = 0.68;
-   public static double ARM_RIGHT_SCORING = 0.42;
+   public static double ARM_RIGHT_SCORING = 0.41;
 
    public static double WRIST_VERTICAL = 0.43;
    public static double WRIST_VERTICAL_FLIPPED = 0.98;
@@ -83,21 +83,21 @@ public class Outtake {
       this.mosaic.setPosition(MOSAIC_STORED);
       if (!Memory.FINISHED_AUTO && teleop) {
          this.slide.setTargetPosition(OUTTAKE_PARTNER);
-         this.armLeft.setPosition(ARM_LEFT_SCORING);
-//         this.armRight.setPosition(ARM_RIGHT_SCORING);
+//         this.armLeft.setPosition(ARM_LEFT_SCORING);
+         this.armRight.setPosition(ARM_RIGHT_SCORING);
          this.claw.setPosition(CLAW_OPEN);
          Memory.FINISHED_AUTO = true;
       } else {
          this.slide.setTargetPosition(0);
-         this.armLeft.setPosition(ARM_LEFT_STORED);
-//         this.armRight.setPosition(ARM_RIGHT_STORED);
+//         this.armLeft.setPosition(ARM_LEFT_STORED);
+         this.armRight.setPosition(ARM_RIGHT_STORED);
       }
    }
 
    public void prepInitializeSlides() {
       this.wrist.setPosition(WRIST_VERTICAL);
-      this.armLeft.setPosition(ARM_LEFT_STORED);
-      //this.armRight.setPosition(ARM_RIGHT_STORED);
+//      this.armLeft.setPosition(ARM_LEFT_STORED);
+      this.armRight.setPosition(ARM_RIGHT_STORED);
       this.slide.setPower(-0.6);
    }
 
@@ -233,19 +233,19 @@ public class Outtake {
 
    public Action armStored() {
       return new ParallelAction(
-              new ActionUtil.ServoPositionAction(armLeft, ARM_LEFT_STORED)
-//              new ActionUtil.ServoPositionAction(armRight, ARM_RIGHT_STORED)
+//              new ActionUtil.ServoPositionAction(armLeft, ARM_LEFT_STORED)
+              new ActionUtil.ServoPositionAction(armRight, ARM_RIGHT_STORED)
       );
    }
 
    public Action armScoring() {
       return new ParallelAction(
-              new ActionUtil.ServoPositionAction(armLeft, ARM_LEFT_SCORING)
-//              new ActionUtil.ServoPositionAction(armRight, ARM_RIGHT_SCORING)
+//              new ActionUtil.ServoPositionAction(armLeft, ARM_LEFT_SCORING)
+              new ActionUtil.ServoPositionAction(armRight, ARM_RIGHT_SCORING)
       );
    }
    public boolean isArmScoring() {
-      return Math.abs(armLeft.getPosition() - ARM_LEFT_SCORING) < EPSILON;
+      return Math.abs(armRight.getPosition() - ARM_RIGHT_SCORING) < EPSILON;
    }
 
    public Action mosaicFix() {
