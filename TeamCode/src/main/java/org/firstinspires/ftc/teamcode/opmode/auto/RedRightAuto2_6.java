@@ -16,20 +16,23 @@ public class RedRightAuto2_6 extends AutoBase {
     public static Waypoint start = new Waypoint(new Pose(12, -63, Math.toRadians(90)), 15);
     public static Waypoint[] spike = {
             new Waypoint(new Pose(34, -33, Math.toRadians(-180)), 15),
-            new Waypoint(new Pose(28, -23, Math.toRadians(-180)), 15),
-            new Waypoint(new Pose(9, -34, Math.toRadians(135)), 15)
+            new Waypoint(new Pose(29, -23, Math.toRadians(-180)), 15),
+            new Waypoint(new Pose(8, -34, Math.toRadians(135)), 15)
     };
     public static Waypoint[] backdrop = {
-            new Waypoint(new Pose(54, -28, Math.toRadians(180)), 15),
-            new Waypoint(new Pose(54, -34.5, Math.toRadians(180)), 15),
-            new Waypoint(new Pose(54, -43, Math.toRadians(180)), 15)
+            new Waypoint(new Pose(54, -42.5, Math.toRadians(180)), 15),
+            new Waypoint(new Pose(54, -36.5, Math.toRadians(180)), 15),
+            new Waypoint(new Pose(54, -29, Math.toRadians(180)), 15)
     };
-    public static Waypoint intermediate = new Waypoint(new Pose(30,  -7, Math.toRadians(-180)), 20);
-    public static Waypoint pastTruss = new Waypoint(new Pose(-36, -7, Math.toRadians(-180)), 20);
-    public static Waypoint stack = new Waypoint(new Pose(-55.5, -13, Math.toRadians(-180)), 15);
-    public static Waypoint secondStack = new Waypoint(new Pose(-59, -21, Math.toRadians(-150)), 15);
-    public static Waypoint scoring = new Waypoint(new Pose(54.5, -22, Math.toRadians(-200)), 15);
-    public static Waypoint park = new Waypoint(new Pose(44, -20, Math.toRadians(-180)), 15);
+    public static Waypoint intermediate = new Waypoint(new Pose(30,  -8, Math.toRadians(-180)), 20);
+    public static Waypoint intermediateAfterPreload = new Waypoint(new Pose(43,  -7, Math.toRadians(-180)), 20);
+    public static Waypoint pastTruss = new Waypoint(new Pose(-36, -8, Math.toRadians(-180)), 20);
+    public static Waypoint pastTrussSecond = new Waypoint(new Pose(-50, -8, Math.toRadians(-180)), 20);
+    public static Waypoint stack = new Waypoint(new Pose(-57.5, -13, Math.toRadians(-180)), 15);
+    public static Waypoint stackSpike2 = new Waypoint(new Pose(-59, -13, Math.toRadians(-180)), 15);
+    public static Waypoint secondStack = new Waypoint(new Pose(-58, -19, Math.toRadians(-150)), 15);
+    public static Waypoint scoring = new Waypoint(new Pose(54, -28, Math.toRadians(-200)), 15);
+    public static Waypoint park = new Waypoint(new Pose(46, -24, Math.toRadians(-180)), 15);
 
     @Override
     protected Pose2d getStartPose() {
@@ -75,7 +78,7 @@ public class RedRightAuto2_6 extends AutoBase {
         sched.addAction(outtake.extendOuttakeBarelyOut());
         sched.addAction(intake.wristPreload());
         sched.addAction(
-                SPIKE != 2 ? new PurePursuitCommand(drive, new PurePursuitPath(
+                SPIKE != 0 ? new PurePursuitCommand(drive, new PurePursuitPath(
                         start,
                         new Waypoint(new Pose(28, -45, ((Pose)spike[SPIKE].getPoint()).heading), 20),
                         spike[SPIKE]
@@ -107,9 +110,9 @@ public class RedRightAuto2_6 extends AutoBase {
         sched.addAction(new ParallelAction(
                 new PurePursuitCommand(drive, new PurePursuitPath(
                         first ? backdrop[SPIKE] : scoring,
-                        intermediate,
-                        pastTruss,
-                        nextStack ? secondStack : stack
+                        first ? intermediateAfterPreload : intermediate,
+                        nextStack ? pastTrussSecond : pastTruss,
+                        nextStack ? secondStack : (SPIKE == 2 ? stackSpike2 : stack)
                 )),
                 new SequentialAction(
                         new WaitPositionCommand(drive, 48, false, true), // Away from backdrop
@@ -144,17 +147,17 @@ public class RedRightAuto2_6 extends AutoBase {
         sched.addAction(new ParallelAction(
                 new PurePursuitCommand(drive, new PurePursuitPath(
                         second ? secondStack : stack,
-                        pastTruss,
+                        second ? pastTrussSecond : pastTruss,
                         intermediate,
                         scoring
                 )),
                 new SequentialAction(
-                        new WaitPositionCommand(drive, -36, true, true), // pastTruss
+                        new WaitPositionCommand(drive, -40, true, true), // pastTruss
                         new SequentialAction(
                                 intake.pixelCount() == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
                                 intake.intakeOff()
                         ),
-                        new WaitPositionCommand(drive, 21, true, true), // intermediate
+                        new WaitPositionCommand(drive, 7, true, true), // intermediate
                         new SequentialAction(
                                 second ? outtake.extendOuttakeCycleHighBlocking() : outtake.extendOuttakeCycleBlocking(),
                                 outtake.armScoring(),

@@ -37,9 +37,9 @@ public class BlueRightAuto2_5_Wall extends AutoBase {
     public static Waypoint pastTruss = new Waypoint(new Pose(30, 60.5, Math.toRadians(180)), 20);
     public static Waypoint stackAfterPreload = new Waypoint(new Pose(-61, 44, Math.toRadians(210)), 15);
     public static Waypoint stack = new Waypoint(new Pose(-59, 37, Math.toRadians(205)), 15);
-    public static Waypoint stackLast = new Waypoint(new Pose(-59, 33, Math.toRadians(205)), 15);
+    public static Waypoint stackLast = new Waypoint(new Pose(-59, 35, Math.toRadians(205)), 15);
     public static Waypoint park = new Waypoint(new Pose(44, 46, Math.toRadians(180)), 15);
-    public static Waypoint scoring = new Waypoint(new Pose(54, 43, Math.toRadians(160)), 15);
+    public static Waypoint scoring = new Waypoint(new Pose(54.5, 43, Math.toRadians(160)), 15);
     private Waypoint backdrop(int pos, double off) {
         Waypoint[] backdrop = {
                 new Waypoint(new Pose(54, 28 + off, Math.toRadians(180)), 15),
@@ -66,8 +66,10 @@ public class BlueRightAuto2_5_Wall extends AutoBase {
         intakeStack(true);
         cycle(true);
 
-        intakeStack(false);
-        cycle(false);
+        if (getRuntime() < 24) {
+            intakeStack(false);
+            cycle(false);
+        }
 
         park();
     }
