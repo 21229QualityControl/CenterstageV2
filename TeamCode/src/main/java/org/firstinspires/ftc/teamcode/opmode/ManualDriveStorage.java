@@ -29,7 +29,7 @@ import org.firstinspires.ftc.teamcode.util.control.PIDFController;
 
 @Config
 @TeleOp(group = "Drive")
-public class ManualDrive extends LinearOpMode {
+public class ManualDriveStorage extends LinearOpMode {
    public static double TURN_SPEED = 0.75;
    public static double DRIVE_SPEED = 1;
    public static double SLOW_TURN_SPEED = 0.3;
@@ -239,15 +239,15 @@ public class ManualDrive extends LinearOpMode {
             sched.queueAction(intake.wristDown());
          }
       }
-//      if (g1.bOnce()) {
-//         sched.cancelParallel();
-//         if (intake.isReversing()) {
-//            sched.queueAction(intake.intakeOff());
-//            sched.queueAction(intake.wristStored());
-//         } else {
-//            sched.queueAction(intake.intakeReverse());
-//         }
-//      }
+      if (g1.bOnce()) {
+         sched.cancelParallel();
+         if (intake.isReversing()) {
+            sched.queueAction(intake.intakeOff());
+            sched.queueAction(intake.wristStored());
+         } else {
+            sched.queueAction(intake.intakeReverse());
+         }
+      }
       if (g1.xOnce()) {
          sched.queueAction(new SequentialAction(
                  intake.feedOpen(),
@@ -255,12 +255,11 @@ public class ManualDrive extends LinearOpMode {
                  intake.feedClosed()
          ));
       }
-      /*
       if (g1.yOnce()) {
          sched.queueAction(intake.intakeOn());
          sched.queueAction(intake.wristStack(1));
       }
-      */
+
       // Other susbsystems
       if (g1.backOnce()) {
          sched.queueAction(plane.scorePlane());
@@ -288,7 +287,7 @@ public class ManualDrive extends LinearOpMode {
 
    private void outtakeControls() {
       // Outtake controls
-      if (g1.yOnce()) {
+      if (g2.yOnce()) {
          boolean one = false;
          if (!outtake.isArmScoring()) {
             if (intake.pixelCount() == 1) {
@@ -299,7 +298,7 @@ public class ManualDrive extends LinearOpMode {
             sched.queueAction(new SequentialAction(
                     intake.pixelCount() == 1 ? outtake.clawSingleClosed() : outtake.clawClosed(),
                     new SleepAction(0.3)
-            ));
+           ));
             sched.queueAction(new ParallelAction(
                     new SequentialAction(new SleepAction(0.4), outtake.armScoring()),
                     outtake.extendOuttakeTeleopBlocking()
@@ -307,7 +306,6 @@ public class ManualDrive extends LinearOpMode {
          }
          sched.queueAction(one ? outtake.wristVerticalFlip() : outtake.wristVertical());
       }
-      /*
       if (g2.xOnce()) {
          if (!outtake.isArmScoring()) {
             if (intake.pixelCount() == 1) {
@@ -330,7 +328,7 @@ public class ManualDrive extends LinearOpMode {
          } else {
             sched.queueAction(outtake.wristMosaic(true));
          }
-      }*/
+      }
 
       if (g2.leftBumperOnce()) {
          if (outtake.isWristVertical()) {
@@ -372,7 +370,7 @@ public class ManualDrive extends LinearOpMode {
          outtake.slidePIDEnabled = true;
          sched.queueAction(outtake.lockPosition());
       }
-      if (g1.bOnce()) {
+      if (g2.aOnce()) {
          sched.queueAction(new SequentialAction(
                  outtake.mosaicStored(),
                  outtake.clawHalfOpen(),
