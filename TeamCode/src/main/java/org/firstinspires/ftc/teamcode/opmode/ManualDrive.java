@@ -30,8 +30,8 @@ import org.firstinspires.ftc.teamcode.util.control.PIDFController;
 @Config
 @TeleOp(group = "Drive")
 public class ManualDrive extends LinearOpMode {
-   public static double TURN_SPEED = 0.75;
-   public static double DRIVE_SPEED = 1;
+   public static double TURN_SPEED = 0.5;
+   public static double DRIVE_SPEED = 0.5;
    public static double SLOW_TURN_SPEED = 0.3;
    public static double D2_SLOW_TURN = 0.25;
    public static double SLOW_DRIVE_SPEED = 0.3;
@@ -378,6 +378,7 @@ public class ManualDrive extends LinearOpMode {
                  outtake.wristVertical(),
                  outtake.armStored(),
                  outtake.clawOpen(),
+                 new SleepAction(1.0),
                  outtake.retractOuttakeBlocking()
          ));
       }

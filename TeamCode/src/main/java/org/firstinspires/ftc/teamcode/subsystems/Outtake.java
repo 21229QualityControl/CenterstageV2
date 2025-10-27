@@ -35,8 +35,8 @@ public class Outtake {
 
    public static double ARM_LEFT_STORED = 0.5;
    public static double ARM_LEFT_SCORING = 0.77;
-   public static double ARM_RIGHT_STORED = 0.68;
-   public static double ARM_RIGHT_SCORING = 0.41;
+   public static double ARM_RIGHT_STORED = 0.72;
+   public static double ARM_RIGHT_SCORING = 1.0;
 
    public static double WRIST_VERTICAL = 0.43;
    public static double WRIST_VERTICAL_FLIPPED = 0.98;

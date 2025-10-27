@@ -17,7 +17,7 @@ public class LocalizationTest extends LinearOpMode {
     public static double POWER_X = 0;
     public static double POWER_Y = 0;
     public static double POWER_TURN = 0;
-    public static boolean USE_DASHBOARD = false;
+    public static boolean USE_DASHBOARD = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
